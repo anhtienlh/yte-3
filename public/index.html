@@ -1,0 +1,204 @@
+﻿<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<body>
+
+    <head>
+        <!-- removed -->
+        <!-- <script type="text/javascript" href="https://code.jquery.com/jquery-3.3.1.js"></script> -->
+        <!-- <script type="text/javascript" charset="utf8"
+    src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script> -->
+
+        <!-- Jquery -->
+        <script src="assets/js/jquery-3.4.1.min.js"></script>
+
+        <!-- Datatable -->
+        <link rel="stylesheet" href="assets/css/fixedHeader.dataTables.min.css">
+        <link rel="stylesheet" type="text/css" href="assets/css/jquery.dataTables.css">
+        <script type="text/javascript" src="assets/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="assets/js/dataTables.fixedHeader.min.js"></script>
+
+        <!-- Bootstrap 4 -->
+        <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+        <script src="assets/js/popper.min.js"></script>
+        <script src="assets/js/bootstrap.min.js"></script>
+
+        <link rel="stylesheet" href="assets/style.css">
+    </head>
+
+
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Phan tich data</a>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row" style="margin: 20px 0;">
+            <div class="card col-12">
+                <div class="card-header row">
+                    <h5>Import Excel Data</h5>
+                </div>
+                <div class="card-body row">
+                    <div class="col-2"></div>
+                    <div class="col-4">
+                        <div class="custom-file mb-3">
+                            <input type="file" class="custom-file-input" id="fileUpload" name="filename">
+                            <label class="custom-file-label" for="fileUpload">Choose file</label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-primary" onclick="Upload()">Upload</button>
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row" style="margin: 20px 0;">
+            <div class="card col-12">
+                <div class="card-header row">
+                    <h5>Filter Conditions</h5>
+                </div>
+                <div class="card-body row">
+                    <div class="col-xl-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="row" style="display: inline-flex; width: 100%;">
+                                    <div class="col-6">
+                                        <h6>User table</h6>
+                                    </div>
+                                    <div class="col-6" style="text-align: right;">
+                                        <button type="button" class="btn btn-outline-primary"
+                                            onclick="clearDataFilter('tblUserData')">Clear</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="card-body">
+                                <table id="tblUserData" style="width: 100%;">
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="row" style="display: inline-flex; width: 100%;">
+                                    <div class="col-6">
+                                        <h6>Answer table</h6>
+                                    </div>
+                                    <div class="col-6" style="text-align: right;">
+                                        <button type="button" class="btn btn-outline-primary"
+                                            onclick="clearDataFilter('tblAnswerData')">Clear</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="card-body">
+                                <table id="tblAnswerData" style="width: 100%;">
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row" style="text-align: center;">
+            <div id="dropdownTag" style=" margin: 15px 0;" class="col-4">
+                <div class="form-row align-items-center" style="float: right;">
+                    <div class="col-auto my-1">
+                        <select class="custom-select mr-sm-2" id="tagSelect">
+                            <option selected>Tag Config</option>
+                            <option value="1">Fill Data</option>
+                            <option value="2">Default</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="dropdownRate" style=" margin: 15px 0;" class="col-4">
+                <div class="form-row align-items-center" style="float: right;">
+                    <div class="col-auto my-1">
+                        <select class="custom-select mr-sm-2" id="rateSelect">
+                            <option selected>Rating Config</option>
+                            <option value="1">Rating (2->1)</option>
+                            <option value="2">Default</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="margin: 20px 0;">
+            <div id="btnFilter" class="col-6" style="text-align: right; margin: 20px 0; visibility: hidden;">
+                <button type="button" class="btn btn-outline-primary" onclick="getResult()">Filter Data</button>
+            </div>
+
+        </div>
+
+        <div class="row" style="margin: 20px 0;">
+            <div class="card col-12">
+                <div class="card-header row">
+                    <h5><a id="resultFilter"> Result Filter</a></h5>
+                </div>
+                <div class="card-body row">
+                    <div class="col-xl-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6>Row data table</h6>
+                            </div>
+                            <div class="card-body">
+                                <table id="tblRowData" style="width: 100%;"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="text-align: center;">
+            <div id="dropdownOption" style=" margin: 15px 0; visibility: hidden;" class="col-4">
+                <div class="form-row align-items-center" style="float: right;">
+                    <div class="col-auto my-1">
+                        <select class="selectpicker" id="inlineFormCustomSelect" multiple title="Choose export filter">
+                            <option value="1">Normal</option>
+                            <option value="2">Abnormal</option>
+                            <option value="3">Symmetric</option>
+                            <option value="4">Asymmetric</option>
+                            <option value="5">Recall</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4" style=" margin: 20px 0; visibility: hidden;">
+                <button id="btnApply" type="button" class="btn btn-outline-primary" onclick="getResult()">Apply</button>
+            </div>
+            <div class="col-4" style=" margin: 20px 0; visibility: hidden;">
+                <button id="btnExport" type="button" class="btn btn-outline-primary" style="float: left;"
+                    onclick="exportExcel()">Export</button>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal1">
+        <!-- Place at bottom of page -->
+    </div>
+</body>
+
+<script type="text/javascript" src="assets/js/xlsx.full.min.js"></script>
+<script type="text/javascript" src="assets/js/jszip.js"></script>
+<script type="text/javascript" src="assets/js/xlsx-populate.min.js"></script>
+<script type="text/javascript" src="assets/js/main.js"> </script>
+
+<link rel="stylesheet" href="assets/css/bootstrap-select.min.css">
+<script src="assets/js/bootstrap-select.js"></script>
+
+</html>
