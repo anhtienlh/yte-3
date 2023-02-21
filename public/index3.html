@@ -66,8 +66,7 @@
                                         <h6>User table</h6>
                                     </div>
                                     <div class="col-6" style="text-align: right;">
-                                        <button type="button" class="btn btn-outline-primary"
-                                            onclick="clearDataFilter('tblUserData')">Clear</button>
+                                        <button type="button" class="btn btn-outline-primary" onclick="clearDataFilter('tblUserData')">Clear</button>
                                     </div>
                                 </div>
 
@@ -87,8 +86,7 @@
                                         <h6>Answer table</h6>
                                     </div>
                                     <div class="col-6" style="text-align: right;">
-                                        <button type="button" class="btn btn-outline-primary"
-                                            onclick="clearDataFilter('tblAnswerData')">Clear</button>
+                                        <button type="button" class="btn btn-outline-primary" onclick="clearDataFilter('tblAnswerData')">Clear</button>
                                     </div>
                                 </div>
 
@@ -129,11 +127,10 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="row" style="margin: 20px 0;">
             <div id="btnFilter" class="col-6" style="text-align: right; margin: 20px 0; visibility: hidden;">
-                <button type="button" class="btn btn-outline-primary" data-toggle="modal"
-                    data-target="#exampleModalCenter">Filter Data</button>
+                <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#exampleModalCenter">Filter Data</button>
             </div>
 
 
@@ -163,12 +160,11 @@
             <div id="dropdownOption" style=" margin: 15px 0; visibility: hidden;" class="col-4">
                 <div class="form-row align-items-center" style="float: right;">
                     <div class="col-auto my-1">
-                        <select class="custom-select mr-sm-2" id="inlineFormCustomSelect">
-                            <option selected>Choose export filter</option>
+                        <select class="selectpicker" id="inlineFormCustomSelect" multiple title="Choose export filter">
                             <option value="1">Normal</option>
-                            <option value="2">Abnormal</option>
+                            <option value="2">AbNormal</option>
                             <option value="3">Symmetric</option>
-                            <option value="4">Asymmetric</option>
+                            <option value="4">NonSymmetric</option>
                             <option value="5">Recall</option>
                         </select>
                     </div>
@@ -178,8 +174,7 @@
                 <button id="btnApply" type="button" class="btn btn-outline-primary" onclick="getResult()">Apply</button>
             </div>
             <div class="col-4" style=" margin: 20px 0; visibility: hidden;">
-                <button id="btnExport" type="button" class="btn btn-outline-primary" style="float: left;"
-                    onclick="exportExcel()">Export</button>
+                <button id="btnExport" type="button" class="btn btn-outline-primary" style="float: left;" onclick="exportExcel()">Export</button>
             </div>
         </div>
 
@@ -191,8 +186,7 @@
 
 
     <!-- Modal -->
-    <div class="modal fade bd-example-modal-lg" id="exampleModalCenter" tabindex="-1" role="dialog"
-        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade bd-example-modal-lg" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -257,12 +251,10 @@
                         </div>
                         <div class="row card-body">
                             <div class="col-3">
-                                <input type="number" id="txtCaseCorrectMin" class="form-control"
-                                    placeholder="Correct Min" />
+                                <input type="number" id="txtCaseCorrectMin" class="form-control" placeholder="Correct Min" />
                             </div>
                             <div class="col-3">
-                                <input type="number" id="txtCaseCorrectMax" class="form-control"
-                                    placeholder="Correct Max" />
+                                <input type="number" id="txtCaseCorrectMax" class="form-control" placeholder="Correct Max" />
                             </div>
                             <div class="col-3">
                                 <select class="custom-select mr-sm-2" id="selectTrue">
@@ -283,13 +275,11 @@
                         </div>
                         <div class="row card-body">
                             <div class="col-3">
-                                <input type="number" id="txtCaseInCorrectMin" class="form-control"
-                                    placeholder="InCorrect Min" />
+                                <input type="number" id="txtCaseInCorrectMin" class="form-control" placeholder="InCorrect Min" />
 
                             </div>
                             <div class="col-3">
-                                <input type="number" id="txtCaseInCorrectMax" class="form-control"
-                                    placeholder="InCorrect Max" />
+                                <input type="number" id="txtCaseInCorrectMax" class="form-control" placeholder="InCorrect Max" />
                             </div>
                             <div class="col-3">
                                 <select class="custom-select mr-sm-2" id="selectFalse">
@@ -336,9 +326,10 @@
 <script type="text/javascript" src="assets/js/xlsx.full.min.js"></script>
 <script type="text/javascript" src="assets/js/jszip.js"></script>
 <script type="text/javascript" src="assets/js/xlsx-populate.min.js"></script>
-<script type="text/javascript" src="assets/js/main3.js"> </script>
+<script type="text/javascript" src="assets/js/main3.js">
+</script>
 
-<link rel="stylesheet" href="assets/css/bootstrap-select.css">
+<link rel="stylesheet" href="assets/css/bootstrap-select.min.css">
 <script src="assets/js/bootstrap-select.js"></script>
 
 </html>

@@ -56,7 +56,8 @@ let header = [];
 
 const headerVairable = ["test_id", "user_id", "session_no", "case_id", "rating", "selectX", "selectY",
     "truthX", "truthY", "lesionID", "frame", "slice", "distance", "timedate",
-    "Case density (user)", "Lesion type(User)"];
+    "Case density (user)", "Lesion type(User)"
+];
 
 
 let headerUser = [];
@@ -71,7 +72,8 @@ let selectW;
 let selectTrue;
 let selectFalse;
 let selectScore;
-let dropdownValue;
+let dropdownArrayValue = [];
+let dropdownObject = [];
 let tagConfig;
 let rateConfig;
 
@@ -90,76 +92,83 @@ let userC = 0;
 let answerC = 0;
 
 
-$("#inlineFormCustomSelect").change(function () {
-    dropdownValue = $(this).children("option:selected").val();
+$("#inlineFormCustomSelect").change(function() {
+    dropdownArrayValue = $(this).selectpicker("val");
+    dropdownObject = {};
+    for (var i = 0; i < dropdownArrayValue.length; i++) {
+        var val = dropdownArrayValue[i];
+        var txt = $("#inlineFormCustomSelect option[value='" + val + "']").text();
+
+        dropdownObject[val] = txt;
+    }
 });
 
-$("#tagSelect").change(function () {
+$("#tagSelect").change(function() {
     tagConfig = $(this).children("option:selected").val();
 });
 
-$("#rateSelect").change(function () {
+$("#rateSelect").change(function() {
     rateConfig = $(this).children("option:selected").val();
 });
 
-$("#selectW").change(function () {
+$("#selectW").change(function() {
     selectW = $(this).children("option:selected").val();
 });
 
-$("#selectTrue").change(function () {
+$("#selectTrue").change(function() {
     selectTrue = $(this).children("option:selected").val();
 });
 
-$("#selectFalse").change(function () {
+$("#selectFalse").change(function() {
     selectFalse = $(this).children("option:selected").val();
 });
 
-$("#selectScore").change(function () {
+$("#selectScore").change(function() {
     selectScore = $(this).children("option:selected").val();
 });
 
-$(".custom-file-input").on("change", function () {
+$(".custom-file-input").on("change", function() {
     var fileName = $(this).val().split("\\").pop();
     $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
 });
 
-$("#txtScoreMin").change(function () {
+$("#txtScoreMin").change(function() {
     setFrom = $(this).val();
 });
 
-$("#txtScoreMax").change(function () {
+$("#txtScoreMax").change(function() {
     setTo = $(this).val();
 });
 
-$("#txtScoreLimit").change(function () {
+$("#txtScoreLimit").change(function() {
     scoreLimit = $(this).val();
 });
 
-$("#txtTrueLimit").change(function () {
+$("#txtTrueLimit").change(function() {
     trueLimit = $(this).val();
 });
 
-$("#txtFalseLimit").change(function () {
+$("#txtFalseLimit").change(function() {
     falseLimit = $(this).val();
 });
 
-$("#txtMvalue").change(function () {
+$("#txtMvalue").change(function() {
     valueM = $(this).val();
 });
 
-$("#txtCaseCorrectMin").change(function () {
+$("#txtCaseCorrectMin").change(function() {
     caseCorrectMin = $(this).val();
 });
 
-$("#txtCaseCorrectMax").change(function () {
+$("#txtCaseCorrectMax").change(function() {
     caseCorrectMax = $(this).val();
 });
 
-$("#txtCaseInCorrectMin").change(function () {
+$("#txtCaseInCorrectMin").change(function() {
     caseInCorrectMin = $(this).val();
 });
 
-$("#txtCaseInCorrectMax").change(function () {
+$("#txtCaseInCorrectMax").change(function() {
     caseInCorrectMax = $(this).val();
 });
 
@@ -181,7 +190,8 @@ $("#btnApply").css("visibility", "visible");
 
 function getResult() {
     let check = validateFormFilterOptions(['txtScoreMin', 'txtScoreMax', 'txtScoreLimit', 'txtCaseCorrectMin',
-        'txtCaseCorrectMax', 'txtCaseInCorrectMin', 'txtCaseInCorrectMax', 'txtTrueLimit', 'txtFalseLimit', 'txtMvalue']);
+        'txtCaseCorrectMax', 'txtCaseInCorrectMin', 'txtCaseInCorrectMax', 'txtTrueLimit', 'txtFalseLimit', 'txtMvalue'
+    ]);
     if (!check || !selectTrue || !selectFalse) {
         window.alert('Please fill all filter conditions');
         return;
@@ -231,7 +241,7 @@ function getResult() {
     if (isInitTableRowData) {
         tmp2 = convertLstObjectToArray(resultAfterFilterAnwerFilter);
         tableRowData.clear().
-            rows.add(tmp2)
+        rows.add(tmp2)
             .draw();
     } else {
         initRawDataTable(resultAfterFilterAnwerFilter);
@@ -340,7 +350,7 @@ function initRawDataTable(excelRowsRawData) {
             { title: '<div style="display: flex;" class="checkbox"><input type="checkbox" id="cbLessionType"  onclick="onClick(event, \'cbLessionType\')"  />' + header[15] + '<img src="http://www.icone-png.com/png/39/38556.png" class="filterIcon" onclick="showFilter(event,\'' + 'tblRowData' + '_' + 15 + '\')" /></div>' }
 
         ],
-        initComplete: function () {
+        initComplete: function() {
             configFilter(this.api().columns(), 'tblRowData', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], [13, 7, 8, 5, 6]);
         }
 
@@ -348,6 +358,7 @@ function initRawDataTable(excelRowsRawData) {
 }
 
 let tblUser;
+
 function initTableUser(excelUserData) {
     let searchPos = [];
     isInitTableUserData = true;
@@ -373,7 +384,7 @@ function initTableUser(excelUserData) {
             { title: '<div style="display: flex;">' + headerUser[7] + '<img src="http://www.icone-png.com/png/39/38556.png" class="filterIcon" onclick="showFilter(event,\'' + 'tblUserData' + '_' + 7 + '\')" /></div>' },
 
         ],
-        initComplete: function () {
+        initComplete: function() {
             tblUser = this;
             configFilter(this.api().columns(), 'tblUserData', [0, 1, 2, 3, 4, 5, 6, 7], [3]);
         }
@@ -382,6 +393,7 @@ function initTableUser(excelUserData) {
 }
 
 let tblAnswer;
+
 function initTableAnswer(excelAnswerData) {
     isInitTableAnswerData = true;
     $("#answer-table").css("visibility", "visible");
@@ -412,7 +424,7 @@ function initTableAnswer(excelAnswerData) {
             { title: '<div style="display: flex;">' + headerAnswer[14] + '<img src="http://www.icone-png.com/png/39/38556.png" class="filterIcon" onclick="showFilter(event,\'' + 'tblAnswerData' + '_' + 14 + '\')" /></div>' }
 
         ],
-        initComplete: function () {
+        initComplete: function() {
             tblAnswer = this;
             configFilter(this.api().columns(), 'tblAnswerData', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], [8, 14, 4, 5]);
         }
@@ -421,6 +433,7 @@ function initTableAnswer(excelAnswerData) {
 
 let isCaseDensity = false;
 let isLessionType = false;
+
 function onClick(event, value) {
     event.stopPropagation();
     let ele = event.target;
@@ -443,6 +456,7 @@ function onClick(event, value) {
 
 let userDateNull = false;
 let rawDataDateNull = false;
+
 function checkDateNull(event, value) {
     if (value === 'tblUserData') {
         userDateNull = true;
@@ -453,7 +467,7 @@ function checkDateNull(event, value) {
 
 
 function configFilter(columns, tableName, colArray, specCol) {
-    setTimeout(function () {
+    setTimeout(function() {
 
         var template = '<div class="modalFilter">' +
             '<div class="modal-content1">' +
@@ -463,8 +477,8 @@ function configFilter(columns, tableName, colArray, specCol) {
             '<a href="#!" onclick="performFilter(this, {1}, \'{2}\');">Ok</a>' +
             '</div>' +
             '</div>';
-        $.each(colArray, function (index, value) {
-            columns.every(function (i) {
+        $.each(colArray, function(index, value) {
+            columns.every(function(i) {
                 var columnName = $(this.header()).text().replace(/\s+/g, "_");
                 if (i === specCol[0] && value === specCol[0] && (tableName === 'tblUserData' || tableName === 'tblRowData')) {
                     let content = '';
@@ -486,171 +500,170 @@ function configFilter(columns, tableName, colArray, specCol) {
                     }
                     content = '';
                 } else
-                    if (i === specCol[0] && value === specCol[0] && tableName === 'tblAnswerData') {
-                        let content = '';
-                        let id = tableName + "_" + columnName + "_" + specCol[0];
+                if (i === specCol[0] && value === specCol[0] && tableName === 'tblAnswerData') {
+                    let content = '';
+                    let id = tableName + "_" + columnName + "_" + specCol[0];
 
-                        content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="0,20"  id="' + id + '"/><label for="' + id + '"> ' + 0 + ' - ' + 20 + '</label></div>';
-                        content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="21,40"  id="' + id + '"/><label for="' + id + '"> ' + 21 + ' - ' + 40 + '</label></div>';
-                        content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="41,60"  id="' + id + '"/><label for="' + id + '"> ' + 41 + ' - ' + 60 + '</label></div>';
-                        content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="60,150"  id="' + id + '"/><label for="' + id + '"> > ' + 61 + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="0,20"  id="' + id + '"/><label for="' + id + '"> ' + 0 + ' - ' + 20 + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="21,40"  id="' + id + '"/><label for="' + id + '"> ' + 21 + ' - ' + 40 + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="41,60"  id="' + id + '"/><label for="' + id + '"> ' + 41 + ' - ' + 60 + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="60,150"  id="' + id + '"/><label for="' + id + '"> > ' + 61 + '</label></div>';
 
-                        var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
-                        $('body').append(newTemplate);
-                        if (tableName === 'tblAnswerData') {
-                            modalFilterArray2[tableName + "_" + value] = newTemplate;
-                        } else if (tableName === 'tblUserData') {
-                            modalFilterArray1[tableName + "_" + value] = newTemplate;
-                        } else {
-                            modalFilterArray3[tableName + "_" + value] = newTemplate;
-                        }
-                        content = '';
-                    } else if (i === specCol[1] && value === specCol[1] && tableName === 'tblAnswerData') {
-                        let content = '';
-                        let id = tableName + "_" + columnName + "_" + specCol[1];
-                        for (let i = 0; i < 10; i++) {
-                            let from = i * 10;
-                            let to = from + 9;
-                            content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="' + from + ',' + to + '"  id="' + id + '"/><label for="' + id + '"> ' + from + ' - ' + to + '</label></div>';
-                        }
-                        var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
-                        $('body').append(newTemplate);
-                        if (tableName === 'tblAnswerData') {
-                            modalFilterArray2[tableName + "_" + value] = newTemplate;
-                        } else if (tableName === 'tblUserData') {
-                            modalFilterArray1[tableName + "_" + value] = newTemplate;
-                        } else {
-                            modalFilterArray3[tableName + "_" + value] = newTemplate;
-                        }
-                        content = '';
-                    } else
-                        if ((i === specCol[2] && value === specCol[2] && tableName === 'tblAnswerData') || (i === specCol[1] && value === specCol[1] && tableName === 'tblRowData') ||
-                            (i === specCol[3] && value === specCol[3] && tableName === 'tblRowData')) {
-                            let content = '';
-                            let id = tableName + "_" + columnName + "_" + specCol[0];
+                    var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
+                    $('body').append(newTemplate);
+                    if (tableName === 'tblAnswerData') {
+                        modalFilterArray2[tableName + "_" + value] = newTemplate;
+                    } else if (tableName === 'tblUserData') {
+                        modalFilterArray1[tableName + "_" + value] = newTemplate;
+                    } else {
+                        modalFilterArray3[tableName + "_" + value] = newTemplate;
+                    }
+                    content = '';
+                } else if (i === specCol[1] && value === specCol[1] && tableName === 'tblAnswerData') {
+                    let content = '';
+                    let id = tableName + "_" + columnName + "_" + specCol[1];
+                    for (let i = 0; i < 10; i++) {
+                        let from = i * 10;
+                        let to = from + 9;
+                        content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="' + from + ',' + to + '"  id="' + id + '"/><label for="' + id + '"> ' + from + ' - ' + to + '</label></div>';
+                    }
+                    var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
+                    $('body').append(newTemplate);
+                    if (tableName === 'tblAnswerData') {
+                        modalFilterArray2[tableName + "_" + value] = newTemplate;
+                    } else if (tableName === 'tblUserData') {
+                        modalFilterArray1[tableName + "_" + value] = newTemplate;
+                    } else {
+                        modalFilterArray3[tableName + "_" + value] = newTemplate;
+                    }
+                    content = '';
+                } else
+                if ((i === specCol[2] && value === specCol[2] && tableName === 'tblAnswerData') || (i === specCol[1] && value === specCol[1] && tableName === 'tblRowData') ||
+                    (i === specCol[3] && value === specCol[3] && tableName === 'tblRowData')) {
+                    let content = '';
+                    let id = tableName + "_" + columnName + "_" + specCol[0];
 
-                            content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="-2, 525"  id="' + id + '"/><label for="' + id + '"> < 525' + '</label></div>';
-                            content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="525,1050"  id="' + id + '"/><label for="' + id + '"> ' + 525 + ' - ' + 1050 + '</label></div>';
-                            content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="1051,1575"  id="' + id + '"/><label for="' + id + '"> ' + 1051 + ' - ' + 1575 + '</label></div>';
-                            content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="1575,100000"  id="' + id + '"/><label for="' + id + '"> >1575' + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="-2, 525"  id="' + id + '"/><label for="' + id + '"> < 525' + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="525,1050"  id="' + id + '"/><label for="' + id + '"> ' + 525 + ' - ' + 1050 + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="1051,1575"  id="' + id + '"/><label for="' + id + '"> ' + 1051 + ' - ' + 1575 + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="1575,100000"  id="' + id + '"/><label for="' + id + '"> >1575' + '</label></div>';
 
-                            var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
-                            $('body').append(newTemplate);
-                            if (tableName === 'tblAnswerData') {
-                                modalFilterArray2[tableName + "_" + value] = newTemplate;
-                            } else if (tableName === 'tblUserData') {
-                                modalFilterArray1[tableName + "_" + value] = newTemplate;
-                            } else {
-                                modalFilterArray3[tableName + "_" + value] = newTemplate;
+                    var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
+                    $('body').append(newTemplate);
+                    if (tableName === 'tblAnswerData') {
+                        modalFilterArray2[tableName + "_" + value] = newTemplate;
+                    } else if (tableName === 'tblUserData') {
+                        modalFilterArray1[tableName + "_" + value] = newTemplate;
+                    } else {
+                        modalFilterArray3[tableName + "_" + value] = newTemplate;
+                    }
+                    content = '';
+                } else
+                if (i === specCol[0] && value === specCol[0] && tableName === 'tblAnswerData') {
+                    let content = '';
+                    let id = tableName + "_" + columnName + "_" + specCol[0];
+
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="0,20"  id="' + id + '"/><label for="' + id + '"> ' + 0 + ' - ' + 20 + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="21,40"  id="' + id + '"/><label for="' + id + '"> ' + 21 + ' - ' + 40 + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="41,60"  id="' + id + '"/><label for="' + id + '"> ' + 41 + ' - ' + 60 + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="60,150"  id="' + id + '"/><label for="' + id + '"> > ' + 61 + '</label></div>';
+
+                    var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
+                    $('body').append(newTemplate);
+                    if (tableName === 'tblAnswerData') {
+                        modalFilterArray2[tableName + "_" + value] = newTemplate;
+                    } else if (tableName === 'tblUserData') {
+                        modalFilterArray1[tableName + "_" + value] = newTemplate;
+                    } else {
+                        modalFilterArray3[tableName + "_" + value] = newTemplate;
+                    }
+                    content = '';
+                } else if (i === specCol[1] && value === specCol[1] && tableName === 'tblAnswerData') {
+                    let content = '';
+                    let id = tableName + "_" + columnName + "_" + specCol[1];
+                    for (let i = 0; i < 10; i++) {
+                        let from = i * 10;
+                        let to = from + 9;
+                        content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="' + from + ',' + to + '"  id="' + id + '"/><label for="' + id + '"> ' + from + ' - ' + to + '</label></div>';
+                    }
+                    var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
+                    $('body').append(newTemplate);
+                    if (tableName === 'tblAnswerData') {
+                        modalFilterArray2[tableName + "_" + value] = newTemplate;
+                    } else if (tableName === 'tblUserData') {
+                        modalFilterArray1[tableName + "_" + value] = newTemplate;
+                    } else {
+                        modalFilterArray3[tableName + "_" + value] = newTemplate;
+                    }
+                    content = '';
+                } else
+                if ((i === specCol[2] && value === specCol[2] && tableName === 'tblAnswerData') || (i === specCol[1] && value === specCol[1] && tableName === 'tblRowData') ||
+                    (i === specCol[3] && value === specCol[3] && tableName === 'tblRowData')) {
+                    let content = '';
+                    let id = tableName + "_" + columnName + "_" + specCol[0];
+
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="-2, 525"  id="' + id + '"/><label for="' + id + '"> < 525' + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="525,1050"  id="' + id + '"/><label for="' + id + '"> ' + 525 + ' - ' + 1050 + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="1051,1575"  id="' + id + '"/><label for="' + id + '"> ' + 1051 + ' - ' + 1575 + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="1575,100000"  id="' + id + '"/><label for="' + id + '"> >1575' + '</label></div>';
+
+                    var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
+                    $('body').append(newTemplate);
+                    if (tableName === 'tblAnswerData') {
+                        modalFilterArray2[tableName + "_" + value] = newTemplate;
+                    } else if (tableName === 'tblUserData') {
+                        modalFilterArray1[tableName + "_" + value] = newTemplate;
+                    } else {
+                        modalFilterArray3[tableName + "_" + value] = newTemplate;
+                    }
+                    content = '';
+                } else
+                if ((i === specCol[3] && value === specCol[3] && tableName === 'tblAnswerData') || (i === specCol[2] && value === specCol[2] && tableName === 'tblRowData') ||
+                    (i === specCol[4] && value === specCol[4] && tableName === 'tblRowData')) {
+                    let content = '';
+                    let id = tableName + "_" + columnName + "_" + specCol[0];
+
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="0, 250"  id="' + id + '"/><label for="' + id + '"> < 250' + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="250,500"  id="' + id + '"/><label for="' + id + '"> ' + 250 + ' - ' + 500 + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="501,750"  id="' + id + '"/><label for="' + id + '"> ' + 501 + ' - ' + 750 + '</label></div>';
+                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="750,100000"  id="' + id + '"/><label for="' + id + '"> >750' + '</label></div>';
+
+                    var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
+                    $('body').append(newTemplate);
+                    if (tableName === 'tblAnswerData') {
+                        modalFilterArray2[tableName + "_" + value] = newTemplate;
+                    } else if (tableName === 'tblUserData') {
+                        modalFilterArray1[tableName + "_" + value] = newTemplate;
+                    } else {
+                        modalFilterArray3[tableName + "_" + value] = newTemplate;
+                    }
+                    content = '';
+                } else {
+                    if (value === i) {
+                        var column = this,
+                            content = '<input type="text" class="filterSearchText" onkeyup="filterValues(this)" /> <br/>';
+
+                        var distinctArray = [];
+                        column.data().sort().each(function(d, j) {
+                            if (distinctArray.indexOf(d) == -1) {
+                                var id = tableName + "_" + columnName + "_" + j; // onchange="formatValues(this,' + value + ');
+                                content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="' + d + '"  id="' + id + '"/><label for="' + id + '"> ' + d + '</label></div>';
+                                distinctArray.push(d);
                             }
-                            content = '';
-                        } else
-                            if (i === specCol[0] && value === specCol[0] && tableName === 'tblAnswerData') {
-                                let content = '';
-                                let id = tableName + "_" + columnName + "_" + specCol[0];
+                        });
+                        var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
+                        $('body').append(newTemplate);
+                        if (tableName === 'tblAnswerData') {
+                            modalFilterArray2[tableName + "_" + value] = newTemplate;
+                        } else if (tableName === 'tblUserData') {
+                            modalFilterArray1[tableName + "_" + value] = newTemplate;
+                        } else {
+                            modalFilterArray3[tableName + "_" + value] = newTemplate;
+                        }
 
-                                content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="0,20"  id="' + id + '"/><label for="' + id + '"> ' + 0 + ' - ' + 20 + '</label></div>';
-                                content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="21,40"  id="' + id + '"/><label for="' + id + '"> ' + 21 + ' - ' + 40 + '</label></div>';
-                                content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="41,60"  id="' + id + '"/><label for="' + id + '"> ' + 41 + ' - ' + 60 + '</label></div>';
-                                content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="60,150"  id="' + id + '"/><label for="' + id + '"> > ' + 61 + '</label></div>';
-
-                                var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
-                                $('body').append(newTemplate);
-                                if (tableName === 'tblAnswerData') {
-                                    modalFilterArray2[tableName + "_" + value] = newTemplate;
-                                } else if (tableName === 'tblUserData') {
-                                    modalFilterArray1[tableName + "_" + value] = newTemplate;
-                                } else {
-                                    modalFilterArray3[tableName + "_" + value] = newTemplate;
-                                }
-                                content = '';
-                            } else if (i === specCol[1] && value === specCol[1] && tableName === 'tblAnswerData') {
-                                let content = '';
-                                let id = tableName + "_" + columnName + "_" + specCol[1];
-                                for (let i = 0; i < 10; i++) {
-                                    let from = i * 10;
-                                    let to = from + 9;
-                                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="' + from + ',' + to + '"  id="' + id + '"/><label for="' + id + '"> ' + from + ' - ' + to + '</label></div>';
-                                }
-                                var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
-                                $('body').append(newTemplate);
-                                if (tableName === 'tblAnswerData') {
-                                    modalFilterArray2[tableName + "_" + value] = newTemplate;
-                                } else if (tableName === 'tblUserData') {
-                                    modalFilterArray1[tableName + "_" + value] = newTemplate;
-                                } else {
-                                    modalFilterArray3[tableName + "_" + value] = newTemplate;
-                                }
-                                content = '';
-                            } else
-                                if ((i === specCol[2] && value === specCol[2] && tableName === 'tblAnswerData') || (i === specCol[1] && value === specCol[1] && tableName === 'tblRowData') ||
-                                    (i === specCol[3] && value === specCol[3] && tableName === 'tblRowData')) {
-                                    let content = '';
-                                    let id = tableName + "_" + columnName + "_" + specCol[0];
-
-                                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="-2, 525"  id="' + id + '"/><label for="' + id + '"> < 525' + '</label></div>';
-                                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="525,1050"  id="' + id + '"/><label for="' + id + '"> ' + 525 + ' - ' + 1050 + '</label></div>';
-                                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="1051,1575"  id="' + id + '"/><label for="' + id + '"> ' + 1051 + ' - ' + 1575 + '</label></div>';
-                                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="1575,100000"  id="' + id + '"/><label for="' + id + '"> >1575' + '</label></div>';
-
-                                    var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
-                                    $('body').append(newTemplate);
-                                    if (tableName === 'tblAnswerData') {
-                                        modalFilterArray2[tableName + "_" + value] = newTemplate;
-                                    } else if (tableName === 'tblUserData') {
-                                        modalFilterArray1[tableName + "_" + value] = newTemplate;
-                                    } else {
-                                        modalFilterArray3[tableName + "_" + value] = newTemplate;
-                                    }
-                                    content = '';
-                                } else
-                                    if ((i === specCol[3] && value === specCol[3] && tableName === 'tblAnswerData') || (i === specCol[2] && value === specCol[2] && tableName === 'tblRowData') ||
-                                        (i === specCol[4] && value === specCol[4] && tableName === 'tblRowData')) {
-                                        let content = '';
-                                        let id = tableName + "_" + columnName + "_" + specCol[0];
-
-                                        content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="0, 250"  id="' + id + '"/><label for="' + id + '"> < 250' + '</label></div>';
-                                        content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="250,500"  id="' + id + '"/><label for="' + id + '"> ' + 250 + ' - ' + 500 + '</label></div>';
-                                        content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="501,750"  id="' + id + '"/><label for="' + id + '"> ' + 501 + ' - ' + 750 + '</label></div>';
-                                        content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="750,100000"  id="' + id + '"/><label for="' + id + '"> >750' + '</label></div>';
-
-                                        var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
-                                        $('body').append(newTemplate);
-                                        if (tableName === 'tblAnswerData') {
-                                            modalFilterArray2[tableName + "_" + value] = newTemplate;
-                                        } else if (tableName === 'tblUserData') {
-                                            modalFilterArray1[tableName + "_" + value] = newTemplate;
-                                        } else {
-                                            modalFilterArray3[tableName + "_" + value] = newTemplate;
-                                        }
-                                        content = '';
-                                    }
-                                    else {
-                                        if (value === i) {
-                                            var column = this,
-                                                content = '<input type="text" class="filterSearchText" onkeyup="filterValues(this)" /> <br/>';
-
-                                            var distinctArray = [];
-                                            column.data().sort().each(function (d, j) {
-                                                if (distinctArray.indexOf(d) == -1) {
-                                                    var id = tableName + "_" + columnName + "_" + j; // onchange="formatValues(this,' + value + ');
-                                                    content += '<div style="text-align: center;"><input type="checkbox" style="margin-right: 8px;" value="' + d + '"  id="' + id + '"/><label for="' + id + '"> ' + d + '</label></div>';
-                                                    distinctArray.push(d);
-                                                }
-                                            });
-                                            var newTemplate = $(template.replace('{0}', content).replace('{1}', value).replace('{1}', value).replace('{2}', tableName).replace('{2}', tableName));
-                                            $('body').append(newTemplate);
-                                            if (tableName === 'tblAnswerData') {
-                                                modalFilterArray2[tableName + "_" + value] = newTemplate;
-                                            } else if (tableName === 'tblUserData') {
-                                                modalFilterArray1[tableName + "_" + value] = newTemplate;
-                                            } else {
-                                                modalFilterArray3[tableName + "_" + value] = newTemplate;
-                                            }
-
-                                            content = '';
-                                        }
-                                    }
+                        content = '';
+                    }
+                }
 
             });
         });
@@ -722,11 +735,13 @@ function performFilter(node, i, tableId) {
     }
 
     var rootNode = $(node).parent().parent();
-    var searchString = '', counter = 0;
+    var searchString = '',
+        counter = 0;
 
     if ((i === 3 && tableId === 'tblUserData') || (i === 13 && tableId === 'tblRowData')) {
         let time = '';
-        let arr = [], arrDate = [];
+        let arr = [],
+            arrDate = [];
         timeFrom = rootNode.find('input#datetimeFilter1')[0].value.replace('-', '/').replace('-', '/');
         timeEnd = rootNode.find('input#datetimeFilter2')[0].value.replace('-', '/').replace('-', '/');
 
@@ -763,7 +778,7 @@ function performFilter(node, i, tableId) {
         // searchString = arr[2] + '/' + arr[1] + '/' + arr[0];
 
     } else {
-        rootNode.find('input:checkbox').each(function (index, checkbox) {
+        rootNode.find('input:checkbox').each(function(index, checkbox) {
             if (checkbox.checked) {
                 searchString += (counter == 0) ? '^' + checkbox.value + '$' : '|^' + checkbox.value + '$';
                 counter++;
@@ -938,7 +953,7 @@ function clearDataFilter(tableid) {
     });
 
     $('.modalFilter').find(".filterSearchText").val('');
-    $('.modalFilter').find('input:checkbox').each(function (index, checkbox) {
+    $('.modalFilter').find('input:checkbox').each(function(index, checkbox) {
         checkbox.checked = false;
         $(checkbox).parent().show();
     });
@@ -946,8 +961,7 @@ function clearDataFilter(tableid) {
     if (tableid === 'tblUserData') {
         configFilter($('#' + tableid).DataTable().rows().columns(), 'tblUserData', [0, 1, 2, 3, 4, 5, 6, 7], [3]);
         userFilter = [];
-    }
-    else if (tableid === 'tblAnswerData') {
+    } else if (tableid === 'tblAnswerData') {
         configFilter($('#' + tableid).DataTable().rows().columns(), 'tblAnswerData', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], [8, 14, 4, 5]);
         answerFilter = [];
     } else {
@@ -966,7 +980,7 @@ function clearFilter(node, i, tableId) {
 
     var rootNode = $(node).parent().parent();
     rootNode.find(".filterSearchText").val('');
-    rootNode.find('input:checkbox').each(function (index, checkbox) {
+    rootNode.find('input:checkbox').each(function(index, checkbox) {
         checkbox.checked = false;
         $(checkbox).parent().show();
     });
@@ -1017,20 +1031,20 @@ function Upload() {
     //Validate whether File is valid Excel file.
     var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
     if (regex.test(fileUpload.value.toLowerCase())) {
-        if (typeof (FileReader) != "undefined") {
+        if (typeof(FileReader) != "undefined") {
             var reader = new FileReader();
             $("#btnFilter").css("visibility", "visible");
             $("#dropdownOption").css("visibility", "visible");
             // $('body').addClass('loading');
             //For Browsers other than IE.
             if (reader.readAsBinaryString) {
-                reader.onload = function (e) {
+                reader.onload = function(e) {
                     ProcessExcel(e.target.result);
                 };
                 reader.readAsBinaryString(fileUpload.files[0]);
             } else {
                 //For IE Browser.
-                reader.onload = function (e) {
+                reader.onload = function(e) {
                     var data = "";
                     var bytes = new Uint8Array(e.target.result);
                     for (var i = 0; i < bytes.byteLength; i++) {
@@ -1047,10 +1061,13 @@ function Upload() {
         alert("Please upload a valid Excel file.");
     }
 };
+
 function ProcessExcel(data) {
     //Read the Excel File data.
     var workbook = XLSX.read(data, {
-        type: 'binary', cellDates: true, cellStyles: true
+        type: 'binary',
+        cellDates: true,
+        cellStyles: true
     });
     //Fetch the name of First Sheet.
     var sheetRawData = workbook.SheetNames[0];
@@ -1071,7 +1088,7 @@ function ProcessExcel(data) {
     if (isInitTableUserData) {
         let dataset = convertlstUserToArray(excelRowsUser);
         tableUserData.clear().
-            rows.add(dataset)
+        rows.add(dataset)
             .draw();
         configFilter(tblUser.api().columns(), 'tblUserData', [0, 1, 2, 3, 4, 5, 6, 7], [3]);
     } else {
@@ -1132,7 +1149,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
     var matchListRawData = [];
     for (var i = 0; i < RowsRawData.length; i++) {
         objIndex = RowsDapAn.
-            findIndex((obj => obj["Test set"] == RowsRawData[i]["test_id"] && obj["Case ID"] == RowsRawData[i]["case_id"]));
+        findIndex((obj => obj["Test set"] == RowsRawData[i]["test_id"] && obj["Case ID"] == RowsRawData[i]["case_id"]));
         if (objIndex != -1) {
             matchListRawData.push(RowsRawData[i]);
         }
@@ -1141,14 +1158,14 @@ function coreCalculate(RowsRawData, RowsDapAn) {
     switch (tagConfig) {
         case "1":
             for (var i = 0; i < userFilter.length; i++) {
-                let rawdatabyUser = RowsRawData.filter(obj => obj["user_id"] === userFilter[i]["user_id"]
-                    && obj["test_id"] === userFilter[i]["test_id"]);
+                let rawdatabyUser = RowsRawData.filter(obj => obj["user_id"] === userFilter[i]["user_id"] &&
+                    obj["test_id"] === userFilter[i]["test_id"]);
                 if (rawdatabyUser.length > 0) {
                     let filterDapan = RowsDapAn.filter(obj => obj["Test set"] === rawdatabyUser[0]["test_id"]);
                     filterDapan.forEach(element => {
-                        let diffIndex = rawdatabyUser.findIndex(obj => element["Case ID"] === obj["case_id"]
-                            && element["Lesion ID"] === obj["lesionID"] && element["TruthX"] === obj["truthX"]
-                            && element["TruthY"] === obj["truthY"]);
+                        let diffIndex = rawdatabyUser.findIndex(obj => element["Case ID"] === obj["case_id"] &&
+                            element["Lesion ID"] === obj["lesionID"] && element["TruthX"] === obj["truthX"] &&
+                            element["TruthY"] === obj["truthY"]);
                         if (diffIndex == -1) {
                             RowsRawData.push({
                                 ["test_id"]: rawdatabyUser[0]["test_id"],
@@ -1183,46 +1200,46 @@ function coreCalculate(RowsRawData, RowsDapAn) {
 
     const uniqueTestId = [...new Set(RowsRawData.map(item => item["test_id"] + ":" + item["user_id"] + ":" + item["case_id"] + ":" + item["session_no"]))];
 
-    uniqueTestId.forEach(function (unique) {
-        {
-            checkType = "Abnormal";
-            objDapAnSymmetricTrue = [];
-            objDapAnSymmetricFalse = [];
-            objDapAnNonSymmetricTrue = [];
-            objDapAnNonSymmetricFalse = [];
-            const arrUnique = splitUniqueTest(unique);
-            const objRowData = RowsRawData
-                .filter(obj => obj["test_id"] === arrUnique[0]
-                    && obj["user_id"] === arrUnique[1]
-                    && obj["case_id"] === arrUnique[2]
-                    && obj["session_no"] === arrUnique[3]
-                )
-                .map(obj => obj);
-            const objDapAn = RowsDapAn
-                .filter(obj => obj["Test set"] == arrUnique[0]
-                    && obj["Case ID"] == arrUnique[2])
-                .map(obj => obj);
+    uniqueTestId.forEach(function(unique) {
+        checkType = "Abnormal";
+        objDapAnSymmetricTrue = [];
+        objDapAnSymmetricFalse = [];
+        objDapAnNonSymmetricTrue = [];
+        objDapAnNonSymmetricFalse = [];
+        const arrUnique = splitUniqueTest(unique);
+        const objRowData = RowsRawData
+            .filter(obj => obj["test_id"] === arrUnique[0] &&
+                obj["user_id"] === arrUnique[1] &&
+                obj["case_id"] === arrUnique[2] &&
+                obj["session_no"] === arrUnique[3]
+            )
+            .map(obj => obj);
+        const objDapAn = RowsDapAn
+            .filter(obj => obj["Test set"] == arrUnique[0] &&
+                obj["Case ID"] == arrUnique[2])
+            .map(obj => obj);
 
-            // FILL DATA CÒN THIẾU
+        // FILL DATA CÒN THIẾU
 
 
-            // START TÍNH TOÁN
-            // calcR(objRowData, objDapAn);
-            // calcJRSymmetric(objRowData, objDapAn);
-            // calcJRNonSymmetric(objRowData, objDapAn);
-            // calcFR(objRowData, objDapAn);
+        // START TÍNH TOÁN
+        // calcR(objRowData, objDapAn);
+        // calcJRSymmetric(objRowData, objDapAn);
+        // calcJRNonSymmetric(objRowData, objDapAn);
+        // calcFR(objRowData, objDapAn);
 
-            objDapAn.forEach(item => {
-                // if (item["Lesion ID"] == null && item["Frame"] == null
-                //     && item["Lesion type"] == null && item["Lesion size (mm)"] == null) {
-                //     checkType = "Normal";
-                // }
-                if (item["Case Type"] === "Normal") {
-                    checkType = "Normal";
-                }
-            });
+        objDapAn.forEach(item => {
+            // if (item["Lesion ID"] == null && item["Frame"] == null
+            //     && item["Lesion type"] == null && item["Lesion size (mm)"] == null) {
+            //     checkType = "Normal";
+            // }
+            if (item["Case Type"] === "Normal") {
+                checkType = "Normal";
+            }
+        });
 
-            // Divide CASE NORMAL || AB-NORMAL
+        // Divide CASE NORMAL || AB-NORMAL
+        dropdownArrayValue.forEach(function(dropdownValue) {
             if (checkType == "Normal") {
                 if (dropdownValue === "1") {
                     if (calcNormal(objRowData, objDapAn) == true) {
@@ -1237,9 +1254,9 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                 objRowData.forEach(element => {
                     let checkDensity = RowsDapAn
                         .filter(obj =>
-                            obj["Test set"] === element["test_id"]
-                            && obj["Case ID"] === element["case_id"]
-                            && obj["Case density"] === element["Case density (user)"]
+                            obj["Test set"] === element["test_id"] &&
+                            obj["Case ID"] === element["case_id"] &&
+                            obj["Case density"] === element["Case density (user)"]
                         )
                         .map(obj => obj);
                     if (checkDensity.length > 0) {
@@ -1256,7 +1273,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                         }
                         break;
 
-                    // Case Recall
+                        // Case Recall
                     case "5":
                         if (calcReCall(objRowData, objDapAn) == true) {
                             checkDistinctTrueAnswer(arrUnique[0], arrUnique[1], listExportData, arrUnique[3], objDapAn, "Recall");
@@ -1278,321 +1295,305 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                 }
             }
             countDensity = 0;
-        }
+        })
     });
 
 
 
     // TINH TOAN MUC SO 2 
-    switch (dropdownValue) {
-        case "3":
-            const uniqueTestIdbyUser1 = [...new Set(RowsRawData.map(item => item["test_id"] + ":" + item["user_id"] + ":" + item["case_id"]
-                + ":" + item["lesionID"] + ":" + item["truthX"] + ":" + item["truthY"]))];
-            uniqueTestIdbyUser1.forEach(function (unique) {
-                {
-                    const arrUnique = splitUniqueTest(unique);
-                    const objRowData = RowsRawData
-                        .filter(obj => obj["test_id"] == arrUnique[0]
-                            && obj["user_id"] == arrUnique[1]
-                            && obj["case_id"] == arrUnique[2]
-                            && obj["lesionID"] == arrUnique[3]
-                            && obj["truthX"] == arrUnique[4]
-                            && obj["truthY"] == arrUnique[5]
-                        )
-                        .map(obj => obj);
-                    const objDapAn = RowsDapAn
-                        .filter(obj => obj["Test set"] == arrUnique[0]
-                            && obj["Case ID"] == arrUnique[2]
-                            && obj["Lesion ID"] == arrUnique[3]
-                            && obj["TruthX"] == arrUnique[4]
-                            && obj["TruthY"] == arrUnique[5]
-
-                        )
-                        .map(obj => obj);
-
-                    let objRowDataDensity = RowsRawData
-                        .filter(obj => obj["test_id"] == arrUnique[0]
-                            && obj["user_id"] == arrUnique[1]
-                            && obj["case_id"] == arrUnique[2]
-                        )
-                        .map(obj => obj);
-
-                    // if (arrUnique[1] === "hcmc028" && arrUnique[2] === "40") {
-                    //     console.log("OBJ DENSITY", objRowDataDensity)
-                    // }
-                    objRowDataDensity.forEach(element => {
-                        let checkDensity = RowsDapAn
-                            .filter(obj =>
-                                obj["Test set"] === element["test_id"]
-                                && obj["Case ID"] === element["case_id"]
-                                && obj["Case density"] === element["Case density (user)"]
+    dropdownArrayValue.forEach(function(dropdownValue) {
+        switch (dropdownValue) {
+            case "3":
+                const uniqueTestIdbyUser1 = [...new Set(RowsRawData.map(item => item["test_id"] + ":" + item["user_id"] + ":" + item["case_id"] +
+                    ":" + item["lesionID"] + ":" + item["truthX"] + ":" + item["truthY"]))];
+                uniqueTestIdbyUser1.forEach(function(unique) {
+                    {
+                        const arrUnique = splitUniqueTest(unique);
+                        const objRowData = RowsRawData
+                            .filter(obj => obj["test_id"] == arrUnique[0] &&
+                                obj["user_id"] == arrUnique[1] &&
+                                obj["case_id"] == arrUnique[2] &&
+                                obj["lesionID"] == arrUnique[3] &&
+                                obj["truthX"] == arrUnique[4] &&
+                                obj["truthY"] == arrUnique[5]
                             )
                             .map(obj => obj);
-                        if (checkDensity.length > 0) {
-                            countDensity = 1;
-                        }
-                    });
-                    objDapAn.forEach(element => {
-                        if (element["Case Type"] === "Abnormal") {
-                            const list = [];
-                            list.push(element)
-                            calcTruePercentofAnyLesionDX(objRowData, list);
-                        }
-                    });
-                    countDensity = 0;
-                }
-            });
-            break;
+                        const objDapAn = RowsDapAn
+                            .filter(obj => obj["Test set"] == arrUnique[0] &&
+                                obj["Case ID"] == arrUnique[2] &&
+                                obj["Lesion ID"] == arrUnique[3] &&
+                                obj["TruthX"] == arrUnique[4] &&
+                                obj["TruthY"] == arrUnique[5]
 
-        case "4":
-            const uniqueTestIdbyUser = [...new Set(RowsRawData.map(item => item["test_id"] + ":" + item["user_id"] + ":" + item["case_id"]
-                + ":" + item["lesionID"]))];
-            uniqueTestIdbyUser.forEach(function (unique) {
-                {
-                    const arrUnique = splitUniqueTest(unique);
-                    const objRowData = RowsRawData
-                        .filter(obj => obj["test_id"] == arrUnique[0]
-                            && obj["user_id"] == arrUnique[1]
-                            && obj["case_id"] == arrUnique[2]
-                            && obj["lesionID"] == arrUnique[3]
-                        )
-                        .map(obj => obj);
-                    const objDapAn = RowsDapAn
-                        .filter(obj => obj["Test set"] == arrUnique[0]
-                            && obj["Case ID"] == arrUnique[2]
-                            && obj["Lesion ID"] == arrUnique[3]
-                        )
-                        .map(obj => obj);
-
-                    ///////////////////////////////////
-                    let objRowDataDensity = RowsRawData
-                        .filter(obj => obj["test_id"] == arrUnique[0]
-                            && obj["user_id"] == arrUnique[1]
-                            && obj["case_id"] == arrUnique[2]
-                        )
-                        .map(obj => obj);
-
-                    // if (arrUnique[1] === "hcmc028" && arrUnique[2] === "40") {
-                    //     console.log("OBJ DENSITY", objRowDataDensity)
-                    // }
-                    objRowDataDensity.forEach(element => {
-                        let checkDensity = RowsDapAn
-                            .filter(obj =>
-                                obj["Test set"] === element["test_id"]
-                                && obj["Case ID"] === element["case_id"]
-                                && obj["Case density"] === element["Case density (user)"]
                             )
                             .map(obj => obj);
-                        if (checkDensity.length > 0) {
-                            countDensity = 1;
-                        }
-                    });
 
-                    let objDapAnClone = [];
-                    objDapAn.forEach(element => {
-                        let index = objDapAnClone.
-                            findIndex((obj => obj["Test set"] === element["Test set"] && obj["Case ID"] === element["Case ID"]
-                                && obj["Lesion ID"] === element["Lesion ID"]));
-                        if (index == -1) {
-                            objDapAnClone.push(element);
-                        }
-                    });
-                    objDapAnClone.forEach(element => {
-                        if (element["Case Type"] === "Abnormal") {
-                            const list = [];
-                            list.push(element)
-                            calcTruePercentofAnyLesionKDX(objRowData, list);
-                        }
-                    });
+                        let objRowDataDensity = RowsRawData
+                            .filter(obj => obj["test_id"] == arrUnique[0] &&
+                                obj["user_id"] == arrUnique[1] &&
+                                obj["case_id"] == arrUnique[2]
+                            )
+                            .map(obj => obj);
 
-                    countDensity = 0;
-                }
-            });
-            break;
-        case "1":
-            const uniqueTestIdbyUser2 = [...new Set(RowsRawData.map(item => item["test_id"] + ":" + item["user_id"] + ":" + item["case_id"]))];
-            uniqueTestIdbyUser2.forEach(function (unique) {
-                {
-                    const arrUnique = splitUniqueTest(unique);
-                    const objRowData = RowsRawData
-                        .filter(obj => obj["test_id"] == arrUnique[0]
-                            && obj["user_id"] == arrUnique[1]
-                            && obj["case_id"] == arrUnique[2]
-                        )
-                        .map(obj => obj);
-                    const objDapAn = RowsDapAn
-                        .filter(obj => obj["Test set"] == arrUnique[0]
-                            && obj["Case ID"] == arrUnique[2])
-                        .map(obj => obj);
+                        // if (arrUnique[1] === "hcmc028" && arrUnique[2] === "40") {
+                        //     console.log("OBJ DENSITY", objRowDataDensity)
+                        // }
+                        objRowDataDensity.forEach(element => {
+                            let checkDensity = RowsDapAn
+                                .filter(obj =>
+                                    obj["Test set"] === element["test_id"] &&
+                                    obj["Case ID"] === element["case_id"] &&
+                                    obj["Case density"] === element["Case density (user)"]
+                                )
+                                .map(obj => obj);
+                            if (checkDensity.length > 0) {
+                                countDensity = 1;
+                            }
+                        });
+                        objDapAn.forEach(element => {
+                            if (element["Case Type"] === "Abnormal") {
+                                const list = [];
+                                list.push(element)
+                                calcTruePercentofAnyLesionDX(objRowData, list);
+                            }
+                        });
+                        countDensity = 0;
+                    }
+                });
+                break;
 
-                    let objDapAnNormal = [];
-                    let objRowDataNormal = [];
-                    objDapAn.forEach(item => {
-                        if (item["Case Type"] === "Normal") {
-                            objDapAnNormal.push(item);
-                        }
-                    });
+            case "4":
+                const uniqueTestIdbyUser = [...new Set(RowsRawData.map(item => item["test_id"] + ":" + item["user_id"] + ":" + item["case_id"] +
+                    ":" + item["lesionID"]))];
+                uniqueTestIdbyUser.forEach(function(unique) {
+                    {
+                        const arrUnique = splitUniqueTest(unique);
+                        const objRowData = RowsRawData
+                            .filter(obj => obj["test_id"] == arrUnique[0] &&
+                                obj["user_id"] == arrUnique[1] &&
+                                obj["case_id"] == arrUnique[2] &&
+                                obj["lesionID"] == arrUnique[3]
+                            )
+                            .map(obj => obj);
+                        const objDapAn = RowsDapAn
+                            .filter(obj => obj["Test set"] == arrUnique[0] &&
+                                obj["Case ID"] == arrUnique[2] &&
+                                obj["Lesion ID"] == arrUnique[3]
+                            )
+                            .map(obj => obj);
 
-                    objRowData.forEach(element => objDapAnNormal.forEach(element1 => {
-                        if (element["test_id"] == element1["Test set"]
-                            && element["case_id"] == element1["Case ID"]) {
-                            objRowDataNormal.push(element);
-                            return false
-                        }
-                    }));
-                    calcTruePercentofAnyCase(objRowDataNormal, objDapAnNormal);
-                }
-            });
-            break;
-        case "2":
-            const uniqueTestIdbyUser3 = [...new Set(RowsRawData.map(item => item["test_id"] + ":" + item["user_id"] + ":" + item["case_id"]))];
-            uniqueTestIdbyUser3.forEach(function (unique) {
-                {
-                    const arrUnique = splitUniqueTest(unique);
-                    let objRowData = RowsRawData
-                        .filter(obj => obj["test_id"] == arrUnique[0]
-                            && obj["user_id"] == arrUnique[1]
-                            && obj["case_id"] == arrUnique[2]
-                        )
-                        .map(obj => obj);
-                    const objDapAn = RowsDapAn
-                        .filter(obj => obj["Test set"] == arrUnique[0]
-                            && obj["Case ID"] == arrUnique[2])
-                        .map(obj => obj);
+                        ///////////////////////////////////
+                        let objRowDataDensity = RowsRawData
+                            .filter(obj => obj["test_id"] == arrUnique[0] &&
+                                obj["user_id"] == arrUnique[1] &&
+                                obj["case_id"] == arrUnique[2]
+                            )
+                            .map(obj => obj);
 
-                    let objDapAnAbNormal = [];
-                    let objRowDataAbNormal = [];
-                    objDapAn.forEach(item => {
-                        if (item["Case Type"] === "Abnormal") {
-                            objDapAnAbNormal.push(item);
-                        }
-                    });
+                        // if (arrUnique[1] === "hcmc028" && arrUnique[2] === "40") {
+                        //     console.log("OBJ DENSITY", objRowDataDensity)
+                        // }
+                        objRowDataDensity.forEach(element => {
+                            let checkDensity = RowsDapAn
+                                .filter(obj =>
+                                    obj["Test set"] === element["test_id"] &&
+                                    obj["Case ID"] === element["case_id"] &&
+                                    obj["Case density"] === element["Case density (user)"]
+                                )
+                                .map(obj => obj);
+                            if (checkDensity.length > 0) {
+                                countDensity = 1;
+                            }
+                        });
 
-                    objRowData.forEach(element => objDapAnAbNormal.forEach(element1 => {
-                        if (element["test_id"] == element1["Test set"]
-                            && element["case_id"] == element1["Case ID"]) {
-                            objRowDataAbNormal.push(element);
-                            return false
-                        }
-                    }));
-                    calcTruePercentofAnyCase(objRowDataAbNormal, objDapAnAbNormal);
-                }
-            });
-            break;
+                        let objDapAnClone = [];
+                        objDapAn.forEach(element => {
+                            let index = objDapAnClone.
+                            findIndex((obj => obj["Test set"] === element["Test set"] && obj["Case ID"] === element["Case ID"] &&
+                                obj["Lesion ID"] === element["Lesion ID"]));
+                            if (index == -1) {
+                                objDapAnClone.push(element);
+                            }
+                        });
+                        objDapAnClone.forEach(element => {
+                            if (element["Case Type"] === "Abnormal") {
+                                const list = [];
+                                list.push(element)
+                                calcTruePercentofAnyLesionKDX(objRowData, list);
+                            }
+                        });
 
-        case "5":
-            const uniqueTestIdbyUser4 = [...new Set(RowsRawData.map(item => item["test_id"] + ":" + item["user_id"] + ":" + item["case_id"]))];
-            uniqueTestIdbyUser4.forEach(function (unique) {
-                {
-                    const arrUnique = splitUniqueTest(unique);
-                    let objRowData = RowsRawData
-                        .filter(obj => obj["test_id"] == arrUnique[0]
-                            && obj["user_id"] == arrUnique[1]
-                            && obj["case_id"] == arrUnique[2]
-                        )
-                        .map(obj => obj);
-                    const objDapAn = RowsDapAn
-                        .filter(obj => obj["Test set"] == arrUnique[0]
-                            && obj["Case ID"] == arrUnique[2])
-                        .map(obj => obj);
+                        countDensity = 0;
+                    }
+                });
+                break;
+            case "1":
+                const uniqueTestIdbyUser2 = [...new Set(RowsRawData.map(item => item["test_id"] + ":" + item["user_id"] + ":" + item["case_id"]))];
+                uniqueTestIdbyUser2.forEach(function(unique) {
+                    {
+                        const arrUnique = splitUniqueTest(unique);
+                        const objRowData = RowsRawData
+                            .filter(obj => obj["test_id"] == arrUnique[0] &&
+                                obj["user_id"] == arrUnique[1] &&
+                                obj["case_id"] == arrUnique[2]
+                            )
+                            .map(obj => obj);
+                        const objDapAn = RowsDapAn
+                            .filter(obj => obj["Test set"] == arrUnique[0] &&
+                                obj["Case ID"] == arrUnique[2])
+                            .map(obj => obj);
 
-                    let objDapAnAbNormal = [];
-                    let objRowDataAbNormal = [];
-                    objDapAn.forEach(item => {
-                        if (item["Case Type"] === "Abnormal") {
-                            objDapAnAbNormal.push(item);
-                        }
-                    });
+                        let objDapAnNormal = [];
+                        let objRowDataNormal = [];
+                        objDapAn.forEach(item => {
+                            if (item["Case Type"] === "Normal") {
+                                objDapAnNormal.push(item);
+                            }
+                        });
 
-                    objRowData.forEach(element => objDapAnAbNormal.forEach(element1 => {
-                        if (element["test_id"] == element1["Test set"]
-                            && element["case_id"] == element1["Case ID"]) {
-                            objRowDataAbNormal.push(element);
-                            return false
-                        }
-                    }));
-                    calcTruePercentofAnyCase(objRowDataAbNormal, objDapAnAbNormal);
-                }
-            });
-            break;
-    }
+                        objRowData.forEach(element => objDapAnNormal.forEach(element1 => {
+                            if (element["test_id"] == element1["Test set"] &&
+                                element["case_id"] == element1["Case ID"]) {
+                                objRowDataNormal.push(element);
+                                return false
+                            }
+                        }));
+                        calcTruePercentofAnyCase(objRowDataNormal, objDapAnNormal, dropdownValue);
+                    }
+                });
+                break;
+            case "2":
+                const uniqueTestIdbyUser3 = [...new Set(RowsRawData.map(item => item["test_id"] + ":" + item["user_id"] + ":" + item["case_id"]))];
+                uniqueTestIdbyUser3.forEach(function(unique) {
+                    {
+                        const arrUnique = splitUniqueTest(unique);
+                        let objRowData = RowsRawData
+                            .filter(obj => obj["test_id"] == arrUnique[0] &&
+                                obj["user_id"] == arrUnique[1] &&
+                                obj["case_id"] == arrUnique[2]
+                            )
+                            .map(obj => obj);
+                        const objDapAn = RowsDapAn
+                            .filter(obj => obj["Test set"] == arrUnique[0] &&
+                                obj["Case ID"] == arrUnique[2])
+                            .map(obj => obj);
 
+                        let objDapAnAbNormal = [];
+                        let objRowDataAbNormal = [];
+                        objDapAn.forEach(item => {
+                            if (item["Case Type"] === "Abnormal") {
+                                objDapAnAbNormal.push(item);
+                            }
+                        });
+
+                        objRowData.forEach(element => objDapAnAbNormal.forEach(element1 => {
+                            if (element["test_id"] == element1["Test set"] &&
+                                element["case_id"] == element1["Case ID"]) {
+                                objRowDataAbNormal.push(element);
+                                return false
+                            }
+                        }));
+                        calcTruePercentofAnyCase(objRowDataAbNormal, objDapAnAbNormal, dropdownValue);
+                    }
+                });
+                break;
+
+            case "5":
+                const uniqueTestIdbyUser4 = [...new Set(RowsRawData.map(item => item["test_id"] + ":" + item["user_id"] + ":" + item["case_id"]))];
+                uniqueTestIdbyUser4.forEach(function(unique) {
+                    {
+                        const arrUnique = splitUniqueTest(unique);
+                        let objRowData = RowsRawData
+                            .filter(obj => obj["test_id"] == arrUnique[0] &&
+                                obj["user_id"] == arrUnique[1] &&
+                                obj["case_id"] == arrUnique[2]
+                            )
+                            .map(obj => obj);
+                        const objDapAn = RowsDapAn
+                            .filter(obj => obj["Test set"] == arrUnique[0] &&
+                                obj["Case ID"] == arrUnique[2])
+                            .map(obj => obj);
+
+                        let objDapAnAbNormal = [];
+                        let objRowDataAbNormal = [];
+                        objDapAn.forEach(item => {
+                            if (item["Case Type"] === "Abnormal") {
+                                objDapAnAbNormal.push(item);
+                            }
+                        });
+
+                        objRowData.forEach(element => objDapAnAbNormal.forEach(element1 => {
+                            if (element["test_id"] == element1["Test set"] &&
+                                element["case_id"] == element1["Case ID"]) {
+                                objRowDataAbNormal.push(element);
+                                return false
+                            }
+                        }));
+                        calcTruePercentofAnyCase(objRowDataAbNormal, objDapAnAbNormal, dropdownValue);
+                    }
+                });
+                break;
+        }
+    })
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // SET UP TOTAL AVERAGE PERCENT OF LIST ANSWER FILTER 
     let listTotalPercentAnswer = [];
-    switch (dropdownValue) {
-        case "3":
-            const uniqueDX = [...new Set(RowsDapAn.map(item => item["Test set"] + ":" + item["Case ID"] + ":" + item["Case Type"] + ":" + item["Lesion ID"]
-                + ":" + item["TruthX"] + ":" + item["TruthY"] + ":" + item["Truth Order"]))];
-            uniqueDX.forEach(function (unique) {
-                {
-                    const arrUnique = splitUniqueTest(unique);
-                    if (arrUnique[2] === "Abnormal") {
-                        let item = [];
-                        let objIndex = listCaseIdbyTestId.
-                            findIndex((obj => obj.testId === arrUnique[0] && obj.caseId.split(" - ")[0] === arrUnique[1] && obj.lesionId === arrUnique[3]
-                                && obj.truthX === arrUnique[4] && obj.truthY === arrUnique[5]));
-                        if (objIndex == -1) {
-                            let percent = (0).toFixed(2);
-                            listTotalPercentAnswer.push(percent);
-                        } else {
-                            let percent = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2);
-                            listTotalPercentAnswer.push(percent);
+    dropdownArrayValue.forEach(function(dropdownValue) {
+        var typeOfValue = dropdownObject[dropdownValue];
+        switch (dropdownValue) {
+            case "3":
+                const uniqueDX = [...new Set(RowsDapAn.map(item => item["Test set"] + ":" + item["Case ID"] + ":" + item["Case Type"] + ":" + item["Lesion ID"] +
+                    ":" + item["TruthX"] + ":" + item["TruthY"] + ":" + item["Truth Order"]))];
+                uniqueDX.forEach(function(unique) {
+                    {
+                        const arrUnique = splitUniqueTest(unique);
+                        if (arrUnique[2] === "Abnormal") {
+                            let item = [];
+                            let objIndex = listCaseIdbyTestId.
+                            findIndex((obj => obj.testId === arrUnique[0] && obj.caseId.split(" - ")[0] === arrUnique[1] && obj.lesionId === arrUnique[3] &&
+                                obj.truthX === arrUnique[4] && obj.truthY === arrUnique[5] && obj.type === typeOfValue));
+                            if (objIndex == -1) {
+                                let percent = (0).toFixed(2);
+                                listTotalPercentAnswer.push(percent);
+                            } else {
+                                let percent = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2);
+                                listTotalPercentAnswer.push(percent);
+                            }
                         }
                     }
-                }
-            });
-            break;
+                });
+                break;
 
-        case "4":
-            const uniqueKDX = [...new Set(RowsDapAn.map(item => item["Test set"] + ":" + item["Case ID"] + ":" + item["Case Type"] + ":" + item["Lesion ID"]))];
-            uniqueKDX.forEach(function (unique) {
-                {
-                    const arrUnique = splitUniqueTest(unique);
-                    if (arrUnique[2] === "Abnormal") {
-                        let item = [];
-                        let objIndex = listCaseIdbyTestId.
-                            findIndex((obj => obj.testId === arrUnique[0] && obj.caseId.split(" - ")[0] === arrUnique[1]
-                                && obj.lesionId === arrUnique[3]));
-                        if (objIndex == -1) {
-                            let percent = (0).toFixed(2);
-                            listTotalPercentAnswer.push(percent);
-                        } else {
-                            let percent = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2);
-                            listTotalPercentAnswer.push(percent);
+            case "4":
+                const uniqueKDX = [...new Set(RowsDapAn.map(item => item["Test set"] + ":" + item["Case ID"] + ":" + item["Case Type"] + ":" + item["Lesion ID"]))];
+                uniqueKDX.forEach(function(unique) {
+                    {
+                        const arrUnique = splitUniqueTest(unique);
+                        if (arrUnique[2] === "Abnormal") {
+                            let item = [];
+                            let objIndex = listCaseIdbyTestId.
+                            findIndex((obj => obj.testId === arrUnique[0] && obj.caseId.split(" - ")[0] === arrUnique[1] &&
+                                obj.lesionId === arrUnique[3] && obj.type === typeOfValue));
+                            if (objIndex == -1) {
+                                let percent = (0).toFixed(2);
+                                listTotalPercentAnswer.push(percent);
+                            } else {
+                                let percent = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2);
+                                listTotalPercentAnswer.push(percent);
+                            }
                         }
                     }
-                }
-            });
-            break;
+                });
+                break;
 
-        case "1":
-            RowsDapAn.forEach(element => {
-                if (element["Case Type"] === "Normal") {
-                    let item = [];
-                    let objIndex = listCaseIdbyTestId.
-                        findIndex((obj => obj.testId === element["Test set"] && obj.caseId === element["Case ID"]));
-                    if (objIndex == -1) {
-                        let percent = (0).toFixed(2);
-                        listTotalPercentAnswer.push(percent);
-                    } else {
-                        let percent = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2);
-                        listTotalPercentAnswer.push(percent);
-                    }
-                }
-            });
-            break;
-        default:
-            const uniqueDapAn = [...new Set(RowsDapAn.map(item => item["Test set"] + ":" + item["Case ID"] + ":" + item["Case Type"]))];
-            uniqueDapAn.forEach(function (unique) {
-                {
-                    const arrUnique = splitUniqueTest(unique);
-                    if (arrUnique[2] === "Abnormal") {
+            case "1":
+                RowsDapAn.forEach(element => {
+                    if (element["Case Type"] === "Normal") {
                         let item = [];
                         let objIndex = listCaseIdbyTestId.
-                            findIndex((obj => obj.testId === arrUnique[0] && obj.caseId === arrUnique[1]));
+                        findIndex((obj => obj.testId === element["Test set"] && obj.caseId === element["Case ID"] && obj.type === typeOfValue));
                         if (objIndex == -1) {
                             let percent = (0).toFixed(2);
                             listTotalPercentAnswer.push(percent);
@@ -1601,10 +1602,30 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                             listTotalPercentAnswer.push(percent);
                         }
                     }
-                }
-            });
-            break;
-    }
+                });
+                break;
+            default:
+                const uniqueDapAn = [...new Set(RowsDapAn.map(item => item["Test set"] + ":" + item["Case ID"] + ":" + item["Case Type"]))];
+                uniqueDapAn.forEach(function(unique) {
+                    {
+                        const arrUnique = splitUniqueTest(unique);
+                        if (arrUnique[2] === "Abnormal") {
+                            let item = [];
+                            let objIndex = listCaseIdbyTestId.
+                            findIndex((obj => obj.testId === arrUnique[0] && obj.caseId === arrUnique[1] && obj.type === typeOfValue));
+                            if (objIndex == -1) {
+                                let percent = (0).toFixed(2);
+                                listTotalPercentAnswer.push(percent);
+                            } else {
+                                let percent = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2);
+                                listTotalPercentAnswer.push(percent);
+                            }
+                        }
+                    }
+                });
+                break;
+        }
+    })
 
     console.log("LIST TOTAL PERCENNNNN ANSWER", listTotalPercentAnswer);
     let answerC = 0;
@@ -1619,166 +1640,123 @@ function coreCalculate(RowsRawData, RowsDapAn) {
     /// SET UP LIST CASE ANSWER I
 
     let listCaseAnswerI = [];
-    switch (dropdownValue) {
-        case "3":
-            const uniqueDX = [...new Set(RowsDapAn.map(item => item["Test set"] + ":" + item["Case ID"] + ":" + item["Case Type"] + ":" + item["Lesion ID"]
-                + ":" + item["TruthX"] + ":" + item["TruthY"] + ":" + item["Truth Order"]))];
-            uniqueDX.forEach(function (unique) {
-                {
-                    const arrUnique = splitUniqueTest(unique);
-                    if (arrUnique[2] === "Abnormal") {
-                        let item = [];
-                        let objIndex = listCaseIdbyTestId.
-                            findIndex((obj => obj.testId === arrUnique[0] && obj.caseId.split(" - ")[0] === arrUnique[1] && obj.lesionId === arrUnique[3]
-                                && obj.truthX === arrUnique[4] && obj.truthY === arrUnique[5]));
-                        if (objIndex != -1) {
-                            let index = listCaseAnswerI.
+    dropdownArrayValue.forEach(function(dropdownValue) {
+        var typeOfValue = dropdownObject[dropdownValue];
+        switch (dropdownValue) {
+            case "3":
+                const uniqueDX = [...new Set(RowsDapAn.map(item => item["Test set"] + ":" + item["Case ID"] + ":" + item["Case Type"] + ":" + item["Lesion ID"] +
+                    ":" + item["TruthX"] + ":" + item["TruthY"] + ":" + item["Truth Order"]))];
+                uniqueDX.forEach(function(unique) {
+                    {
+                        const arrUnique = splitUniqueTest(unique);
+                        if (arrUnique[2] === "Abnormal") {
+                            let item = [];
+                            let objIndex = listCaseIdbyTestId.
+                            findIndex((obj => obj.testId === arrUnique[0] && obj.caseId.split(" - ")[0] === arrUnique[1] && obj.lesionId === arrUnique[3] &&
+                                obj.truthX === arrUnique[4] && obj.truthY === arrUnique[5] && obj.type === typeOfValue));
+                            if (objIndex != -1) {
+                                let index = listCaseAnswerI.
                                 findIndex((obj => obj.testId === arrUnique[0]));
-                            if (index == -1) {
-                                let v = listCaseIdbyTestId[objIndex]["totalUser"];
-                                let r = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / v) * 100).toFixed(2);
-                                let percent = 0.01 * (v * r + parseFloat(valueM) * answerC);
-                                percent = percent / (v + parseFloat(valueM));
-                                listCaseIdbyTestId[objIndex]["valueW"] = percent.toFixed(2);
-                                listCaseAnswerI.push({
-                                    testId: arrUnique[0],
-                                    listCase: "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + percent.toFixed(2) + "W)"
-                                        + " , ",
-                                    listAnswer: [{
+                                if (index == -1) {
+                                    let v = listCaseIdbyTestId[objIndex]["totalUser"];
+                                    let r = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / v) * 100).toFixed(2);
+                                    let percent = 0.01 * (v * r + parseFloat(valueM) * answerC);
+                                    percent = percent / (v + parseFloat(valueM));
+                                    listCaseIdbyTestId[objIndex]["valueW"] = percent.toFixed(2);
+                                    listCaseAnswerI.push({
+                                        testId: arrUnique[0],
+                                        listCase: "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + percent.toFixed(2) + "W)" +
+                                            " , ",
+                                        listAnswer: [{
+                                            testId: arrUnique[0],
+                                            caseId: listCaseIdbyTestId[objIndex]["caseId"],
+                                            percent: percent.toFixed(2),
+                                            lesionId: arrUnique[3],
+                                            truthOrder: arrUnique[6]
+                                        }]
+                                    });
+                                } else {
+                                    let v = listCaseIdbyTestId[objIndex]["totalUser"];
+                                    let r = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / v) * 100).toFixed(2);
+                                    let percent = 0.01 * (v * r + parseFloat(valueM) * answerC);
+                                    percent = percent / (v + parseFloat(valueM));
+                                    listCaseIdbyTestId[objIndex]["valueW"] = percent.toFixed(2);
+                                    listCaseAnswerI[index]["listCase"] += "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + percent.toFixed(2) + "W)" +
+                                        " , ";
+                                    listCaseAnswerI[index]["listAnswer"].push({
                                         testId: arrUnique[0],
                                         caseId: listCaseIdbyTestId[objIndex]["caseId"],
                                         percent: percent.toFixed(2),
                                         lesionId: arrUnique[3],
                                         truthOrder: arrUnique[6]
-                                    }]
-                                });
-                            } else {
-                                let v = listCaseIdbyTestId[objIndex]["totalUser"];
-                                let r = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / v) * 100).toFixed(2);
-                                let percent = 0.01 * (v * r + parseFloat(valueM) * answerC);
-                                percent = percent / (v + parseFloat(valueM));
-                                listCaseIdbyTestId[objIndex]["valueW"] = percent.toFixed(2);
-                                listCaseAnswerI[index]["listCase"] += "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + percent.toFixed(2) + "W)"
-                                    + " , ";
-                                listCaseAnswerI[index]["listAnswer"].push({
-                                    testId: arrUnique[0],
-                                    caseId: listCaseIdbyTestId[objIndex]["caseId"],
-                                    percent: percent.toFixed(2),
-                                    lesionId: arrUnique[3],
-                                    truthOrder: arrUnique[6]
-                                });
+                                    });
+                                }
                             }
                         }
                     }
-                }
-            });
-            break;
+                });
+                break;
 
-        case "4":
-            const uniqueKDX = [...new Set(RowsDapAn.map(item => item["Test set"] + ":" + item["Case ID"] + ":" + item["Case Type"] + ":" + item["Lesion ID"]))];
-            uniqueKDX.forEach(function (unique) {
-                {
-                    const arrUnique = splitUniqueTest(unique);
-                    if (arrUnique[2] === "Abnormal") {
-                        let item = [];
-                        let objIndex = listCaseIdbyTestId.
-                            findIndex((obj => obj.testId === arrUnique[0] && obj.caseId.split(" - ")[0] === arrUnique[1]
-                                && obj.lesionId === arrUnique[3]));
-                        if (objIndex != -1) {
-                            let index = listCaseAnswerI.
+            case "4":
+                const uniqueKDX = [...new Set(RowsDapAn.map(item => item["Test set"] + ":" + item["Case ID"] + ":" + item["Case Type"] + ":" + item["Lesion ID"]))];
+                uniqueKDX.forEach(function(unique) {
+                    {
+                        const arrUnique = splitUniqueTest(unique);
+                        if (arrUnique[2] === "Abnormal") {
+                            let item = [];
+                            let objIndex = listCaseIdbyTestId.
+                            findIndex((obj => obj.testId === arrUnique[0] && obj.caseId.split(" - ")[0] === arrUnique[1] &&
+                                obj.lesionId === arrUnique[3] && obj.type === typeOfValue));
+                            if (objIndex != -1) {
+                                let index = listCaseAnswerI.
                                 findIndex((obj => obj.testId === arrUnique[0]));
-                            if (index == -1) {
-                                let v = listCaseIdbyTestId[objIndex]["totalUser"];
-                                let r = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / v) * 100).toFixed(2);
-                                let percent = 0.01 * (v * r + parseFloat(valueM) * answerC);
-                                percent = percent / (v + parseFloat(valueM));
-                                listCaseIdbyTestId[objIndex]["valueW"] = percent.toFixed(2);
-                                listCaseAnswerI.push({
-                                    testId: arrUnique[0],
-                                    listCase: "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + percent.toFixed(2) + "W)"
-                                        + " , ",
-                                    listAnswer: [{
+                                if (index == -1) {
+                                    let v = listCaseIdbyTestId[objIndex]["totalUser"];
+                                    let r = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / v) * 100).toFixed(2);
+                                    let percent = 0.01 * (v * r + parseFloat(valueM) * answerC);
+                                    percent = percent / (v + parseFloat(valueM));
+                                    listCaseIdbyTestId[objIndex]["valueW"] = percent.toFixed(2);
+                                    listCaseAnswerI.push({
+                                        testId: arrUnique[0],
+                                        listCase: "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + percent.toFixed(2) + "W)" +
+                                            " , ",
+                                        listAnswer: [{
+                                            testId: arrUnique[0],
+                                            caseId: listCaseIdbyTestId[objIndex]["caseId"],
+                                            percent: percent.toFixed(2),
+                                            lesionId: arrUnique[3]
+                                        }]
+                                    });
+                                } else {
+                                    let v = listCaseIdbyTestId[objIndex]["totalUser"];
+                                    let r = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / v) * 100).toFixed(2);
+                                    let percent = 0.01 * (v * r + parseFloat(valueM) * answerC);
+                                    percent = percent / (v + parseFloat(valueM));
+                                    listCaseIdbyTestId[objIndex]["valueW"] = percent.toFixed(2);
+                                    listCaseAnswerI[index]["listCase"] += "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + percent.toFixed(2) + "W)" +
+                                        " , ";
+                                    listCaseAnswerI[index]["listAnswer"].push({
                                         testId: arrUnique[0],
                                         caseId: listCaseIdbyTestId[objIndex]["caseId"],
                                         percent: percent.toFixed(2),
                                         lesionId: arrUnique[3]
-                                    }]
-                                });
-                            } else {
-                                let v = listCaseIdbyTestId[objIndex]["totalUser"];
-                                let r = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / v) * 100).toFixed(2);
-                                let percent = 0.01 * (v * r + parseFloat(valueM) * answerC);
-                                percent = percent / (v + parseFloat(valueM));
-                                listCaseIdbyTestId[objIndex]["valueW"] = percent.toFixed(2);
-                                listCaseAnswerI[index]["listCase"] += "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + percent.toFixed(2) + "W)"
-                                    + " , ";
-                                listCaseAnswerI[index]["listAnswer"].push({
-                                    testId: arrUnique[0],
-                                    caseId: listCaseIdbyTestId[objIndex]["caseId"],
-                                    percent: percent.toFixed(2),
-                                    lesionId: arrUnique[3]
-                                });
+                                    });
+                                }
                             }
                         }
                     }
-                }
-            });
-            break;
+                });
+                break;
 
-        case "1":
-            RowsDapAn.forEach(element => {
-                if (element["Case Type"] === "Normal") {
-                    let item = [];
-                    let objIndex = listCaseIdbyTestId.
-                        findIndex((obj => obj.testId === element["Test set"] && obj.caseId === element["Case ID"]));
-                    if (objIndex != -1) {
-                        let index = listCaseAnswerI.
-                            findIndex((obj => obj.testId === element["Test set"]));
-                        if (index == -1) {
-                            let v = listCaseIdbyTestId[objIndex]["totalUser"];
-                            let r = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / v) * 100).toFixed(2);
-                            let percent = 0.01 * (v * r + parseFloat(valueM) * answerC);
-                            percent = percent / (v + parseFloat(valueM));
-                            listCaseIdbyTestId[objIndex]["valueW"] = percent.toFixed(2);
-                            listCaseAnswerI.push({
-                                testId: element["Test set"],
-                                listCase: "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + percent.toFixed(2) + "W),",
-                                listAnswer: [{
-                                    testId: element["Test set"],
-                                    caseId: listCaseIdbyTestId[objIndex]["caseId"],
-                                    percent: percent.toFixed(2)
-                                }]
-                            });
-                        } else {
-                            let v = listCaseIdbyTestId[objIndex]["totalUser"];
-                            let r = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / v) * 100).toFixed(2);
-                            let percent = 0.01 * (v * r + parseFloat(valueM) * answerC);
-                            percent = percent / (v + parseFloat(valueM));
-                            listCaseIdbyTestId[objIndex]["valueW"] = percent.toFixed(2);
-                            listCaseAnswerI[index]["listCase"] += "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + percent.toFixed(2) + "W),";
-                            listCaseAnswerI[index]["listAnswer"].push({
-                                testId: element["Test set"],
-                                caseId: listCaseIdbyTestId[objIndex]["caseId"],
-                                percent: percent.toFixed(2)
-                            });
-                        }
-                    }
-                }
-            });
-            break;
-        default:
-            const uniqueDapAn = [...new Set(RowsDapAn.map(item => item["Test set"] + ":" + item["Case ID"] + ":" + item["Case Type"]))];
-            console.log("VALUE M =", valueM)
-            uniqueDapAn.forEach(function (unique) {
-                {
-                    const arrUnique = splitUniqueTest(unique);
-                    if (arrUnique[2] === "Abnormal") {
+            case "1":
+                RowsDapAn.forEach(element => {
+                    if (element["Case Type"] === "Normal") {
                         let item = [];
                         let objIndex = listCaseIdbyTestId.
-                            findIndex((obj => obj.testId === arrUnique[0] && obj.caseId === arrUnique[1]));
+                        findIndex((obj => obj.testId === element["Test set"] && obj.caseId === element["Case ID"] && obj.type === typeOfValue));
                         if (objIndex != -1) {
                             let index = listCaseAnswerI.
-                                findIndex((obj => obj.testId === arrUnique[0]));
+                            findIndex((obj => obj.testId === element["Test set"]));
                             if (index == -1) {
                                 let v = listCaseIdbyTestId[objIndex]["totalUser"];
                                 let r = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / v) * 100).toFixed(2);
@@ -1786,10 +1764,10 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                 percent = percent / (v + parseFloat(valueM));
                                 listCaseIdbyTestId[objIndex]["valueW"] = percent.toFixed(2);
                                 listCaseAnswerI.push({
-                                    testId: arrUnique[0],
+                                    testId: element["Test set"],
                                     listCase: "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + percent.toFixed(2) + "W),",
                                     listAnswer: [{
-                                        testId: arrUnique[0],
+                                        testId: element["Test set"],
                                         caseId: listCaseIdbyTestId[objIndex]["caseId"],
                                         percent: percent.toFixed(2)
                                     }]
@@ -1802,17 +1780,63 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                 listCaseIdbyTestId[objIndex]["valueW"] = percent.toFixed(2);
                                 listCaseAnswerI[index]["listCase"] += "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + percent.toFixed(2) + "W),";
                                 listCaseAnswerI[index]["listAnswer"].push({
-                                    testId: arrUnique[0],
+                                    testId: element["Test set"],
                                     caseId: listCaseIdbyTestId[objIndex]["caseId"],
                                     percent: percent.toFixed(2)
                                 });
                             }
                         }
                     }
-                }
-            });
-            break;
-    }
+                });
+                break;
+            default:
+                const uniqueDapAn = [...new Set(RowsDapAn.map(item => item["Test set"] + ":" + item["Case ID"] + ":" + item["Case Type"]))];
+                console.log("VALUE M =", valueM)
+                uniqueDapAn.forEach(function(unique) {
+                    {
+                        const arrUnique = splitUniqueTest(unique);
+                        if (arrUnique[2] === "Abnormal") {
+                            let item = [];
+                            let objIndex = listCaseIdbyTestId.
+                            findIndex((obj => obj.testId === arrUnique[0] && obj.caseId === arrUnique[1] && obj.type === typeOfValue));
+                            if (objIndex != -1) {
+                                let index = listCaseAnswerI.
+                                findIndex((obj => obj.testId === arrUnique[0]));
+                                if (index == -1) {
+                                    let v = listCaseIdbyTestId[objIndex]["totalUser"];
+                                    let r = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / v) * 100).toFixed(2);
+                                    let percent = 0.01 * (v * r + parseFloat(valueM) * answerC);
+                                    percent = percent / (v + parseFloat(valueM));
+                                    listCaseIdbyTestId[objIndex]["valueW"] = percent.toFixed(2);
+                                    listCaseAnswerI.push({
+                                        testId: arrUnique[0],
+                                        listCase: "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + percent.toFixed(2) + "W),",
+                                        listAnswer: [{
+                                            testId: arrUnique[0],
+                                            caseId: listCaseIdbyTestId[objIndex]["caseId"],
+                                            percent: percent.toFixed(2)
+                                        }]
+                                    });
+                                } else {
+                                    let v = listCaseIdbyTestId[objIndex]["totalUser"];
+                                    let r = ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / v) * 100).toFixed(2);
+                                    let percent = 0.01 * (v * r + parseFloat(valueM) * answerC);
+                                    percent = percent / (v + parseFloat(valueM));
+                                    listCaseIdbyTestId[objIndex]["valueW"] = percent.toFixed(2);
+                                    listCaseAnswerI[index]["listCase"] += "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + percent.toFixed(2) + "W),";
+                                    listCaseAnswerI[index]["listAnswer"].push({
+                                        testId: arrUnique[0],
+                                        caseId: listCaseIdbyTestId[objIndex]["caseId"],
+                                        percent: percent.toFixed(2)
+                                    });
+                                }
+                            }
+                        }
+                    }
+                });
+                break;
+        }
+    })
 
 
     // TINH TOAN COT D,E,F,G
@@ -1875,11 +1899,11 @@ function coreCalculate(RowsRawData, RowsDapAn) {
         if (item.length > 0) {
             item.forEach(items => {
                 let objIndex = listExportDataFinal.
-                    findIndex((obj => obj.userId === items["userId"]));
+                findIndex((obj => obj.userId === items["userId"] && obj.type === items["percentType"]));
                 if (objIndex == -1) {
                     listExportDataFinal.push({
                         userId: user["user_id"],
-                        type: "",
+                        type: items["percentType"],
                         totalCaseofUser: items["totalCase"],
                         listCaseIdTruebyUser: "Test " + items["testId"] + " : " + items["listCaseIdTrue"],
                         totalCaseIdTrue: items["numberCaseTrue"],
@@ -1958,11 +1982,11 @@ function coreCalculate(RowsRawData, RowsDapAn) {
 
         totalCaseJ = listKClone.length;
         if (selectScore == "1") {
-            listKClone = listKClone.sort(function (a, b) {
+            listKClone = listKClone.sort(function(a, b) {
                 return b.percent - a.percent;
             });
         } else {
-            listKClone = listKClone.sort(function (a, b) {
+            listKClone = listKClone.sort(function(a, b) {
                 return a.percent - b.percent;
             });
         }
@@ -1971,7 +1995,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             listKClone.splice(scoreLimit, listKClone.length - 1)
         }
 
-        listKClone = listKClone.sort(function (a, b) {
+        listKClone = listKClone.sort(function(a, b) {
             return a.testId - b.testId;
         });
 
@@ -1999,7 +2023,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             .map(obj => obj);
         if (caseCorrectMin == 0 && listTruebyUser.length > 0) {
             let listOutputTrue = [];
-            listTruebyUser = listTruebyUser.sort(function (a, b) {
+            listTruebyUser = listTruebyUser.sort(function(a, b) {
                 return a.percent - b.percent;
             });
             let roundValue = Math.round((listTruebyUser.length * caseCorrectMax) / 100);
@@ -2022,7 +2046,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                 listOutputTrue = listOutputTrueClone;
             }
 
-            listOutputTrue = listOutputTrue.sort(function (a, b) {
+            listOutputTrue = listOutputTrue.sort(function(a, b) {
                 return a.testId - b.testId;
             });
 
@@ -2043,7 +2067,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             }
         } else if (caseCorrectMax == 100 && listTruebyUser.length > 0) {
             let listOutputTrue = [];
-            listTruebyUser = listTruebyUser.sort(function (a, b) {
+            listTruebyUser = listTruebyUser.sort(function(a, b) {
                 return b.percent - a.percent;
             });
             let roundValue = Math.round((listTruebyUser.length * (100 - caseCorrectMin)) / 100);
@@ -2067,7 +2091,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                 }
                 listOutputTrue = listOutputTrueClone;
             }
-            listOutputTrue = listOutputTrue.sort(function (a, b) {
+            listOutputTrue = listOutputTrue.sort(function(a, b) {
                 return a.testId - b.testId;
             });
             if (listOutputTrue.length > 0) {
@@ -2087,7 +2111,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
         } else {
             if (listTruebyUser.length > 0) {
                 let listOutputTrue = [];
-                listTruebyUser = listTruebyUser.sort(function (a, b) {
+                listTruebyUser = listTruebyUser.sort(function(a, b) {
                     return a.percent - b.percent;
                 });
                 let min1 = Math.round((listTruebyUser.length * caseCorrectMin) / 100);
@@ -2119,7 +2143,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                         }
                         listOutputTrue = listOutputTrueClone;
                     }
-                    listOutputTrue = listOutputTrue.sort(function (a, b) {
+                    listOutputTrue = listOutputTrue.sort(function(a, b) {
                         return a.testId - b.testId;
                     });
                     let listReUseTrue = "(Tính theo W USER-TRUE ở giữa)\n" + "Test " + listOutputTrue[0]["testId"] + " : ";
@@ -2135,8 +2159,8 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                     element["listReUseTrue"] = listReUseTrue;
                     element["totalReuseTrue"] = listOutputTrue.length;
                 } else if (listOutputTrue.length == 1) {
-                    element["listReUseTrue"] = "(Tính theo W USER-TRUE ở giữa)\n" + "Test " + listOutputTrue[0]["testId"] + " : "
-                        + "Case" + listOutputTrue[0]["caseId"] + " (" + listOutputTrue[0]["percent"] + "W), ";
+                    element["listReUseTrue"] = "(Tính theo W USER-TRUE ở giữa)\n" + "Test " + listOutputTrue[0]["testId"] + " : " +
+                        "Case" + listOutputTrue[0]["caseId"] + " (" + listOutputTrue[0]["percent"] + "W), ";
                     element["totalReuseTrue"] = 1;
                 }
             }
@@ -2155,7 +2179,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             .map(obj => obj);
         if (caseInCorrectMin == 0 && listFalsebyUser.length > 0) {
             let listOutputFalse = [];
-            listFalsebyUser = listFalsebyUser.sort(function (a, b) {
+            listFalsebyUser = listFalsebyUser.sort(function(a, b) {
                 return a.percent - b.percent;
             });
             let roundValueFalse = Math.round((listFalsebyUser.length * caseInCorrectMax) / 100);
@@ -2176,7 +2200,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                 }
                 listOutputFalse = listOutputFalseClone;
             }
-            listOutputFalse = listOutputFalse.sort(function (a, b) {
+            listOutputFalse = listOutputFalse.sort(function(a, b) {
                 return a.testId - b.testId;
             });
             if (listOutputFalse.length > 0) {
@@ -2196,7 +2220,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
 
         } else if (caseInCorrectMax == 100 && listFalsebyUser.length > 0) {
             let listOutputFalse = [];
-            listFalsebyUser = listFalsebyUser.sort(function (a, b) {
+            listFalsebyUser = listFalsebyUser.sort(function(a, b) {
                 return b.percent - a.percent;
             });
 
@@ -2220,7 +2244,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                 }
                 listOutputFalse = listOutputFalseClone;
             }
-            listOutputFalse = listOutputFalse.sort(function (a, b) {
+            listOutputFalse = listOutputFalse.sort(function(a, b) {
                 return a.testId - b.testId;
             });
 
@@ -2242,7 +2266,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
         } else {
             if (listFalsebyUser.length > 0) {
                 let listOutputFalse = [];
-                listFalsebyUser = listFalsebyUser.sort(function (a, b) {
+                listFalsebyUser = listFalsebyUser.sort(function(a, b) {
                     return a.percent - b.percent;
                 });
                 let min1 = Math.round((listFalsebyUser.length * caseInCorrectMin) / 100);
@@ -2273,7 +2297,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                         }
                         listOutputFalse = listOutputFalseClone;
                     }
-                    listOutputFalse = listOutputFalse.sort(function (a, b) {
+                    listOutputFalse = listOutputFalse.sort(function(a, b) {
                         return a.testId - b.testId;
                     });
                     let listReUseFalse = "(Tính theo W USER-FALSE ở giữa)\n" + "Test " + listOutputFalse[0]["testId"] + " : ";
@@ -2289,8 +2313,8 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                     element["listReUseFalse"] = listReUseFalse;
                     element["totalReuseFalse"] = listOutputFalse.length;
                 } else if (listOutputFalse.length == 1) {
-                    element["listReUseFalse"] = "(Tính theo W USER-FALSE ở giữa)\n" + "Test " + listOutputFalse[0]["testId"] + " : "
-                        + "Case" + listOutputFalse[0]["caseId"] + " (" + listOutputFalse[0]["percent"] + "W), ";
+                    element["listReUseFalse"] = "(Tính theo W USER-FALSE ở giữa)\n" + "Test " + listOutputFalse[0]["testId"] + " : " +
+                        "Case" + listOutputFalse[0]["caseId"] + " (" + listOutputFalse[0]["percent"] + "W), ";
                     element["totalReuseFalse"] = 1;
                 }
             }
@@ -2361,23 +2385,6 @@ function caclAverageFG() {
         let averageFalse = totalFalse / strFinalFalse.length;
         element["averageF"] = averageTrue.toFixed(2) + "W";
         element["averageG"] = averageFalse.toFixed(2) + "W";
-        switch (dropdownValue) {
-            case "1":
-                element["type"] = "Normal";
-                break;
-            case "2":
-                element["type"] = "AbNormal";
-                break;
-            case "3":
-                element["type"] = "Symmetric";
-                break;
-            case "4":
-                element["type"] = "NonSymmetric";
-                break;
-            case "5":
-                element["type"] = "Recall";
-                break;
-        }
     });
 }
 
@@ -2407,6 +2414,7 @@ function calcAverageI(listCaseAnswerI) {
 
 let listTrue = [];
 let listFalse = [];
+
 function calcPercentOfCaseIdRawData(data) {
     let listAverageTrue = [];
     let listAverageFalse = [];
@@ -2416,7 +2424,7 @@ function calcPercentOfCaseIdRawData(data) {
 
     str.forEach(element => {
         let objIndex = listClone.
-            findIndex((obj => obj.testId === data["testId"] && obj.caseId === element));
+        findIndex((obj => obj.testId === data["testId"] && obj.caseId === element && obj.type === data["percentType"]));
         if (objIndex != -1) {
             let percent = (listClone[objIndex]["totalUserTruth"] / listClone[objIndex]["totalUser"]) * 100;
             listAverageTrue.push(percent.toFixed(2));
@@ -2429,7 +2437,7 @@ function calcPercentOfCaseIdRawData(data) {
     let listClone2 = listCaseIdbyTestId.slice(0);
     str2.forEach(element => {
         let objIndex1 = listClone2.
-            findIndex((obj => obj.testId === data["testId"] && obj.caseId === element));
+        findIndex((obj => obj.testId === data["testId"] && obj.caseId === element && obj.type === data["percentType"]));
         if (objIndex1 != -1) {
             let percent = (listClone2[objIndex1]["totalUserTruth"] / listClone2[objIndex1]["totalUser"]) * 100;
             listAverageFalse.push(percent.toFixed(2));
@@ -2468,7 +2476,7 @@ function calcValueWWWOfCaseIdRawData(data) {
 
     str.forEach(element => {
         let objIndex = listClone.
-            findIndex((obj => obj.testId === data["testId"] && obj.caseId === element));
+        findIndex((obj => obj.testId === data["testId"] && obj.caseId === element && obj.type === data["percentType"]));
         if (objIndex != -1) {
             percent = listClone[objIndex]["valueW"];
             listTrue.push({
@@ -2503,7 +2511,7 @@ function calcValueWWWOfCaseIdRawData(data) {
     let listClone2 = listCaseIdbyTestId.slice(0);
     str2.forEach(element => {
         let objIndex1 = listClone2.
-            findIndex((obj => obj.testId === data["testId"] && obj.caseId === element));
+        findIndex((obj => obj.testId === data["testId"] && obj.caseId === element && obj.type === data["percentType"]));
         if (objIndex1 != -1) {
             percent = listClone2[objIndex1]["valueW"];
             listFalse.push({
@@ -2536,11 +2544,11 @@ function calcValueWWWOfCaseIdRawData(data) {
     });
     console.log("STRRRRR", str);
     let listTrueClone = listTrueTiny;
-    listTrueClone = listTrueClone.sort(function (a, b) {
+    listTrueClone = listTrueClone.sort(function(a, b) {
         return a.percent - b.percent;
     });
     let listFalseClone = listFalseTiny;
-    listFalseClone = listFalseClone.sort(function (a, b) {
+    listFalseClone = listFalseClone.sort(function(a, b) {
         return a.percent - b.percent;
     });
     listTrueClone.forEach(element => {
@@ -2596,96 +2604,35 @@ function exportExcel() {
         timeTrue: "Số giờ",
         exp: "Số năm kinh nghiệm"
     };
-    var myHeader2;
-
-    switch (dropdownValue) {
-        case "3":
-            myHeader2 = {
-                testId: "Test ID",
-                caseId: "Case ID",
-                lesionId: "LesionID",
-                truthX: "Truth X",
-                truthY: "Truth Y",
-                truthOrder: "Truth Order",
-                totalUserTruth: "Total True",
-                totalUser: "Total",
-                percent: "Percent",
-                listUserIdTrue: "List User Id True",
-                listUserAddressTrue: "Address True",
-                listUserGroupTrue: "Group True",
-                listUserTimeTrue: "Time True",
-                listUserExpTrue: "Exp True",
-                listUserIdFalse: "List User Id False",
-                listUserAddressFalse: "Address False",
-                listUserGroupFalse: "Group False",
-                listUserTimeFalse: "Time False",
-                listUserExpFalse: "Exp False",
-                listAge: "Age",
-                listCaseDensity: "Case Density",
-                listLesionType: "Lesion Type",
-                type: "Type",
-                lesionSide: "Lesion side",
-                lesionSite: "Lesion site",
-                lesionSize: "Lesion size (mm)",
-                valueW: "W Value"
-            };
-            break;
-        case "4":
-            myHeader2 = {
-                testId: "Test ID",
-                caseId: "Case ID",
-                lesionId: "LesionID",
-                totalUserTruth: "Total True",
-                totalUser: "Total",
-                percent: "Percent",
-                listUserIdTrue: "List User Id True",
-                listUserAddressTrue: "Address True",
-                listUserGroupTrue: "Group True",
-                listUserTimeTrue: "Time True",
-                listUserExpTrue: "Exp True",
-                listUserIdFalse: "List User Id False",
-                listUserAddressFalse: "Address False",
-                listUserGroupFalse: "Group False",
-                listUserTimeFalse: "Time False",
-                listUserExpFalse: "Exp False",
-                listAge: "Age",
-                listCaseDensity: "Case Density",
-                listLesionType: "Lesion Type",
-                type: "Type",
-                lesionSide: "Lesion side",
-                lesionSite: "Lesion site",
-                lesionSize: "Lesion size (mm)",
-                valueW: "W Value"
-            };
-            break;
-        default:
-            myHeader2 = {
-                testId: "Test ID",
-                caseId: "Case ID",
-                totalUserTruth: "Total True",
-                totalUser: "Total",
-                percent: "Percent",
-                listUserIdTrue: "List User Id True",
-                listUserAddressTrue: "Address True",
-                listUserGroupTrue: "Group True",
-                listUserTimeTrue: "Time True",
-                listUserExpTrue: "Exp True",
-                listUserIdFalse: "List User Id False",
-                listUserAddressFalse: "Address False",
-                listUserGroupFalse: "Group False",
-                listUserTimeFalse: "Time False",
-                listUserExpFalse: "Exp False",
-                listAge: "Age",
-                listCaseDensity: "Case Density",
-                listLesionType: "Lesion Type",
-                type: "Type",
-                lesionSide: "Lesion side",
-                lesionSite: "Lesion site",
-                lesionSize: "Lesion size (mm)",
-                valueW: "W Value"
-            };
-            break;
-    }
+    var myHeader2 = {
+        testId: "Test ID",
+        caseId: "Case ID",
+        lesionId: "LesionID",
+        truthX: "Truth X",
+        truthY: "Truth Y",
+        truthOrder: "Truth Order",
+        totalUserTruth: "Total True",
+        totalUser: "Total",
+        percent: "Percent",
+        listUserIdTrue: "List User Id True",
+        listUserAddressTrue: "Address True",
+        listUserGroupTrue: "Group True",
+        listUserTimeTrue: "Time True",
+        listUserExpTrue: "Exp True",
+        listUserIdFalse: "List User Id False",
+        listUserAddressFalse: "Address False",
+        listUserGroupFalse: "Group False",
+        listUserTimeFalse: "Time False",
+        listUserExpFalse: "Exp False",
+        listAge: "Age",
+        listCaseDensity: "Case Density",
+        listLesionType: "Lesion Type",
+        type: "Type",
+        lesionSide: "Lesion side",
+        lesionSite: "Lesion site",
+        lesionSize: "Lesion size (mm)",
+        valueW: "W Value"
+    };
 
     const myHeaderRawData = {
         testId: "test_id",
@@ -2746,11 +2693,21 @@ function exportExcel() {
 
 
 
+    var tab_dynamic = {};
+    var tab_2 = [],
+        tab_3 = [],
+        tab_4 = [],
+        tab_5 = [],
+        tab_6 = [];
 
-    var tab_1 = [], tab_2 = [], tab_3 = [], tab_4 = [], tab_5 = [];
-    var tab_6 = [], tab_7 = [], tab_8 = [], tab_9 = []
-    listExportDataFinal.forEach(element => {
-        tab_1.push(element);
+    dropdownArrayValue.forEach(function(dropdownValue) {
+        var listExportDataFinalByDropdown = listExportDataFinal.filter(obj => obj["type"] === dropdownObject[dropdownValue])
+            .map(obj => obj);
+        var tab_value = [];
+        listExportDataFinalByDropdown.forEach(element => {
+            tab_value.push(element);
+        });
+        tab_dynamic[dropdownObject[dropdownValue]] = tab_value;
     });
     // listExportDataAbnormal.forEach(element => {
     //     element.testId = parseInt(element.testId)
@@ -2797,33 +2754,14 @@ function exportExcel() {
     //     tab_1.push(element);
     // });
 
-    switch (dropdownValue) {
-        case "3":
-            listCaseIdbyTestId.forEach(element => {
-                element.testId = parseInt(element.testId)
-                element.caseId = parseInt(element.caseId)
-                element.lesionId = parseInt(element.lesionId)
-                element.truthX = parseInt(element.truthX)
-                element.truthY = parseInt(element.truthY)
-                tab_2.push(element);
-            });
-            break;
-        case "4":
-            listCaseIdbyTestId.forEach(element => {
-                element.testId = parseInt(element.testId)
-                element.caseId = parseInt(element.caseId)
-                element.lesionId = parseInt(element.lesionId)
-                tab_2.push(element);
-            });
-            break;
-        default:
-            listCaseIdbyTestId.forEach(element => {
-                element.testId = parseInt(element.testId)
-                element.caseId = parseInt(element.caseId)
-                tab_2.push(element);
-            });
-            break;
-    }
+    listCaseIdbyTestId.forEach(element => {
+        element.testId = element.testId ? parseInt(element.testId) : ""
+        element.caseId = element.caseId ? parseInt(element.caseId) : ""
+        element.lesionId = element.lesionId ? parseInt(element.lesionId) : ""
+        element.truthX = element.truthX ? parseInt(element.truthX) : ""
+        element.truthY = element.truthY ? parseInt(element.truthY) : ""
+        tab_2.push(element);
+    });
 
     answerFilter.forEach(element => {
         element["Test set"] = parseInt(element["Test set"])
@@ -2878,7 +2816,10 @@ function exportExcel() {
 
 
     // format header
-    tab_1.unshift(myHeader);
+    dropdownArrayValue.forEach(function(dropdownValue) {
+        tab_dynamic[dropdownObject[dropdownValue]].unshift(myHeader)
+    })
+
     tab_2.unshift(myHeader2);
     tab_3.unshift(myHeaderDapAn);
     tab_4.unshift(myHeaderUser);
@@ -2888,28 +2829,36 @@ function exportExcel() {
     let excel = XlsxPopulate.fromBlankAsync()
         .then(workbook => {
             // Add sheet the workbook.
-            let sheet1 = workbook.addSheet("Report_1");
+            let isFirst = true
+            dropdownArrayValue.forEach(function(dropdownValue) {
+                let sheetDynamic = workbook.addSheet("Report_" + dropdownObject[dropdownValue]);
+                sheetDynamic.cell("A1").value(convertArrayObjectToNestedArray(tab_dynamic[dropdownObject[dropdownValue]]))
+                sheetDynamic = setHeaderStyleAndAutoFillter(sheetDynamic)
+
+                if (isFirst)
+                    sheetDynamic.active(true);
+                isFirst = false;
+            })
+
             let sheet2 = workbook.addSheet("Report_2");
             let sheet3 = workbook.addSheet("Dap An");
             let sheet4 = workbook.addSheet("User");
             let sheet5 = workbook.addSheet("Raw Data");
             let sheet6 = workbook.addSheet("Filter");
 
-            sheet1.cell("A1").value(convertArrayObjectToNestedArray(tab_1))
             sheet2.cell("A1").value(convertArrayObjectToNestedArray(tab_2))
             sheet3.cell("A1").value(convertArrayObjectToNestedArray(tab_3))
             sheet4.cell("A1").value(convertArrayObjectToNestedArray(tab_4))
             sheet5.cell("A1").value(convertArrayObjectToNestedArray(tab_5))
             sheet6.cell("A1").value(convertArrayObjectToNestedArray(tab_6))
 
-            sheet1 = setHeaderStyleAndAutoFillter(sheet1)
             sheet2 = setHeaderStyleAndAutoFillter(sheet2)
             sheet3 = setHeaderStyleAndAutoFillter(sheet3)
             sheet4 = setHeaderStyleAndAutoFillter(sheet4)
             sheet5 = setHeaderStyleAndAutoFillter(sheet5)
             sheet6 = setHeaderStyleAndAutoFillter(sheet6)
+
             // Activate the sheet
-            sheet1.active(true);
             // sheet2.active(true);
             // sheet3.active(true);
             // sheet4.active(true);
@@ -2921,7 +2870,7 @@ function exportExcel() {
             // sheet to file.
             generateBlob(workbook)
         }).then(() => {
-            setTimeout(function () {
+            setTimeout(function() {
                 // location.reload()
                 tableRowData.clear()
                     .draw();
@@ -2931,37 +2880,38 @@ function exportExcel() {
 
 
 function generateBlob(workbook, type) {
-    return workbook.outputAsync({ type: type }).then(function (blob) {
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-            window.navigator.msSaveOrOpenBlob(blob, "Report.xlsx");
-        } else {
-            var url = window.URL.createObjectURL(blob);
-            var a = document.createElement("a");
-            document.body.appendChild(a);
-            a.href = url;
-            a.download = "Report.xlsx";
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        }
-    })
-        .catch(function (err) {
+    return workbook.outputAsync({ type: type }).then(function(blob) {
+            if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                window.navigator.msSaveOrOpenBlob(blob, "Report.xlsx");
+            } else {
+                var url = window.URL.createObjectURL(blob);
+                var a = document.createElement("a");
+                document.body.appendChild(a);
+                a.href = url;
+                a.download = "Report.xlsx";
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            }
+        })
+        .catch(function(err) {
             alert(err.message || err);
             throw err;
         });
 }
 
 function convertArrayObjectToNestedArray(arrayObject) {
-    return arrayObject.map(function (obj) {
+    return arrayObject.map(function(obj) {
         return convertObjectToArray(obj);
     });
 }
 
 function convertObjectToArray(obj) {
-    return Object.keys(obj).map(function (key) {
+    return Object.keys(obj).map(function(key) {
         return obj[key];
     });
 }
+
 function setHeaderStyleAndAutoFillter(worksheet) {
     // bold header
     worksheet.range("A1:Y1").autoFilter().style("bold", true);
@@ -3065,15 +3015,16 @@ function convertlstAnswer(lstDataRow) {
 // add true answer to list data export, dùng chung cho tất cả
 function checkDistinctTrueAnswer(testId, userId, listExportData, session_no, objDapAn, type) {
     var objIndex;
-    let user = userFilter.filter(obj => obj["test_id"] == testId
-        && obj["user_id"] == userId
-        && obj["session_no"] == session_no)
+    let user = userFilter.filter(obj => obj["test_id"] == testId &&
+            obj["user_id"] == userId &&
+            obj["session_no"] == session_no)
         .map(obj => obj);
 
     const check = listExportData
-        .filter(obj => obj["testId"] === testId
-            && obj["userId"] === userId
-            && obj["sessionNo"] === session_no)
+        .filter(obj => obj["testId"] === testId &&
+            obj["userId"] === userId &&
+            obj["sessionNo"] === session_no &&
+            obj["percentType"] == type)
         .map(obj => obj);
     if (check.length == 0) {
         listExportData.push({
@@ -3105,7 +3056,7 @@ function checkDistinctTrueAnswer(testId, userId, listExportData, session_no, obj
         })
 
         objIndex = listExportData.
-            findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no));
+        findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no && obj.percentType == type));
 
         if (listExportData[objIndex].listAgeTrue == "") {
             listExportData[objIndex].listAgeTrue += (objDapAn[0]["Tuổi"]);
@@ -3161,7 +3112,7 @@ function checkDistinctTrueAnswer(testId, userId, listExportData, session_no, obj
         listExportData[objIndex].percent = (listExportData[objIndex].numberCaseTrue / listExportData[objIndex].totalCase) * 100 + "W";
     } else {
         objIndex = listExportData.
-            findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no));
+        findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no && obj.percentType == type));
         listExportData[objIndex].numberCaseTrue++;
         listExportData[objIndex].totalCase++;
         listExportData[objIndex].percent = (listExportData[objIndex].numberCaseTrue / listExportData[objIndex].totalCase) * 100 + "W";
@@ -3215,15 +3166,16 @@ function checkDistinctTrueAnswer(testId, userId, listExportData, session_no, obj
 // add false answer to list data export, dùng chung cho tất cả
 function checkDistinctTotalAnswer(testId, userId, listExportData, session_no, objDapAn, type) {
     var objIndex;
-    let user = userFilter.filter(obj => obj["test_id"] == testId
-        && obj["user_id"] == userId
-        && obj["session_no"] == session_no)
+    let user = userFilter.filter(obj => obj["test_id"] == testId &&
+            obj["user_id"] == userId &&
+            obj["session_no"] == session_no)
         .map(obj => obj);
 
     const check = listExportData
-        .filter(obj => obj["testId"] === testId
-            && obj["userId"] === userId
-            && obj["sessionNo"] === session_no)
+        .filter(obj => obj["testId"] === testId &&
+            obj["userId"] === userId &&
+            obj["sessionNo"] === session_no &&
+            obj["percentType"] == type)
         .map(obj => obj);
     if (check.length == 0) {
         listExportData.push({
@@ -3255,7 +3207,7 @@ function checkDistinctTotalAnswer(testId, userId, listExportData, session_no, ob
         })
 
         objIndex = listExportData.
-            findIndex((obj => obj.testId == testId && obj.userId == userId && obj.sessionNo === session_no));
+        findIndex((obj => obj.testId == testId && obj.userId == userId && obj.sessionNo === session_no && obj.percentType === type));
 
         if (listExportData[objIndex].listAgeFalse == "") {
             listExportData[objIndex].listAgeFalse += (objDapAn[0]["Tuổi"]);
@@ -3311,7 +3263,7 @@ function checkDistinctTotalAnswer(testId, userId, listExportData, session_no, ob
         listExportData[objIndex].percent = (listExportData[objIndex].numberCaseTrue / listExportData[objIndex].totalCase) * 100 + "W";
     } else {
         objIndex = listExportData.
-            findIndex((obj => obj.testId == testId && obj.userId == userId && obj.sessionNo === session_no));
+        findIndex((obj => obj.testId == testId && obj.userId == userId && obj.sessionNo === session_no && obj.percentType === type));
         listExportData[objIndex].totalCase++;
         listExportData[objIndex].percent = (listExportData[objIndex].numberCaseTrue / listExportData[objIndex].totalCase) * 100 + "W";
         if (listExportData[objIndex].listAgeFalse == "") {
@@ -3361,15 +3313,16 @@ function checkDistinctTotalAnswer(testId, userId, listExportData, session_no, ob
 
 
 function checkDistinctSymmetric(testId, userId, listExportData, session_no, case_true, total_case, objDapAn, type, listSysTrue, listSysFalse) {
-    let user = userFilter.filter(obj => obj["test_id"] == testId
-        && obj["user_id"] == userId
-        && obj["session_no"] == session_no)
+    let user = userFilter.filter(obj => obj["test_id"] == testId &&
+            obj["user_id"] == userId &&
+            obj["session_no"] == session_no)
         .map(obj => obj);
 
     const check = listExportData
-        .filter(obj => obj["testId"] === testId
-            && obj["userId"] === userId
-            && obj["sessionNo"] === session_no)
+        .filter(obj => obj["testId"] === testId &&
+            obj["userId"] === userId &&
+            obj["sessionNo"] === session_no &&
+            obj["percentType"] === type)
         .map(obj => obj);
     if (check.length == 0) {
         listExportData.push({
@@ -3400,7 +3353,7 @@ function checkDistinctSymmetric(testId, userId, listExportData, session_no, case
             userExp: user[0]["Số năm kinh nghiệm"]
         })
         objIndex = listExportData.
-            findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no));
+        findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no && obj.percentType === type));
 
         if (listSysTrue.length !== 0) {
             for (var i = 0; i < listSysTrue.length; i++) {
@@ -3419,11 +3372,11 @@ function checkDistinctSymmetric(testId, userId, listExportData, session_no, case
         if (listSysTrue.length !== 0) {
             for (var i = 0; i < listSysTrue.length; i++) {
                 if (listExportData[objIndex].listCaseIdTrue == "") {
-                    listExportData[objIndex].listCaseIdTrue += (listSysTrue[i].arrayTrue[0]["Case ID"]) + " - "
-                        + (listSysTrue[i].arrayTrue[0]["Lesion ID"]) + " - " + (listSysTrue[i].arrayTrue[0]["Truth Order"]);
+                    listExportData[objIndex].listCaseIdTrue += (listSysTrue[i].arrayTrue[0]["Case ID"]) + " - " +
+                        (listSysTrue[i].arrayTrue[0]["Lesion ID"]) + " - " + (listSysTrue[i].arrayTrue[0]["Truth Order"]);
                 } else {
-                    listExportData[objIndex].listCaseIdTrue += ("," + listSysTrue[i].arrayTrue[0]["Case ID"]) + " - "
-                        + (listSysTrue[i].arrayTrue[0]["Lesion ID"]) + " - " + (listSysTrue[i].arrayTrue[0]["Truth Order"]);
+                    listExportData[objIndex].listCaseIdTrue += ("," + listSysTrue[i].arrayTrue[0]["Case ID"]) + " - " +
+                        (listSysTrue[i].arrayTrue[0]["Lesion ID"]) + " - " + (listSysTrue[i].arrayTrue[0]["Truth Order"]);
                 }
             }
         }
@@ -3519,11 +3472,11 @@ function checkDistinctSymmetric(testId, userId, listExportData, session_no, case
                 if (listSysFalse[i].arrayFalse.length !== 0) {
                     for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
                         if (listExportData[objIndex].listCaseIdFalse == "") {
-                            listExportData[objIndex].listCaseIdFalse += (listSysFalse[i].arrayFalse[k]["Case ID"]) + " - "
-                                + (listSysFalse[i].arrayFalse[k]["Lesion ID"]) + " - " + (listSysFalse[i].arrayFalse[k]["Truth Order"]);
+                            listExportData[objIndex].listCaseIdFalse += (listSysFalse[i].arrayFalse[k]["Case ID"]) + " - " +
+                                (listSysFalse[i].arrayFalse[k]["Lesion ID"]) + " - " + (listSysFalse[i].arrayFalse[k]["Truth Order"]);
                         } else {
-                            listExportData[objIndex].listCaseIdFalse += ("," + listSysFalse[i].arrayFalse[k]["Case ID"]) + " - "
-                                + (listSysFalse[i].arrayFalse[k]["Lesion ID"]) + " - " + (listSysFalse[i].arrayFalse[k]["Truth Order"]);
+                            listExportData[objIndex].listCaseIdFalse += ("," + listSysFalse[i].arrayFalse[k]["Case ID"]) + " - " +
+                                (listSysFalse[i].arrayFalse[k]["Lesion ID"]) + " - " + (listSysFalse[i].arrayFalse[k]["Truth Order"]);
                         }
                     }
                 }
@@ -3613,18 +3566,18 @@ function checkDistinctSymmetric(testId, userId, listExportData, session_no, case
 
     } else {
         objIndex = listExportData.
-            findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no));
+        findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no && obj.percentType === type));
         listExportData[objIndex].numberCaseTrue += case_true;
         listExportData[objIndex].totalCase += total_case;
 
         if (listSysTrue.length !== 0) {
             for (var i = 0; i < listSysTrue.length; i++) {
                 if (listExportData[objIndex].listCaseIdTrue == "") {
-                    listExportData[objIndex].listCaseIdTrue += (listSysTrue[i].arrayTrue[0]["Case ID"]) + " - "
-                        + (listSysTrue[i].arrayTrue[0]["Lesion ID"]) + " - " + (listSysTrue[i].arrayTrue[0]["Truth Order"]);
+                    listExportData[objIndex].listCaseIdTrue += (listSysTrue[i].arrayTrue[0]["Case ID"]) + " - " +
+                        (listSysTrue[i].arrayTrue[0]["Lesion ID"]) + " - " + (listSysTrue[i].arrayTrue[0]["Truth Order"]);
                 } else {
-                    listExportData[objIndex].listCaseIdTrue += ("," + listSysTrue[i].arrayTrue[0]["Case ID"]) + " - "
-                        + (listSysTrue[i].arrayTrue[0]["Lesion ID"]) + " - " + (listSysTrue[i].arrayTrue[0]["Truth Order"]);
+                    listExportData[objIndex].listCaseIdTrue += ("," + listSysTrue[i].arrayTrue[0]["Case ID"]) + " - " +
+                        (listSysTrue[i].arrayTrue[0]["Lesion ID"]) + " - " + (listSysTrue[i].arrayTrue[0]["Truth Order"]);
                 }
             }
         }
@@ -3633,11 +3586,11 @@ function checkDistinctSymmetric(testId, userId, listExportData, session_no, case
                 if (listSysFalse[i].arrayFalse.length !== 0) {
                     for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
                         if (listExportData[objIndex].listCaseIdFalse == "") {
-                            listExportData[objIndex].listCaseIdFalse += (listSysFalse[i].arrayFalse[k]["Case ID"]) + " - "
-                                + (listSysFalse[i].arrayFalse[k]["Lesion ID"]) + " - " + (listSysFalse[i].arrayFalse[k]["Truth Order"]);
+                            listExportData[objIndex].listCaseIdFalse += (listSysFalse[i].arrayFalse[k]["Case ID"]) + " - " +
+                                (listSysFalse[i].arrayFalse[k]["Lesion ID"]) + " - " + (listSysFalse[i].arrayFalse[k]["Truth Order"]);
                         } else {
-                            listExportData[objIndex].listCaseIdFalse += ("," + listSysFalse[i].arrayFalse[k]["Case ID"]) + " - "
-                                + (listSysFalse[i].arrayFalse[k]["Lesion ID"]) + " - " + (listSysFalse[i].arrayFalse[k]["Truth Order"]);
+                            listExportData[objIndex].listCaseIdFalse += ("," + listSysFalse[i].arrayFalse[k]["Case ID"]) + " - " +
+                                (listSysFalse[i].arrayFalse[k]["Lesion ID"]) + " - " + (listSysFalse[i].arrayFalse[k]["Truth Order"]);
                         }
                     }
                 }
@@ -3818,15 +3771,15 @@ function checkDistinctSymmetric(testId, userId, listExportData, session_no, case
 
 
 function checkDistinctNonSymmetric(testId, userId, listExportData, session_no, case_true, total_case, objDapAn, type) {
-    let user = userFilter.filter(obj => obj["test_id"] == testId
-        && obj["user_id"] == userId
-        && obj["session_no"] == session_no)
+    let user = userFilter.filter(obj => obj["test_id"] == testId &&
+            obj["user_id"] == userId &&
+            obj["session_no"] == session_no)
         .map(obj => obj);
 
     const check = listExportData
-        .filter(obj => obj["testId"] === testId
-            && obj["userId"] === userId
-            && obj["sessionNo"] === session_no)
+        .filter(obj => obj["testId"] === testId &&
+            obj["userId"] === userId &&
+            obj["sessionNo"] === session_no)
         .map(obj => obj);
     if (check.length == 0) {
         listExportData.push({
@@ -3857,7 +3810,7 @@ function checkDistinctNonSymmetric(testId, userId, listExportData, session_no, c
             userExp: user[0]["Số năm kinh nghiệm"]
         })
         objIndex = listExportData.
-            findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no));
+        findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no));
         if (case_true > 0) {
             if (listExportData[objIndex].listAgeTrue == "") {
                 listExportData[objIndex].listAgeTrue += (objDapAn[0]["Tuổi"]);
@@ -3956,7 +3909,7 @@ function checkDistinctNonSymmetric(testId, userId, listExportData, session_no, c
 
     } else {
         objIndex = listExportData.
-            findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no));
+        findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no));
         listExportData[objIndex].numberCaseTrue += case_true;
         listExportData[objIndex].totalCase += total_case;
 
@@ -4053,14 +4006,15 @@ function checkDistinctNonSymmetric(testId, userId, listExportData, session_no, c
 
 function checkDistinctNonSymmetric1(testId, userId, listExportData, session_no, case_true, total_case, objDapAn, type, listSysTrue, listSysFalse) {
     // console.log("LISSS FALSEEE", listSysFalse)
-    let user = userFilter.filter(obj => obj["test_id"] == testId
-        && obj["user_id"] == userId
-        && obj["session_no"] == session_no)
+    let user = userFilter.filter(obj => obj["test_id"] == testId &&
+            obj["user_id"] == userId &&
+            obj["session_no"] == session_no)
         .map(obj => obj);
     const check = listExportData
-        .filter(obj => obj["testId"] === testId
-            && obj["userId"] === userId
-            && obj["sessionNo"] === session_no)
+        .filter(obj => obj["testId"] === testId &&
+            obj["userId"] === userId &&
+            obj["sessionNo"] === session_no &&
+            obj["percentType"] === type)
         .map(obj => obj);
     var checkLesion = [];
     var checkLesionFalse = [];
@@ -4093,17 +4047,17 @@ function checkDistinctNonSymmetric1(testId, userId, listExportData, session_no, 
             userExp: user[0]["Số năm kinh nghiệm"]
         })
         objIndex = listExportData.
-            findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no));
+        findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no && obj.percentType === type));
 
         if (listSysTrue.length !== 0) {
             for (var i = 0; i < listSysTrue.length; i++) {
                 if (listSysTrue[i].arrayTrue.length !== 0) {
                     for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
                         objIndexLesion = checkLesion.
-                            findIndex((obj => obj === listSysTrue[i].arrayTrue[k]["Lesion ID"]));
+                        findIndex((obj => obj === listSysTrue[i].arrayTrue[k]["Lesion ID"]));
                         if (objIndexLesion == -1) {
                             checkLesion.push(listSysTrue[i].arrayTrue[k]["Lesion ID"] + "")
-                            // console.log("CHECKLESION", checkLesion)
+                                // console.log("CHECKLESION", checkLesion)
                             if (listExportData[objIndex].listAgeTrue == "") {
                                 listExportData[objIndex].listAgeTrue += (listSysTrue[i].arrayTrue[k]["Tuổi"]);
                             } else {
@@ -4149,11 +4103,11 @@ function checkDistinctNonSymmetric1(testId, userId, listExportData, session_no, 
         if (listSysTrue.length !== 0) {
             for (var i = 0; i < listSysTrue.length; i++) {
                 if (listExportData[objIndex].listCaseIdTrue == "") {
-                    listExportData[objIndex].listCaseIdTrue += (listSysTrue[i].arrayTrue[0]["Case ID"]) + " - "
-                        + (listSysTrue[i].arrayTrue[0]["Lesion ID"]);
+                    listExportData[objIndex].listCaseIdTrue += (listSysTrue[i].arrayTrue[0]["Case ID"]) + " - " +
+                        (listSysTrue[i].arrayTrue[0]["Lesion ID"]);
                 } else {
-                    listExportData[objIndex].listCaseIdTrue += ("," + listSysTrue[i].arrayTrue[0]["Case ID"]) + " - "
-                        + (listSysTrue[i].arrayTrue[0]["Lesion ID"]);
+                    listExportData[objIndex].listCaseIdTrue += ("," + listSysTrue[i].arrayTrue[0]["Case ID"]) + " - " +
+                        (listSysTrue[i].arrayTrue[0]["Lesion ID"]);
                 }
             }
         }
@@ -4163,15 +4117,15 @@ function checkDistinctNonSymmetric1(testId, userId, listExportData, session_no, 
                 if (listSysFalse[i].arrayFalse.length !== 0) {
                     for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
                         objIndexLesionFalse = checkLesionFalse.
-                            findIndex((obj => obj === listSysFalse[i].arrayFalse[k]["Lesion ID"]));
+                        findIndex((obj => obj === listSysFalse[i].arrayFalse[k]["Lesion ID"]));
                         if (objIndexLesionFalse == -1) {
                             checkLesionFalse.push(listSysFalse[i].arrayFalse[k]["Lesion ID"] + "")
                             if (listExportData[objIndex].listCaseIdFalse == "") {
-                                listExportData[objIndex].listCaseIdFalse += (listSysFalse[i].arrayFalse[k]["Case ID"]) + " - "
-                                    + (listSysFalse[i].arrayFalse[0]["Lesion ID"]);
+                                listExportData[objIndex].listCaseIdFalse += (listSysFalse[i].arrayFalse[k]["Case ID"]) + " - " +
+                                    (listSysFalse[i].arrayFalse[0]["Lesion ID"]);
                             } else {
-                                listExportData[objIndex].listCaseIdFalse += ("," + listSysFalse[i].arrayFalse[k]["Case ID"]) + " - "
-                                    + (listSysFalse[i].arrayFalse[0]["Lesion ID"]);
+                                listExportData[objIndex].listCaseIdFalse += ("," + listSysFalse[i].arrayFalse[k]["Case ID"]) + " - " +
+                                    (listSysFalse[i].arrayFalse[0]["Lesion ID"]);
                             }
 
                             if (listExportData[objIndex].listAgeFalse == "") {
@@ -4227,18 +4181,18 @@ function checkDistinctNonSymmetric1(testId, userId, listExportData, session_no, 
 
     } else {
         objIndex = listExportData.
-            findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no));
+        findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no && obj.percentType === type));
         listExportData[objIndex].numberCaseTrue += case_true;
         listExportData[objIndex].totalCase += total_case;
 
         if (listSysTrue.length !== 0) {
             for (var i = 0; i < listSysTrue.length; i++) {
                 if (listExportData[objIndex].listCaseIdTrue == "") {
-                    listExportData[objIndex].listCaseIdTrue += (listSysTrue[i].arrayTrue[0]["Case ID"]) + " - "
-                        + (listSysTrue[i].arrayTrue[0]["Lesion ID"]);
+                    listExportData[objIndex].listCaseIdTrue += (listSysTrue[i].arrayTrue[0]["Case ID"]) + " - " +
+                        (listSysTrue[i].arrayTrue[0]["Lesion ID"]);
                 } else {
-                    listExportData[objIndex].listCaseIdTrue += ("," + listSysTrue[i].arrayTrue[0]["Case ID"]) + " - "
-                        + (listSysTrue[i].arrayTrue[0]["Lesion ID"]);
+                    listExportData[objIndex].listCaseIdTrue += ("," + listSysTrue[i].arrayTrue[0]["Case ID"]) + " - " +
+                        (listSysTrue[i].arrayTrue[0]["Lesion ID"]);
                 }
             }
         }
@@ -4248,10 +4202,10 @@ function checkDistinctNonSymmetric1(testId, userId, listExportData, session_no, 
                 if (listSysTrue[i].arrayTrue.length !== 0) {
                     for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
                         objIndexLesion = checkLesion.
-                            findIndex((obj => obj === listSysTrue[i].arrayTrue[k]["Lesion ID"]));
+                        findIndex((obj => obj === listSysTrue[i].arrayTrue[k]["Lesion ID"]));
                         if (objIndexLesion == -1) {
                             checkLesion.push(listSysTrue[i].arrayTrue[k]["Lesion ID"] + "")
-                            // console.log("CHECKLESION", checkLesion)
+                                // console.log("CHECKLESION", checkLesion)
                             if (listExportData[objIndex].listAgeTrue == "") {
                                 listExportData[objIndex].listAgeTrue += (listSysTrue[i].arrayTrue[k]["Tuổi"]);
                             } else {
@@ -4298,15 +4252,15 @@ function checkDistinctNonSymmetric1(testId, userId, listExportData, session_no, 
                 if (listSysFalse[i].arrayFalse.length !== 0) {
                     for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
                         objIndexLesionFalse = checkLesionFalse.
-                            findIndex((obj => obj === listSysFalse[i].arrayFalse[k]["Lesion ID"]));
+                        findIndex((obj => obj === listSysFalse[i].arrayFalse[k]["Lesion ID"]));
                         if (objIndexLesionFalse == -1) {
                             checkLesionFalse.push(listSysFalse[i].arrayFalse[k]["Lesion ID"] + "")
                             if (listExportData[objIndex].listCaseIdFalse == "") {
-                                listExportData[objIndex].listCaseIdFalse += (listSysFalse[i].arrayFalse[k]["Case ID"]) + " - "
-                                    + (listSysFalse[i].arrayFalse[0]["Lesion ID"]);
+                                listExportData[objIndex].listCaseIdFalse += (listSysFalse[i].arrayFalse[k]["Case ID"]) + " - " +
+                                    (listSysFalse[i].arrayFalse[0]["Lesion ID"]);
                             } else {
-                                listExportData[objIndex].listCaseIdFalse += ("," + listSysFalse[i].arrayFalse[k]["Case ID"]) + " - "
-                                    + (listSysFalse[i].arrayFalse[0]["Lesion ID"]);
+                                listExportData[objIndex].listCaseIdFalse += ("," + listSysFalse[i].arrayFalse[k]["Case ID"]) + " - " +
+                                    (listSysFalse[i].arrayFalse[0]["Lesion ID"]);
                             }
 
                             if (listExportData[objIndex].listAgeFalse == "") {
@@ -4365,7 +4319,7 @@ function calcNormal(objRowData, objDapAn) {
         if (maxRatingValue <= 2) {
             for (var i = 0; i < objRowData.length; i++) {
                 if (objRowData[i]["rating"] <= 2) {
-                    objDapAn.forEach(function (caseDapAn) {
+                    objDapAn.forEach(function(caseDapAn) {
                         if (objRowData[i]["Case density (user)"] === caseDapAn["Case density"]) {
                             count++;
                         }
@@ -4398,7 +4352,7 @@ function calcAbNormal(objRowData, objDapAn) {
 
         for (var i = 0; i < objRowData.length; i++) {
             if (objRowData[i]["selectX"] > 0 && objRowData[i]["selectY"] > 0 && objRowData[i]["rating"] >= 3) {
-                objDapAn.forEach(function (caseDapAn) {
+                objDapAn.forEach(function(caseDapAn) {
                     if (isCaseDensity == true && isLessionType == true) {
                         if (checkLesionType(caseDapAn["Lesion type"], objRowData[i]["Lesion type(User)"]) == true && countDensityAb > 0) {
                             count++
@@ -4447,13 +4401,13 @@ function calcReCall(objRowData, objDapAn) {
         for (var i = 0; i < objRowData.length; i++) {
             check = objDapAn
                 .filter(
-                    obj => obj["Lesion ID"] === objRowData[i]["lesionID"]
-                        && objRowData[i]["distance"] > 0
-                        && objRowData[i]["rating"] >= 3
-                        && objRowData[i]["selectX"] > 0
-                        && objRowData[i]["selectY"] > 0
-                        && (isCaseDensity ? countDensityRecall > 0 : true)
-                        && (isLessionType ? checkLesionType(obj["Lesion type"], objRowData[i]["Lesion type(User)"]) === true : true))
+                    obj => obj["Lesion ID"] === objRowData[i]["lesionID"] &&
+                    objRowData[i]["distance"] > 0 &&
+                    objRowData[i]["rating"] >= 3 &&
+                    objRowData[i]["selectX"] > 0 &&
+                    objRowData[i]["selectY"] > 0 &&
+                    (isCaseDensity ? countDensityRecall > 0 : true) &&
+                    (isLessionType ? checkLesionType(obj["Lesion type"], objRowData[i]["Lesion type(User)"]) === true : true))
                 .map(obj => obj);
             if (check.length != 0) {
                 count++;
@@ -4467,7 +4421,7 @@ function calcReCall(objRowData, objDapAn) {
     } else {
         for (var i = 0; i < objRowData.length; i++) {
             if (objRowData[i]["selectX"] > 0 && objRowData[i]["selectY"] > 0 && parseInt(objRowData[i]["rating"]) > 2) {
-                objDapAn.forEach(function (caseDapAn) {
+                objDapAn.forEach(function(caseDapAn) {
                     if (objRowData[i]["lesionID"] === caseDapAn["Lesion ID"] && parseInt(objRowData[i]["distance"]) > 0) {
                         count++;
                     }
@@ -4522,28 +4476,27 @@ function calcSymmetric(objRowData, objDapAn) {
         }
     });
     // objRowData = newData;
-    const uniqueLesionId =
-        [...new Set(objDapAn.map(item => item["Test set"] + ":"
-            + item["Case ID"] + ":" + item["Frame"]
-        ))];
+    const uniqueLesionId = [...new Set(objDapAn.map(item => item["Test set"] + ":" +
+        item["Case ID"] + ":" + item["Frame"]
+    ))];
     countTotal = objDapAn.length
-    //  TRUONG HOP =1 FRAME
+        //  TRUONG HOP =1 FRAME
     if (uniqueLesionId.length == 1) {
         for (var i = 0; i < objRowData.length; i++) {
             if (checkXY.indexOf(objRowData[i]["truthX"] + "" + objRowData[i]["truthY"] + "" + objRowData[i]["lesionID"]) == -1) {
                 const check = objDapAn
-                    .filter(obj => obj["Test set"] === objRowData[i]["test_id"]
-                        && obj["Case ID"] === objRowData[i]["case_id"]
-                        && obj["Lesion ID"] === objRowData[i]["lesionID"]
-                        && obj["Lesion ID"] === objRowData[i]["lesionID"]
-                        && obj["TruthX"] === objRowData[i]["truthX"]
-                        && obj["TruthY"] === objRowData[i]["truthY"]
-                        && objRowData[i]["distance"] > 0
-                        && objRowData[i]["rating"] > 2
-                        && objRowData[i]["selectX"] > 0
-                        && objRowData[i]["selectY"] > 0
-                        && (isCaseDensity ? countDensity > 0 : true)
-                        && (isLessionType ? checkLesionType(obj["Lesion type"], objRowData[i]["Lesion type(User)"]) === true : true))
+                    .filter(obj => obj["Test set"] === objRowData[i]["test_id"] &&
+                        obj["Case ID"] === objRowData[i]["case_id"] &&
+                        obj["Lesion ID"] === objRowData[i]["lesionID"] &&
+                        obj["Lesion ID"] === objRowData[i]["lesionID"] &&
+                        obj["TruthX"] === objRowData[i]["truthX"] &&
+                        obj["TruthY"] === objRowData[i]["truthY"] &&
+                        objRowData[i]["distance"] > 0 &&
+                        objRowData[i]["rating"] > 2 &&
+                        objRowData[i]["selectX"] > 0 &&
+                        objRowData[i]["selectY"] > 0 &&
+                        (isCaseDensity ? countDensity > 0 : true) &&
+                        (isLessionType ? checkLesionType(obj["Lesion type"], objRowData[i]["Lesion type(User)"]) === true : true))
                     .map(obj => obj);
                 if (check.length != 0) {
                     listCheck1.push(check);
@@ -4572,17 +4525,18 @@ function calcSymmetric(objRowData, objDapAn) {
     //  TRUONG HOP >=2 FRAME
     else {
         for (var i = 0; i < objRowData.length; i++) {
-            if (checkXY.indexOf(objRowData[i]["truthX"] + "" + objRowData[i]["truthY"] + + "" + objRowData[i]["case_id"] + "" + objRowData[i]["lesionID"] + "" + objRowData[i]["frame"]) == -1) {
+            if (checkXY.indexOf(objRowData[i]["truthX"] + "" + objRowData[i]["truthY"] + +"" + objRowData[i]["case_id"] + "" + objRowData[i]["lesionID"] + "" + objRowData[i]["frame"]) == -1) {
                 const check = objDapAn
-                    .filter(obj => obj["Test set"] === objRowData[i]["test_id"]
-                        && obj["Case ID"] === objRowData[i]["case_id"]
-                        && obj["Lesion ID"] === objRowData[i]["lesionID"]
+                    .filter(obj => obj["Test set"] === objRowData[i]["test_id"] &&
+                        obj["Case ID"] === objRowData[i]["case_id"] &&
+                        obj["Lesion ID"] === objRowData[i]["lesionID"]
                         // && obj["TruthX"] === objRowData[i]["truthX"]
                         // && obj["TruthY"] === objRowData[i]["truthY"]
-                        && objRowData[i]["distance"] > 0
-                        && objRowData[i]["rating"] > 2
-                        && (isCaseDensity ? countDensity > 0 : true)
-                        && (isLessionType ? checkLesionType(obj["Lesion type"], objRowData[i]["Lesion type(User)"]) === true : true)
+                        &&
+                        objRowData[i]["distance"] > 0 &&
+                        objRowData[i]["rating"] > 2 &&
+                        (isCaseDensity ? countDensity > 0 : true) &&
+                        (isLessionType ? checkLesionType(obj["Lesion type"], objRowData[i]["Lesion type(User)"]) === true : true)
                     )
                     .map(obj => obj);
                 if (check.length != 0) {
@@ -4593,7 +4547,7 @@ function calcSymmetric(objRowData, objDapAn) {
                         arrayTrue: check
                     })
                     answerTrue = objDapAn[0]
-                    checkXY.push(objRowData[i]["truthX"] + "" + objRowData[i]["truthY"] + + "" + objRowData[i]["case_id"] + "" + objRowData[i]["lesionID"] + "" + objRowData[i]["frame"]);
+                    checkXY.push(objRowData[i]["truthX"] + "" + objRowData[i]["truthY"] + +"" + objRowData[i]["case_id"] + "" + objRowData[i]["lesionID"] + "" + objRowData[i]["frame"]);
                     countAnswer++;
                 } else {
                     // listSysFalse.push(objRowData[i]);
@@ -4622,21 +4576,19 @@ function calcNonSymmetric(objRowData, objDapAn) {
     var countTotal = 0;
     var checkLesion = [];
     var listCheck1 = [];
-    const uniqueLesionId =
-        [...new Set(objDapAn.map(item => item["Lesion ID"]
-        ))];
+    const uniqueLesionId = [...new Set(objDapAn.map(item => item["Lesion ID"]))];
 
     countTotal = uniqueLesionId.length;
     for (var i = 0; i < objRowData.length; i++) {
         if (checkLesion.indexOf(objRowData[i]["test_id"] + "-" + objRowData[i]["user_id"] + "-" + objRowData[i]["case_id"] + "-" + objRowData[i]["lesionID"]) == -1) {
             const check = objDapAn
-                .filter(obj => obj["Test set"] === objRowData[i]["test_id"]
-                    && obj["Case ID"] === objRowData[i]["case_id"]
-                    && obj["Lesion ID"] === objRowData[i]["lesionID"]
-                    && parseInt(objRowData[i]["distance"]) > 0
-                    && objRowData[i]["rating"] >= 3
-                    && (isCaseDensity ? countDensity > 0 : true)
-                    && (isLessionType ? checkLesionType(obj["Lesion type"], objRowData[i]["Lesion type(User)"]) === true : true)
+                .filter(obj => obj["Test set"] === objRowData[i]["test_id"] &&
+                    obj["Case ID"] === objRowData[i]["case_id"] &&
+                    obj["Lesion ID"] === objRowData[i]["lesionID"] &&
+                    parseInt(objRowData[i]["distance"]) > 0 &&
+                    objRowData[i]["rating"] >= 3 &&
+                    (isCaseDensity ? countDensity > 0 : true) &&
+                    (isLessionType ? checkLesionType(obj["Lesion type"], objRowData[i]["Lesion type(User)"]) === true : true)
                 )
                 .map(obj => obj);
 
@@ -4672,7 +4624,7 @@ function calcNonSymmetric(objRowData, objDapAn) {
 }
 
 // TINH TOAN MUC SO 2
-function calcTruePercentofAnyCase(objRowData, objDapAn) {
+function calcTruePercentofAnyCase(objRowData, objDapAn, dropdownValue) {
     // tach thanh các testid, caseid
     // list data cua caseid tren (testid,caseid,listuser,totaltrue,total)
     // neu dung, listuser[], -> tong so luong
@@ -4680,7 +4632,7 @@ function calcTruePercentofAnyCase(objRowData, objDapAn) {
         return;
     }
     objIndex = listCaseIdbyTestId.
-        findIndex((obj => obj.testId === objRowData[0]["test_id"] && obj.caseId === objRowData[0]["case_id"]));
+    findIndex((obj => obj.testId === objRowData[0]["test_id"] && obj.caseId === objRowData[0]["case_id"] && obj.type === dropdownObject[dropdownValue]));
     if (objIndex == -1) {
         listCaseIdbyTestId.push({
             testId: objRowData[0]["test_id"],
@@ -4701,7 +4653,7 @@ function calcTruePercentofAnyCase(objRowData, objDapAn) {
             listAge: "",
             listCaseDensity: "",
             listLesionType: "",
-            type: "",
+            type: dropdownObject[dropdownValue],
             lesionSide: "",
             lesionSite: "",
             lesionSize: ""
@@ -4710,11 +4662,10 @@ function calcTruePercentofAnyCase(objRowData, objDapAn) {
     const checkUser = userFilter
         .filter(obj => objRowData[0]["user_id"] === obj["user_id"])
     currentIndex = listCaseIdbyTestId.
-        findIndex((obj => obj.testId === objRowData[0]["test_id"] && obj.caseId === objRowData[0]["case_id"]));
+    findIndex((obj => obj.testId === objRowData[0]["test_id"] && obj.caseId === objRowData[0]["case_id"] && obj.type === dropdownObject[dropdownValue]));
 
     switch (dropdownValue) {
         case "1":
-            listCaseIdbyTestId[currentIndex].type = "Normal";
             if (calcNormal(objRowData, objDapAn) == true) {
                 listCaseIdbyTestId[currentIndex]["totalUserTruth"]++;
                 listCaseIdbyTestId[currentIndex]["totalUser"]++;
@@ -4741,7 +4692,6 @@ function calcTruePercentofAnyCase(objRowData, objDapAn) {
             }
             break;
         case "2":
-            listCaseIdbyTestId[currentIndex].type = "AbNormal";
             if (calcAbNormal(objRowData, objDapAn) == true) {
                 listCaseIdbyTestId[currentIndex]["totalUserTruth"]++;
                 listCaseIdbyTestId[currentIndex]["totalUser"]++;
@@ -4804,7 +4754,6 @@ function calcTruePercentofAnyCase(objRowData, objDapAn) {
             }
             break;
         case "5":
-            listCaseIdbyTestId[currentIndex].type = "Recall";
             if (calcReCall(objRowData, objDapAn) == true) {
                 listCaseIdbyTestId[currentIndex]["totalUserTruth"]++;
                 listCaseIdbyTestId[currentIndex]["totalUser"]++;
@@ -4878,9 +4827,9 @@ function calcTruePercentofAnyLesionDX(objRowData, objDapAn) {
         return;
     }
     objIndex = listCaseIdbyTestId.
-        findIndex((obj => obj.testId == objRowData[0]["test_id"] && obj.caseId.split(" - ")[0] == objRowData[0]["case_id"]
-            && obj.lesionId == objRowData[0]["lesionID"] && obj.truthX == objDapAn[0]["TruthX"]
-            && obj.truthY == objDapAn[0]["TruthY"]));
+    findIndex((obj => obj.testId == objRowData[0]["test_id"] && obj.caseId.split(" - ")[0] == objRowData[0]["case_id"] &&
+        obj.lesionId == objRowData[0]["lesionID"] && obj.truthX == objDapAn[0]["TruthX"] &&
+        obj.truthY == objDapAn[0]["TruthY"] && obj.type === "Symmetric"));
     if (objIndex == -1) {
         listCaseIdbyTestId.push({
             testId: objRowData[0]["test_id"],
@@ -4914,13 +4863,12 @@ function calcTruePercentofAnyLesionDX(objRowData, objDapAn) {
     // const checkUser = userFilter
     //     .filter(obj => objRowData[0]["user_id"] === obj["user_id"])
     currentIndex = listCaseIdbyTestId.
-        findIndex((obj => obj.testId === objRowData[0]["test_id"] && obj.caseId.split(" - ")[0] === objRowData[0]["case_id"] && obj.lesionId === objRowData[0]["lesionID"]
-            && obj.truthX === objDapAn[0]["TruthX"]
-            && obj.truthY === objDapAn[0]["TruthY"]));
+    findIndex((obj => obj.testId === objRowData[0]["test_id"] && obj.caseId.split(" - ")[0] === objRowData[0]["case_id"] && obj.lesionId === objRowData[0]["lesionID"] &&
+        obj.truthX === objDapAn[0]["TruthX"] &&
+        obj.truthY === objDapAn[0]["TruthY"] && obj.type === "Symmetric"));
 
     let symmetric = calcSymmetric(objRowData, objDapAn);
-    if (symmetric[3].length != 0) {
-    }
+    if (symmetric[3].length != 0) {}
     let listSysTrue = symmetric[2];
     let listSysFalse = symmetric[3];
 
@@ -5030,8 +4978,8 @@ function calcTruePercentofAnyLesionKDX(objRowData, objDapAn) {
         return;
     }
     objIndex = listCaseIdbyTestId.
-        findIndex((obj => obj.testId === objRowData[0]["test_id"] && obj.caseId.split(" - ")[0] === objRowData[0]["case_id"]
-            && obj.lesionId === objRowData[0]["lesionID"]));
+    findIndex((obj => obj.testId === objRowData[0]["test_id"] && obj.caseId.split(" - ")[0] === objRowData[0]["case_id"] &&
+        obj.lesionId === objRowData[0]["lesionID"] && obj.type === "NonSymmetric"));
     if (objIndex == -1) {
         listCaseIdbyTestId.push({
             testId: objRowData[0]["test_id"],
@@ -5062,7 +5010,7 @@ function calcTruePercentofAnyLesionKDX(objRowData, objDapAn) {
     // const checkUser = userFilter
     //     .filter(obj => objRowData[0]["user_id"] === obj["user_id"])
     currentIndex = listCaseIdbyTestId.
-        findIndex((obj => obj.testId === objRowData[0]["test_id"] && obj.caseId.split(" - ")[0] === objRowData[0]["case_id"] && obj.lesionId === objRowData[0]["lesionID"]));
+    findIndex((obj => obj.testId === objRowData[0]["test_id"] && obj.caseId.split(" - ")[0] === objRowData[0]["case_id"] && obj.lesionId === objRowData[0]["lesionID"] && obj.type === "NonSymmetric"));
 
     let symmetric = calcNonSymmetric(objRowData, objDapAn);
     let listSysTrue = symmetric[2];
@@ -5164,7 +5112,3 @@ function calcTruePercentofAnyLesionKDX(objRowData, objDapAn) {
             (symmetric[3].length == 0) ? '' : (userFilter.filter(obj => symmetric[3][0]["user"] === obj["user_id"]))[0]["Số năm kinh nghiệm"] + ",";
     }
 }
-
-
-
-

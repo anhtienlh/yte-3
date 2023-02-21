@@ -71,7 +71,7 @@ let selectTrue;
 let selectFalse;
 let selectScore;
 let dropdownArrayValue = [];
-let dropdownArrayText = [];
+let dropdownObject = {};
 let tagConfig;
 let rateConfig;
 let setFrom = 0;
@@ -92,13 +92,12 @@ let countDensity = 0;
 
 $("#inlineFormCustomSelect").change(function() {
     dropdownArrayValue = $(this).selectpicker("val");
-    dropdownArrayText = [];
+    dropdownObject = {};
     for (var i = 0; i < dropdownArrayValue.length; i++) {
-
         var val = dropdownArrayValue[i];
         var txt = $("#inlineFormCustomSelect option[value='" + val + "']").text();
 
-        dropdownArrayText.push(txt);
+        dropdownObject[val] = txt;
     }
 });
 
@@ -1555,6 +1554,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
 
     let listCaseAnswerI = [];
     dropdownArrayValue.forEach(function(dropdownValue) {
+        var typeOfValue = dropdownObject[dropdownValue];
         switch (dropdownValue) {
             case "3":
                 const uniqueDX = [...new Set(RowsDapAn.map(item => item["Test set"] + ":" + item["Case ID"] + ":" + item["Case Type"] + ":" + item["Lesion ID"] +
@@ -1565,7 +1565,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                         if (arrUnique[2] === "Abnormal") {
                             let objIndex = listCaseIdbyTestId.
                             findIndex((obj => obj.testId === arrUnique[0] && obj.caseId.split(" - ")[0] === arrUnique[1] && obj.lesionId === arrUnique[3] &&
-                                obj.truthX === arrUnique[4] && obj.truthY === arrUnique[5] && obj.type === dropdownValue));
+                                obj.truthX === arrUnique[4] && obj.truthY === arrUnique[5] && obj.type === typeOfValue));
                             if (objIndex == -1) {
                                 let index = listCaseAnswerI.
                                 findIndex((obj => obj.testId === arrUnique[0]));
@@ -1632,7 +1632,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                         if (arrUnique[2] === "Abnormal") {
                             let objIndex = listCaseIdbyTestId.
                             findIndex((obj => obj.testId === arrUnique[0] && obj.caseId.split(" - ")[0] === arrUnique[1] &&
-                                obj.lesionId === arrUnique[3] && obj.type === dropdownValue));
+                                obj.lesionId === arrUnique[3] && obj.type === typeOfValue));
                             if (objIndex == -1) {
                                 let index = listCaseAnswerI.
                                 findIndex((obj => obj.testId === arrUnique[0]));
@@ -1691,7 +1691,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                 RowsDapAn.forEach(element => {
                     if (element["Case Type"] === "Normal") {
                         let objIndex = listCaseIdbyTestId.
-                        findIndex((obj => obj.testId === element["Test set"] && obj.caseId === element["Case ID"] && obj.type === dropdownValue));
+                        findIndex((obj => obj.testId === element["Test set"] && obj.caseId === element["Case ID"] && obj.type === typeOfValue));
                         if (objIndex == -1) {
                             let index = listCaseAnswerI.
                             findIndex((obj => obj.testId === element["Test set"]));
@@ -1745,7 +1745,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                         const arrUnique = splitUniqueTest(unique);
                         if (arrUnique[2] === "Abnormal") {
                             let objIndex = listCaseIdbyTestId.
-                            findIndex((obj => obj.testId === arrUnique[0] && obj.caseId === arrUnique[1] && obj.type === dropdownValue));
+                            findIndex((obj => obj.testId === arrUnique[0] && obj.caseId === arrUnique[1] && obj.type === typeOfValue));
                             if (objIndex == -1) {
                                 let index = listCaseAnswerI.
                                 findIndex((obj => obj.testId === arrUnique[0]));
@@ -2436,10 +2436,10 @@ function calcPercentOfCaseIdRawData(data) {
 
     str.forEach(element => {
         let objIndex = listClone.
-        findIndex((obj => obj.testId === data["testId"] && obj.caseId === element && obj.type === data["type"]));
+        findIndex((obj => obj.testId === data["testId"] && obj.caseId === element && obj.type === data["percentType"]));
         if (objIndex != -1) {
             let percent = (listClone[objIndex]["totalUserTruth"] / listClone[objIndex]["totalUser"]) * 100;
-            switch (data["type"]) {
+            switch (data["percentType"]) {
                 // case "3":
                 //     listCaseIdTrue += "case " + element + " (" + percent.toFixed(2) + "%)" + " - " + listClone[objIndex]["lesionId"] + " - " + listClone[objIndex]["truthOrder"] + " , ";
                 //     listTrue.push({
@@ -2497,11 +2497,11 @@ function calcPercentOfCaseIdRawData(data) {
     let listClone2 = listCaseIdbyTestId.slice(0);
     str2.forEach(element => {
         let objIndex1 = listClone2.
-        findIndex((obj => obj.testId === data["testId"] && obj.caseId === element && obj.type === data["type"]));
+        findIndex((obj => obj.testId === data["testId"] && obj.caseId === element && obj.type === data["percentType"]));
         if (objIndex1 != -1) {
             let percent = (listClone2[objIndex1]["totalUserTruth"] / listClone2[objIndex1]["totalUser"]) * 100;
 
-            switch (data["type"]) {
+            switch (data["percentType"]) {
                 // case "3":
                 //     listCaseIdFalse += "case " + element + " (" + percent.toFixed(2) + "%)" + " - " + listClone2[objIndex1]["lesionId"] + " - " + listClone2[objIndex1]["truthOrder"] + " , ";
                 //     listFalse.push({
@@ -2807,22 +2807,21 @@ function exportExcel() {
 
 
     var tab_dynamic = {};
-    var tab_1 = [],
-        tab_2 = [],
+    var tab_2 = [],
         tab_3 = [],
         tab_4 = [],
         tab_5 = [],
         tab_6 = [];
 
-    dropdownArrayText.forEach(function(text) {
-        var listExportDataFinalByDropdown = listExportDataFinal.filter(obj => obj["type"] === text)
+    dropdownArrayValue.forEach(function(dropdownValue) {
+        var listExportDataFinalByDropdown = listExportDataFinal.filter(obj => obj["type"] === dropdownObject[dropdownValue])
             .map(obj => obj);
         var tab_value = [];
         listExportDataFinalByDropdown.forEach(element => {
             tab_value.push(element);
         });
-        tab_dynamic[text] = tab_value;
-    })
+        tab_dynamic[dropdownObject[dropdownValue]] = tab_value;
+    });
 
 
     // listExportDataAbnormal.forEach(element => {
@@ -2933,8 +2932,8 @@ function exportExcel() {
 
 
     // format header
-    dropdownArrayText.forEach(function(text) {
-        tab_dynamic[text].unshift(myHeader)
+    dropdownArrayValue.forEach(function(dropdownValue) {
+        tab_dynamic[dropdownObject[dropdownValue]].unshift(myHeader)
     })
 
     tab_2.unshift(myHeader2);
@@ -2947,9 +2946,9 @@ function exportExcel() {
         .then(workbook => {
             // Add sheet the workbook.
             let isFirst = true
-            dropdownArrayText.forEach(function(text) {
-                let sheetDynamic = workbook.addSheet("Report_" + text);
-                sheetDynamic.cell("A1").value(convertArrayObjectToNestedArray(tab_dynamic[text]))
+            dropdownArrayValue.forEach(function(dropdownValue) {
+                let sheetDynamic = workbook.addSheet("Report_" + dropdownObject[dropdownValue]);
+                sheetDynamic.cell("A1").value(convertArrayObjectToNestedArray(tab_dynamic[dropdownObject[dropdownValue]]))
                 sheetDynamic = setHeaderStyleAndAutoFillter(sheetDynamic)
 
                 if (isFirst)
@@ -3173,8 +3172,7 @@ function checkDistinctTrueAnswer(testId, userId, listExportData, session_no, obj
         })
 
         objIndex = listExportData.
-        findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no &&
-            obj.percentType == type));
+        findIndex((obj => obj.testId === testId && obj.userId === userId && obj.sessionNo === session_no && obj.percentType == type));
 
         if (listExportData[objIndex].listAgeTrue == "") {
             listExportData[objIndex].listAgeTrue += (objDapAn[0]["Tuổi"]);
@@ -4748,7 +4746,7 @@ function calcTruePercentofAnyCase(objRowData, objDapAn, dropdownValue) {
         return;
     }
     objIndex = listCaseIdbyTestId.
-    findIndex((obj => obj.testId === objRowData[0]["test_id"] && obj.caseId === objRowData[0]["case_id"] && obj.type === dropdownValue));
+    findIndex((obj => obj.testId === objRowData[0]["test_id"] && obj.caseId === objRowData[0]["case_id"] && obj.type === dropdownObject[dropdownValue]));
     if (objIndex == -1) {
         listCaseIdbyTestId.push({
             testId: objRowData[0]["test_id"],
@@ -4769,7 +4767,7 @@ function calcTruePercentofAnyCase(objRowData, objDapAn, dropdownValue) {
             listAge: "",
             listCaseDensity: "",
             listLesionType: "",
-            type: dropdownValue,
+            type: dropdownObject[dropdownValue],
             lesionSide: "",
             lesionSite: "",
             lesionSize: ""
@@ -4778,11 +4776,10 @@ function calcTruePercentofAnyCase(objRowData, objDapAn, dropdownValue) {
     const checkUser = userFilter
         .filter(obj => objRowData[0]["user_id"] === obj["user_id"])
     currentIndex = listCaseIdbyTestId.
-    findIndex((obj => obj.testId === objRowData[0]["test_id"] && obj.caseId === objRowData[0]["case_id"] && obj.type === dropdownValue));
+    findIndex((obj => obj.testId === objRowData[0]["test_id"] && obj.caseId === objRowData[0]["case_id"] && obj.type === dropdownObject[dropdownValue]));
 
     switch (dropdownValue) {
         case "1":
-            listCaseIdbyTestId[currentIndex].type = "Normal";
             if (calcNormal(objRowData, objDapAn) == true) {
                 listCaseIdbyTestId[currentIndex]["totalUserTruth"]++;
                 listCaseIdbyTestId[currentIndex]["totalUser"]++;
@@ -4809,7 +4806,6 @@ function calcTruePercentofAnyCase(objRowData, objDapAn, dropdownValue) {
             }
             break;
         case "2":
-            listCaseIdbyTestId[currentIndex].type = "AbNormal";
             if (calcAbNormal(objRowData, objDapAn) == true) {
                 listCaseIdbyTestId[currentIndex]["totalUserTruth"]++;
                 listCaseIdbyTestId[currentIndex]["totalUser"]++;
@@ -4872,7 +4868,6 @@ function calcTruePercentofAnyCase(objRowData, objDapAn, dropdownValue) {
             }
             break;
         case "5":
-            listCaseIdbyTestId[currentIndex].type = "Recall";
             if (calcReCall(objRowData, objDapAn) == true) {
                 listCaseIdbyTestId[currentIndex]["totalUserTruth"]++;
                 listCaseIdbyTestId[currentIndex]["totalUser"]++;
