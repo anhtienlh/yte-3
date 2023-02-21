@@ -74,8 +74,7 @@
                                         <h6>User table</h6>
                                     </div>
                                     <div class="col-6" style="text-align: right;">
-                                        <button type="button" class="btn btn-outline-primary"
-                                            onclick="clearDataFilter('tblUserData')">Clear</button>
+                                        <button type="button" class="btn btn-outline-primary" onclick="clearDataFilter('tblUserData')">Clear</button>
                                     </div>
                                 </div>
 
@@ -95,8 +94,7 @@
                                         <h6>Answer table</h6>
                                     </div>
                                     <div class="col-6" style="text-align: right;">
-                                        <button type="button" class="btn btn-outline-primary"
-                                            onclick="clearDataFilter('tblAnswerData')">Clear</button>
+                                        <button type="button" class="btn btn-outline-primary" onclick="clearDataFilter('tblAnswerData')">Clear</button>
                                     </div>
                                 </div>
 
@@ -170,9 +168,9 @@
                     <div class="col-auto my-1">
                         <select class="selectpicker" id="inlineFormCustomSelect" multiple title="Choose export filter">
                             <option value="1">Normal</option>
-                            <option value="2">Abnormal</option>
+                            <option value="2">AbNormal</option>
                             <option value="3">Symmetric</option>
-                            <option value="4">Asymmetric</option>
+                            <option value="4">NonSymmetric</option>
                             <option value="5">Recall</option>
                         </select>
                     </div>
@@ -182,8 +180,7 @@
                 <button id="btnApply" type="button" class="btn btn-outline-primary" onclick="getResult()">Apply</button>
             </div>
             <div class="col-4" style=" margin: 20px 0; visibility: hidden;">
-                <button id="btnExport" type="button" class="btn btn-outline-primary" style="float: left;"
-                    onclick="exportExcel()">Export</button>
+                <button id="btnExport" type="button" class="btn btn-outline-primary" style="float: left;" onclick="exportExcel()">Export</button>
             </div>
         </div>
 
@@ -196,7 +193,8 @@
 <script type="text/javascript" src="assets/js/xlsx.full.min.js"></script>
 <script type="text/javascript" src="assets/js/jszip.js"></script>
 <script type="text/javascript" src="assets/js/xlsx-populate.min.js"></script>
-<script type="text/javascript" src="assets/js/main.js"> </script>
+<script type="text/javascript" src="assets/js/main.js">
+</script>
 
 <link rel="stylesheet" href="assets/css/bootstrap-select.min.css">
 <script src="assets/js/bootstrap-select.js"></script>

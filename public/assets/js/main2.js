@@ -2870,11 +2870,21 @@ function exportExcel() {
     // });
 
     listCaseIdbyTestId.forEach(element => {
-        element.testId = element.testId ? parseInt(element.testId) : ""
-        element.caseId = element.caseId ? parseInt(element.caseId) : ""
-        element.lesionId = element.lesionId ? parseInt(element.lesionId) : ""
-        element.truthX = element.truthX ? parseInt(element.truthX) : ""
-        element.truthY = element.truthY ? parseInt(element.truthY) : ""
+        element.testId = !isNaN(element.testId) ?
+            parseInt(element.testId) :
+            element.testId;
+        element.caseId = !isNaN(element.caseId) ?
+            parseInt(element.caseId) :
+            element.caseId;
+        element.lesionId = !isNaN(element.lesionId) ?
+            parseInt(element.lesionId) :
+            element.lesionId;
+        element.truthX = !isNaN(element.truthX) ?
+            parseInt(element.truthX) :
+            element.truthX;
+        element.truthY = !isNaN(element.truthY) ?
+            parseInt(element.truthY) :
+            element.truthY;
         tab_2.push(element);
     });
 
