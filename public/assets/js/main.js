@@ -2593,21 +2593,21 @@ function exportExcel() {
     });
 
     listCaseIdbyTestId.forEach(element => {
-        element.testId = !isNaN(element.testId) ?
+        element.testId = element.testId ?
             parseInt(element.testId) :
-            element.testId;
-        element.caseId = !isNaN(element.caseId) ?
+            "";
+        element.caseId = element.caseId ?
             parseInt(element.caseId) :
             element.caseId;
-        element.lesionId = !isNaN(element.lesionId) ?
+        element.lesionId = element.lesionId ?
             parseInt(element.lesionId) :
-            element.lesionId;
-        element.truthX = !isNaN(element.truthX) ?
+            "";
+        element.truthX = element.truthX ?
             parseInt(element.truthX) :
-            element.truthX;
-        element.truthY = !isNaN(element.truthY) ?
+            "";
+        element.truthY = element.truthY ?
             parseInt(element.truthY) :
-            element.truthY;
+            "";
         tab_2.push(element);
     });
 
@@ -5039,6 +5039,9 @@ function calcTruePercentofAnyCase(objRowData, objDapAn, dropdownValue) {
         listCaseIdbyTestId.push({
             testId: objRowData[0]["test_id"],
             caseId: objRowData[0]["case_id"],
+            lesionId: null,
+            truthX: null,
+            truthY: null,
             totalUserTruth: 0,
             totalUser: 0,
             listUserIdTrue: "",
@@ -5496,6 +5499,8 @@ function calcTruePercentofAnyLesionKDX(objRowData, objDapAn) {
             testId: objRowData[0]["test_id"],
             caseId: objRowData[0]["case_id"],
             lesionId: objRowData[0]["lesionID"],
+            truthX: null,
+            truthY: null,
             totalUserTruth: 0,
             totalUser: 0,
             listUserIdTrue: "",
