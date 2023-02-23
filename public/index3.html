@@ -201,9 +201,22 @@
                             Condition 1
                         </div>
                         <div class="row card-body">
-                            <div class="col-6">
+                            <div class="col-5">
                                 <input type="number" id="txtMvalue" class="form-control" placeholder="M value" />
-
+                            </div>
+                            <div class="col-2" style="text-align: center; margin-top: 10px;">
+                                <span>OR</span>
+                            </div>
+                            <div class="col-5">
+                                <select class="custom-select" id="inlineCustomMValue" title="Choose export filter">
+                                    <option value="-1"selected>Choose</option>
+                                    <option value="1">Average</option>
+                                    <option value="2">Median</option>
+                                    <option value="3">Min</option>
+                                    <option value="4">Max</option>
+                                    <option value="5">25th</option>
+                                    <option value="6">75th</option>
+                                </select>
                             </div>
                         </div>
                     </div>

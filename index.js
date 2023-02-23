@@ -5,7 +5,7 @@ const compression = require('compression')
 // setup serve static file
 const app = express();
 app.use(compression());
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 8080;
 
 app.use(express.static(path.join(__dirname + '/public')))
 
