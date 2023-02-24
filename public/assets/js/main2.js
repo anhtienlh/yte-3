@@ -86,7 +86,6 @@ let caseCorrectMax = 0;
 let caseInCorrectMin = 0;
 let caseInCorrectMax = 0;
 let userC = 0;
-let answerC = 0;
 let listExportFilter = [];
 let countDensity = 0;
 
@@ -1552,9 +1551,10 @@ function coreCalculate(RowsRawData, RowsDapAn) {
         }
     });
 
-    let listCaseAnswerI = [];
+    let listCaseAnswerIByType = {};
     dropdownArrayValue.forEach(function(dropdownValue) {
         var typeOfValue = dropdownObject[dropdownValue];
+        listCaseAnswerIByType[typeOfValue] = [];
         switch (dropdownValue) {
             case "3":
                 const uniqueDX = [...new Set(RowsDapAn.map(item => item["Test set"] + ":" + item["Case ID"] + ":" + item["Case Type"] + ":" + item["Lesion ID"] +
@@ -1567,10 +1567,10 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                             findIndex((obj => obj.testId === arrUnique[0] && obj.caseId.split(" - ")[0] === arrUnique[1] && obj.lesionId === arrUnique[3] &&
                                 obj.truthX === arrUnique[4] && obj.truthY === arrUnique[5] && obj.type === typeOfValue));
                             if (objIndex == -1) {
-                                let index = listCaseAnswerI.
+                                let index = listCaseAnswerIByType[typeOfValue].
                                 findIndex((obj => obj.testId === arrUnique[0]));
                                 if (index == -1) {
-                                    listCaseAnswerI.push({
+                                    listCaseAnswerIByType[typeOfValue].push({
                                         testId: arrUnique[0],
                                         listCase: "Case" + arrUnique[1] + " " + "(0.00%)" + " , ",
                                         listAnswer: [{
@@ -1582,8 +1582,8 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                         }]
                                     });
                                 } else {
-                                    listCaseAnswerI[index]["listCase"] += "Case" + arrUnique[1] + " " + "(0.00%)" + " , ";
-                                    listCaseAnswerI[index]["listAnswer"].push({
+                                    listCaseAnswerIByType[typeOfValue][index]["listCase"] += "Case" + arrUnique[1] + " " + "(0.00%)" + " , ";
+                                    listCaseAnswerIByType[typeOfValue][index]["listAnswer"].push({
                                         testId: arrUnique[0],
                                         caseId: "case " + arrUnique[1],
                                         percent: (0).toFixed(2),
@@ -1592,10 +1592,10 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                     });
                                 }
                             } else {
-                                let index = listCaseAnswerI.
+                                let index = listCaseAnswerIByType[typeOfValue].
                                 findIndex((obj => obj.testId === arrUnique[0]));
                                 if (index == -1) {
-                                    listCaseAnswerI.push({
+                                    listCaseAnswerIByType[typeOfValue].push({
                                         testId: arrUnique[0],
                                         listCase: "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2) + "%)" +
                                             " , ",
@@ -1608,9 +1608,9 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                         }]
                                     });
                                 } else {
-                                    listCaseAnswerI[index]["listCase"] += "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2) + "%)" +
+                                    listCaseAnswerIByType[typeOfValue][index]["listCase"] += "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2) + "%)" +
                                         " , ";
-                                    listCaseAnswerI[index]["listAnswer"].push({
+                                    listCaseAnswerIByType[typeOfValue][index]["listAnswer"].push({
                                         testId: arrUnique[0],
                                         caseId: "case " + listCaseIdbyTestId[objIndex]["caseId"],
                                         percent: ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2),
@@ -1634,10 +1634,10 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                             findIndex((obj => obj.testId === arrUnique[0] && obj.caseId.split(" - ")[0] === arrUnique[1] &&
                                 obj.lesionId === arrUnique[3] && obj.type === typeOfValue));
                             if (objIndex == -1) {
-                                let index = listCaseAnswerI.
+                                let index = listCaseAnswerIByType[typeOfValue].
                                 findIndex((obj => obj.testId === arrUnique[0]));
                                 if (index == -1) {
-                                    listCaseAnswerI.push({
+                                    listCaseAnswerIByType[typeOfValue].push({
                                         testId: arrUnique[0],
                                         listCase: "Case" + arrUnique[1] + " " + "(0.00%)" + " , ",
                                         listAnswer: [{
@@ -1648,19 +1648,19 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                         }]
                                     });
                                 } else {
-                                    listCaseAnswerI[index]["listCase"] += "Case" + arrUnique[1] + " " + "(0.00%)" + " , ",
-                                        listCaseAnswerI[index]["listAnswer"].push({
-                                            testId: arrUnique[0],
-                                            caseId: "case " + arrUnique[1],
-                                            percent: (0).toFixed(2),
-                                            lesionId: arrUnique[3]
-                                        });
+                                    listCaseAnswerIByType[typeOfValue][index]["listCase"] += "Case" + arrUnique[1] + " " + "(0.00%)" + " , ";
+                                    listCaseAnswerIByType[typeOfValue][index]["listAnswer"].push({
+                                        testId: arrUnique[0],
+                                        caseId: "case " + arrUnique[1],
+                                        percent: (0).toFixed(2),
+                                        lesionId: arrUnique[3]
+                                    });
                                 }
                             } else {
-                                let index = listCaseAnswerI.
+                                let index = listCaseAnswerIByType[typeOfValue].
                                 findIndex((obj => obj.testId === arrUnique[0]));
                                 if (index == -1) {
-                                    listCaseAnswerI.push({
+                                    listCaseAnswerIByType[typeOfValue].push({
                                         testId: arrUnique[0],
                                         listCase: "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2) + "%)" +
                                             " , ",
@@ -1672,9 +1672,9 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                         }]
                                     });
                                 } else {
-                                    listCaseAnswerI[index]["listCase"] += "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2) + "%)" +
+                                    listCaseAnswerIByType[typeOfValue][index]["listCase"] += "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2) + "%)" +
                                         " , ";
-                                    listCaseAnswerI[index]["listAnswer"].push({
+                                    listCaseAnswerIByType[typeOfValue][index]["listAnswer"].push({
                                         testId: arrUnique[0],
                                         caseId: "case " + listCaseIdbyTestId[objIndex]["caseId"],
                                         percent: ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2),
@@ -1693,10 +1693,10 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                         let objIndex = listCaseIdbyTestId.
                         findIndex((obj => obj.testId === element["Test set"] && obj.caseId === element["Case ID"] && obj.type === typeOfValue));
                         if (objIndex == -1) {
-                            let index = listCaseAnswerI.
+                            let index = listCaseAnswerIByType[typeOfValue].
                             findIndex((obj => obj.testId === element["Test set"]));
                             if (index == -1) {
-                                listCaseAnswerI.push({
+                                listCaseAnswerIByType[typeOfValue].push({
                                     testId: element["Test set"],
                                     listCase: "Case" + element["Case ID"] + " " + "(0.00%)," + " ",
                                     listAnswer: [{
@@ -1706,18 +1706,18 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                     }]
                                 });
                             } else {
-                                listCaseAnswerI[index]["listCase"] += "Case" + element["Case ID"] + " " + "(0.00%),";
-                                listCaseAnswerI[index]["listAnswer"].push({
+                                listCaseAnswerIByType[typeOfValue][index]["listCase"] += "Case" + element["Case ID"] + " " + "(0.00%),";
+                                listCaseAnswerIByType[typeOfValue][index]["listAnswer"].push({
                                     testId: element["Test set"],
                                     caseId: "case " + element["Case ID"],
                                     percent: (0).toFixed(2)
                                 });
                             }
                         } else {
-                            let index = listCaseAnswerI.
+                            let index = listCaseAnswerIByType[typeOfValue].
                             findIndex((obj => obj.testId === element["Test set"]));
                             if (index == -1) {
-                                listCaseAnswerI.push({
+                                listCaseAnswerIByType[typeOfValue].push({
                                     testId: element["Test set"],
                                     listCase: "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2) + "%),",
                                     listAnswer: [{
@@ -1727,8 +1727,8 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                     }]
                                 });
                             } else {
-                                listCaseAnswerI[index]["listCase"] += "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2) + "%),";
-                                listCaseAnswerI[index]["listAnswer"].push({
+                                listCaseAnswerIByType[typeOfValue][index]["listCase"] += "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2) + "%),";
+                                listCaseAnswerIByType[typeOfValue][index]["listAnswer"].push({
                                     testId: element["Test set"],
                                     caseId: "case " + listCaseIdbyTestId[objIndex]["caseId"],
                                     percent: ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2)
@@ -1747,10 +1747,10 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                             let objIndex = listCaseIdbyTestId.
                             findIndex((obj => obj.testId === arrUnique[0] && obj.caseId === arrUnique[1] && obj.type === typeOfValue));
                             if (objIndex == -1) {
-                                let index = listCaseAnswerI.
+                                let index = listCaseAnswerIByType[typeOfValue].
                                 findIndex((obj => obj.testId === arrUnique[0]));
                                 if (index == -1) {
-                                    listCaseAnswerI.push({
+                                    listCaseAnswerIByType[typeOfValue].push({
                                         testId: arrUnique[0],
                                         listCase: "Case" + arrUnique[1] + " " + "(0.00%)," + " ",
                                         listAnswer: [{
@@ -1760,18 +1760,18 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                         }]
                                     });
                                 } else {
-                                    listCaseAnswerI[index]["listCase"] += "Case" + arrUnique[1] + " " + "(0.00%),";
-                                    listCaseAnswerI[index]["listAnswer"].push({
+                                    listCaseAnswerIByType[typeOfValue][index]["listCase"] += "Case" + arrUnique[1] + " " + "(0.00%),";
+                                    listCaseAnswerIByType[typeOfValue][index]["listAnswer"].push({
                                         testId: arrUnique[0],
                                         caseId: "case " + arrUnique[1],
                                         percent: (0).toFixed(2)
                                     });
                                 }
                             } else {
-                                let index = listCaseAnswerI.
+                                let index = listCaseAnswerIByType[typeOfValue].
                                 findIndex((obj => obj.testId === arrUnique[0]));
                                 if (index == -1) {
-                                    listCaseAnswerI.push({
+                                    listCaseAnswerIByType[typeOfValue].push({
                                         testId: arrUnique[0],
                                         listCase: "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2) + "%),",
                                         listAnswer: [{
@@ -1781,8 +1781,8 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                         }]
                                     });
                                 } else {
-                                    listCaseAnswerI[index]["listCase"] += "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2) + "%),";
-                                    listCaseAnswerI[index]["listAnswer"].push({
+                                    listCaseAnswerIByType[typeOfValue][index]["listCase"] += "Case" + listCaseIdbyTestId[objIndex]["caseId"] + " (" + ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2) + "%),";
+                                    listCaseAnswerIByType[typeOfValue][index]["listAnswer"].push({
                                         testId: arrUnique[0],
                                         caseId: "case " + listCaseIdbyTestId[objIndex]["caseId"],
                                         percent: ((listCaseIdbyTestId[objIndex]["totalUserTruth"] / listCaseIdbyTestId[objIndex]["totalUser"]) * 100).toFixed(2)
@@ -1798,8 +1798,8 @@ function coreCalculate(RowsRawData, RowsDapAn) {
 
     caclAverageFG();
     console.log("LIST TRUE", listTrue)
-    console.log("LIST ANSWER", listCaseAnswerI)
-    let averageI = calcAverageI(listCaseAnswerI);
+    console.log("LIST ANSWER ALL TYPE", listCaseAnswerIByType)
+    let averageIByType = calcAverageI(listCaseAnswerIByType);
     listExportDataFinal.forEach(element => {
         let listCaseK = "";
         let totalCaseJ = 0;
@@ -1827,7 +1827,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
         element["totalJ"] = 0;
         let listKClone = [];
 
-        listCaseAnswerI.forEach(elm => {
+        listCaseAnswerIByType[element["type"]].forEach(elm => {
             element["totalJ"] += elm.listAnswer.length;
             element["listCaseIdbyAnswer"] += "Test" + elm["testId"] + " : " + elm["listCase"] + "\n";
             elm.listAnswer.forEach(item => {
@@ -1837,7 +1837,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             });;
         });
 
-        let listD = listTrue.filter(obj => obj["userId"] === element["userId"])
+        let listD = listTrue.filter(obj => obj["userId"] === element["userId"] && obj["type"] === element["type"])
         for (var i = 0; i < listKClone.length; i++) {
             let index = listD.findIndex((obj => obj.testId === listKClone[i].testId && obj.caseId === listKClone[i].caseId));
             if (index >= 0) {
@@ -1846,7 +1846,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             }
         }
 
-        let listF = listFalse.filter(obj => obj["userId"] === element["userId"])
+        let listF = listFalse.filter(obj => obj["userId"] === element["userId"] && obj["type"] === element["type"])
         for (var i = 0; i < listKClone.length; i++) {
             let index = listF.findIndex((obj => obj.testId === listKClone[i].testId && obj.caseId === listKClone[i].caseId));
             if (index >= 0) {
@@ -1892,14 +1892,14 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                 }
             }
         }
-        element["averageI"] = averageI.toFixed(2) + "%";
+        element["averageI"] = averageIByType[element["type"]].toFixed(2) + "%";
         element["totalCaseJ"] = totalCaseJ;
         element["listCaseK"] = listCaseK;
         element["totalSetScore"] = listKClone.length;
 
 
         // TÍNH CÁC CASE TÁI SỬ DỤNG ĐÚNG
-        let listTruebyUser = listTrue.filter(obj => obj["userId"] === element["userId"])
+        let listTruebyUser = listTrue.filter(obj => obj["userId"] === element["userId"] && obj["type"] === element["type"])
             .map(obj => obj);
         if (caseCorrectMin == 0 && listTruebyUser.length > 0) {
             let listOutputTrue = [];
@@ -2400,26 +2400,31 @@ function caclAverageFG() {
 
 
 // CALC AVERAGE COT I
-function calcAverageI(listCaseAnswerI) {
-    let averageI = 0;
-    let totalTrue = 0;
-    let totalLength = 0;
-    listCaseAnswerI.forEach(element => {
-        let strTrue = element["listCase"].replace(/[^0-9.]/g, '%');
-        let strTempTrue = strTrue.split("%");
-        let strFinalTrue = [];
-        strTempTrue.forEach(element => {
-            if (element.length > 3 && element.length < 7) {
-                strFinalTrue.push(element);
-            }
+function calcAverageI(listCaseAnswerIByType) {
+    let averageTrueByType = {}
+    dropdownArrayValue.forEach(function(dropdownValue) {
+        let totalTrue = 0;
+        let totalLength = 0;
+        let typeOfValue = dropdownObject[dropdownValue];
+        let listCaseAnswerI = listCaseAnswerIByType[typeOfValue];
+        listCaseAnswerI.forEach(element => {
+            let strTrue = element["listCase"].replace(/[^0-9.]/g, '%');
+            let strTempTrue = strTrue.split("%");
+            let strFinalTrue = [];
+            strTempTrue.forEach(element => {
+                if (element.length > 3 && element.length < 7) {
+                    strFinalTrue.push(element);
+                }
+            });
+            totalLength += strFinalTrue.length;
+            strFinalTrue.forEach(element => {
+                totalTrue += parseFloat(element);
+            });
         });
-        totalLength += strFinalTrue.length;
-        strFinalTrue.forEach(element => {
-            totalTrue += parseFloat(element);
-        });
+        let averageTrue = totalTrue / totalLength;
+        averageTrueByType[typeOfValue] = averageTrue;
     });
-    let averageTrue = totalTrue / totalLength;
-    return averageTrue;
+    return averageTrueByType;
 }
 
 let listTrue = [];
@@ -2467,13 +2472,15 @@ function calcPercentOfCaseIdRawData(data) {
                     userId: data["userId"],
                     testId: data["testId"],
                     caseId: "case " + element,
-                    percent: percent.toFixed(2)
+                    percent: percent.toFixed(2),
+                    type: data["percentType"]
                 });
                 listTrueTiny.push({
                     userId: data["userId"],
                     testId: data["testId"],
                     caseId: "case " + element,
-                    percent: percent.toFixed(2)
+                    percent: percent.toFixed(2),
+                    type: data["percentType"]
                 });
                 break;
             }
@@ -2483,13 +2490,15 @@ function calcPercentOfCaseIdRawData(data) {
                 userId: data["userId"],
                 testId: data["testId"],
                 caseId: "case " + element,
-                percent: "0.00"
+                percent: "0.00",
+                type: data["percentType"]
             });
             listTrueTiny.push({
                 userId: data["userId"],
                 testId: data["testId"],
                 caseId: "case " + element,
-                percent: "0.00"
+                percent: "0.00",
+                type: data["percentType"]
             });
         }
     });
@@ -2529,13 +2538,15 @@ function calcPercentOfCaseIdRawData(data) {
                     userId: data["userId"],
                     testId: data["testId"],
                     caseId: "case " + element,
-                    percent: percent.toFixed(2)
+                    percent: percent.toFixed(2),
+                    type: data["percentType"]
                 });
                 listFalseTiny.push({
                     userId: data["userId"],
                     testId: data["testId"],
                     caseId: "case " + element,
-                    percent: percent.toFixed(2)
+                    percent: percent.toFixed(2),
+                    type: data["percentType"]
                 });
                 break;
             }
@@ -2545,13 +2556,15 @@ function calcPercentOfCaseIdRawData(data) {
                 userId: data["userId"],
                 testId: data["testId"],
                 caseId: "case " + element,
-                percent: "0.00"
+                percent: "0.00",
+                type: data["percentType"]
             });
             listFalseTiny.push({
                 userId: data["userId"],
                 testId: data["testId"],
                 caseId: "case " + element,
-                percent: "0.00"
+                percent: "0.00",
+                type: data["percentType"]
             });
         }
     });
@@ -2618,7 +2631,8 @@ function calcWofCaseIdRawData(data) {
                         caseId: "case " + element,
                         percent: percent.toFixed(2),
                         lesionId: listClone[objIndex]["lesionId"],
-                        truthOrder: listClone[objIndex]["truthOrder"]
+                        truthOrder: listClone[objIndex]["truthOrder"],
+                        type: data["percentType"]
                     });
                     break;
                 case "4":
@@ -2628,7 +2642,8 @@ function calcWofCaseIdRawData(data) {
                         testId: data["testId"],
                         caseId: "case " + element,
                         percent: percent.toFixed(2),
-                        lesionId: listClone[objIndex]["lesionId"]
+                        lesionId: listClone[objIndex]["lesionId"],
+                        type: data["percentType"]
                     });
                     break;
                 default:
@@ -2637,7 +2652,8 @@ function calcWofCaseIdRawData(data) {
                         userId: data["userId"],
                         testId: data["testId"],
                         caseId: "case " + element,
-                        percent: percent.toFixed(2)
+                        percent: percent.toFixed(2),
+                        type: data["percentType"]
                     });
                     break;
             }
@@ -2661,7 +2677,8 @@ function calcWofCaseIdRawData(data) {
                         caseId: "case " + element,
                         percent: percent.toFixed(2),
                         lesionId: listClone2[objIndex]["lesionId"],
-                        truthOrder: listClone2[objIndex]["truthOrder"]
+                        truthOrder: listClone2[objIndex]["truthOrder"],
+                        type: data["percentType"]
                     });
                     break;
                 case "4":
@@ -2671,7 +2688,8 @@ function calcWofCaseIdRawData(data) {
                         testId: data["testId"],
                         caseId: "case " + element,
                         percent: percent.toFixed(2),
-                        lesionId: listClone2[objIndex]["lesionId"]
+                        lesionId: listClone2[objIndex]["lesionId"],
+                        type: data["percentType"]
                     });
                     break;
                 default:
@@ -2680,7 +2698,8 @@ function calcWofCaseIdRawData(data) {
                         userId: data["userId"],
                         testId: data["testId"],
                         caseId: "case " + element,
-                        percent: percent.toFixed(2)
+                        percent: percent.toFixed(2),
+                        type: data["percentType"]
                     });
                     break;
             }
