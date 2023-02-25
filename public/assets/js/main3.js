@@ -3091,7 +3091,20 @@ function coreCalculate(RowsRawData, RowsDapAn) {
         }
 
         if (scoreLimit > 0 && scoreLimit < listKClone.length) {
-            listKClone.splice(scoreLimit, listKClone.length - 1);
+            if (selectScore == "3") {
+                let haftScoreLimit = parseInt(scoreLimit / 2);
+                if (listKClone.length % 2 == 1) {
+                    listKClone.unshift(listKClone[0])
+                } else if (parseInt(scoreLimit) % 2 == 1)
+                    haftScoreLimit += 1;
+                let countStartDelete = (listKClone.length / 2) - haftScoreLimit;
+                let countEndDelete = parseInt(scoreLimit) % 2 == 0 ? (listKClone.length / 2) - haftScoreLimit : (listKClone.length / 2) - (haftScoreLimit - 1);
+                listKClone.splice(0, countStartDelete);
+                listKClone.splice(scoreLimit, countEndDelete);
+                // listKClone.sort((a, b) => Math.abs(a.percent - listKClone[Math.floor(listKClone.length / 2)].percent) - Math.abs(b.percent - listKClone[Math.floor(listKClone.length / 2)].percent) || b.percent - a.percent);
+                // listKClone.splice(scoreLimit, listKClone.length - 1);
+            } else
+                listKClone.splice(scoreLimit, listKClone.length - 1);
         }
 
         listKClone = listKClone.sort(function(a, b) {
@@ -3150,11 +3163,23 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             }
 
             if (trueLimit > 0 && trueLimit < listOutputTrue.length) {
-                let listOutputTrueClone = [];
-                for (var i = 0; i < trueLimit; i++) {
-                    listOutputTrueClone.push(listOutputTrue[i]);
+                if (selectTrue == "3") {
+                    let haftScoreLimit = parseInt(trueLimit / 2);
+                    if (listOutputTrue.length % 2 == 1) {
+                        listOutputTrue.unshift(listOutputTrue[0])
+                    } else if (parseInt(trueLimit) % 2 == 1)
+                        haftScoreLimit += 1;
+                    let countStartDelete = (listOutputTrue.length / 2) - haftScoreLimit;
+                    let countEndDelete = parseInt(trueLimit) % 2 == 0 ? (listOutputTrue.length / 2) - haftScoreLimit : (listOutputTrue.length / 2) - (haftScoreLimit - 1);
+                    listOutputTrue.splice(0, countStartDelete);
+                    listOutputTrue.splice(trueLimit, countEndDelete);
+                } else {
+                    let listOutputTrueClone = [];
+                    for (var i = 0; i < trueLimit; i++) {
+                        listOutputTrueClone.push(listOutputTrue[i]);
+                    }
+                    listOutputTrue = listOutputTrueClone;
                 }
-                listOutputTrue = listOutputTrueClone;
             }
 
             listOutputTrue = listOutputTrue.sort(function(a, b) {
@@ -3207,16 +3232,28 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                 listOutputTrue.push(listTruebyUser[i]);
             }
 
-            if (selectTrue == "2") {
+            if (selectTrue == "2" || selectTrue == "3") {
                 listOutputTrue = listOutputTrue.reverse();
             }
 
             if (trueLimit > 0 && trueLimit < listOutputTrue.length) {
-                let listOutputTrueClone = [];
-                for (var i = 0; i < trueLimit; i++) {
-                    listOutputTrueClone.push(listOutputTrue[i]);
+                if (selectTrue == "3") {
+                    let haftScoreLimit = parseInt(trueLimit / 2);
+                    if (listOutputTrue.length % 2 == 1) {
+                        listOutputTrue.unshift(listOutputTrue[0])
+                    } else if (parseInt(trueLimit) % 2 == 1)
+                        haftScoreLimit += 1;
+                    let countStartDelete = (listOutputTrue.length / 2) - haftScoreLimit;
+                    let countEndDelete = parseInt(trueLimit) % 2 == 0 ? (listOutputTrue.length / 2) - haftScoreLimit : (listOutputTrue.length / 2) - (haftScoreLimit - 1);
+                    listOutputTrue.splice(0, countStartDelete);
+                    listOutputTrue.splice(trueLimit, countEndDelete);
+                } else {
+                    let listOutputTrueClone = [];
+                    for (var i = 0; i < trueLimit; i++) {
+                        listOutputTrueClone.push(listOutputTrue[i]);
+                    }
+                    listOutputTrue = listOutputTrueClone;
                 }
-                listOutputTrue = listOutputTrueClone;
             }
             listOutputTrue = listOutputTrue.sort(function(a, b) {
                 return a.testId - b.testId;
@@ -3279,11 +3316,23 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                     }
 
                     if (trueLimit > 0 && trueLimit < listOutputTrue.length) {
-                        let listOutputTrueClone = [];
-                        for (var i = 0; i < trueLimit; i++) {
-                            listOutputTrueClone.push(listOutputTrue[i]);
+                        if (selectTrue == "3") {
+                            let haftScoreLimit = parseInt(trueLimit / 2);
+                            if (listOutputTrue.length % 2 == 1) {
+                                listOutputTrue.unshift(listOutputTrue[0])
+                            } else if (parseInt(trueLimit) % 2 == 1)
+                                haftScoreLimit += 1;
+                            let countStartDelete = (listOutputTrue.length / 2) - haftScoreLimit;
+                            let countEndDelete = parseInt(trueLimit) % 2 == 0 ? (listOutputTrue.length / 2) - haftScoreLimit : (listOutputTrue.length / 2) - (haftScoreLimit - 1);
+                            listOutputTrue.splice(0, countStartDelete);
+                            listOutputTrue.splice(trueLimit, countEndDelete);
+                        } else {
+                            let listOutputTrueClone = [];
+                            for (var i = 0; i < trueLimit; i++) {
+                                listOutputTrueClone.push(listOutputTrue[i]);
+                            }
+                            listOutputTrue = listOutputTrueClone;
                         }
-                        listOutputTrue = listOutputTrueClone;
                     }
                     listOutputTrue = listOutputTrue.sort(function(a, b) {
                         return a.testId - b.testId;
@@ -3359,11 +3408,23 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             }
 
             if (falseLimit > 0 && falseLimit < listOutputFalse.length) {
-                let listOutputFalseClone = [];
-                for (var i = 0; i < falseLimit; i++) {
-                    listOutputFalseClone.push(listOutputFalse[i]);
+                if (selectFalse == "3") {
+                    let haftScoreLimit = parseInt(falseLimit / 2);
+                    if (listOutputFalse.length % 2 == 1) {
+                        listOutputFalse.unshift(listOutputFalse[0])
+                    } else if (parseInt(falseLimit) % 2 == 1)
+                        haftScoreLimit += 1;
+                    let countStartDelete = (listOutputFalse.length / 2) - haftScoreLimit;
+                    let countEndDelete = parseInt(falseLimit) % 2 == 0 ? (listOutputFalse.length / 2) - haftScoreLimit : (listOutputFalse.length / 2) - (haftScoreLimit - 1);
+                    listOutputFalse.splice(0, countStartDelete);
+                    listOutputFalse.splice(falseLimit, countEndDelete);
+                } else {
+                    let listOutputFalseClone = [];
+                    for (var i = 0; i < falseLimit; i++) {
+                        listOutputFalseClone.push(listOutputFalse[i]);
+                    }
+                    listOutputFalse = listOutputFalseClone;
                 }
-                listOutputFalse = listOutputFalseClone;
             }
             listOutputFalse = listOutputFalse.sort(function(a, b) {
                 return a.testId - b.testId;
@@ -3413,16 +3474,28 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             for (var i = 0; i < roundValueFalse; i++) {
                 listOutputFalse.push(listFalsebyUser[i]);
             }
-            if (selectFalse == "2") {
+            if (selectFalse == "2" || selectFalse == "3") {
                 listOutputFalse = listOutputFalse.reverse();
             }
 
             if (falseLimit > 0 && falseLimit < listOutputFalse.length) {
-                let listOutputFalseClone = [];
-                for (var i = 0; i < falseLimit; i++) {
-                    listOutputFalseClone.push(listOutputFalse[i]);
+                if (selectFalse == "3") {
+                    let haftScoreLimit = parseInt(falseLimit / 2);
+                    if (listOutputFalse.length % 2 == 1) {
+                        listOutputFalse.unshift(listOutputFalse[0])
+                    } else if (parseInt(falseLimit) % 2 == 1)
+                        haftScoreLimit += 1;
+                    let countStartDelete = (listOutputFalse.length / 2) - haftScoreLimit;
+                    let countEndDelete = parseInt(falseLimit) % 2 == 0 ? (listOutputFalse.length / 2) - haftScoreLimit : (listOutputFalse.length / 2) - (haftScoreLimit - 1);
+                    listOutputFalse.splice(0, countStartDelete);
+                    listOutputFalse.splice(falseLimit, countEndDelete);
+                } else {
+                    let listOutputFalseClone = [];
+                    for (var i = 0; i < falseLimit; i++) {
+                        listOutputFalseClone.push(listOutputFalse[i]);
+                    }
+                    listOutputFalse = listOutputFalseClone;
                 }
-                listOutputFalse = listOutputFalseClone;
             }
             listOutputFalse = listOutputFalse.sort(function(a, b) {
                 return a.testId - b.testId;
@@ -3488,11 +3561,23 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                     }
 
                     if (falseLimit > 0 && falseLimit < listOutputFalse.length) {
-                        let listOutputFalseClone = [];
-                        for (var i = 0; i < falseLimit; i++) {
-                            listOutputFalseClone.push(listOutputFalse[i]);
+                        if (selectFalse == "3") {
+                            let haftScoreLimit = parseInt(falseLimit / 2);
+                            if (listOutputFalse.length % 2 == 1) {
+                                listOutputFalse.unshift(listOutputFalse[0])
+                            } else if (parseInt(falseLimit) % 2 == 1)
+                                haftScoreLimit += 1;
+                            let countStartDelete = (listOutputFalse.length / 2) - haftScoreLimit;
+                            let countEndDelete = parseInt(falseLimit) % 2 == 0 ? (listOutputFalse.length / 2) - haftScoreLimit : (listOutputFalse.length / 2) - (haftScoreLimit - 1);
+                            listOutputFalse.splice(0, countStartDelete);
+                            listOutputFalse.splice(falseLimit, countEndDelete);
+                        } else {
+                            let listOutputFalseClone = [];
+                            for (var i = 0; i < falseLimit; i++) {
+                                listOutputFalseClone.push(listOutputFalse[i]);
+                            }
+                            listOutputFalse = listOutputFalseClone;
                         }
-                        listOutputFalse = listOutputFalseClone;
                     }
                     listOutputFalse = listOutputFalse.sort(function(a, b) {
                         return a.testId - b.testId;
