@@ -23,6 +23,32 @@
     <script src="assets/js/bootstrap.min.js"></script>
 
     <link rel="stylesheet" href="assets/style.css">
+
+    <script type="text/javascript">
+        $(document).ready(() => {
+            //-- score limitation
+            $("#txtScoreMin").val(0).trigger('change');
+            $("#txtScoreMax").val(100).trigger('change');
+            $("#txtScoreLimit").val(10).trigger('change');
+            $("#selectScore").val(1).trigger('change');
+
+            //-- re-user true
+            $("#txtCaseCorrectMin").val(0).trigger('change');
+            $("#txtCaseCorrectMax").val(100).trigger('change');
+            $("#txtTrueLimit").val(10).trigger('change');
+            $("#txtTrueFrom").val(0).trigger('change');
+            $("#txtTrueTo").val(100).trigger('change');
+            $("#selectTrue").val(1).trigger('change');
+
+            //-- re-user false
+            $("#txtCaseInCorrectMin").val(0).trigger('change');
+            $("#txtCaseInCorrectMax").val(100).trigger('change');
+            $("#txtFalseLimit").val(10).trigger('change');
+            $("#txtFalseFrom").val(0).trigger('change');
+            $("#txtFalseTo").val(100).trigger('change');
+            $("#selectFalse").val(1).trigger('change');
+        })
+    </script>
 </head>
 
 <body>
@@ -318,7 +344,7 @@
                                 <input type="number" id="txtFalseFrom" class="form-control" placeholder="From (W/%)" />
 
                             </div>
-                            <div class="col-3"style="margin-top: 10px;">
+                            <div class="col-3" style="margin-top: 10px;">
                                 <input type="number" id="txtFalseTo" class="form-control" placeholder="To (W/%)" />
                             </div>
                         </div>
