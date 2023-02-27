@@ -26,26 +26,60 @@
 
     <script type="text/javascript">
         $(document).ready(() => {
+            /* 
+            selectScore:
+                1 => Average
+                2 => Median
+                3 => Min
+                4 => Max
+                5 => 25th
+                6 => 75th
+            */
+            $("#inlineCustomMValue").val(1).trigger('change');
+            
             //-- score limitation
+            // Score value between 0 => 100
             $("#txtScoreMin").val(0).trigger('change');
             $("#txtScoreMax").val(100).trigger('change');
             $("#txtScoreLimit").val(10).trigger('change');
+            /* 
+            selectScore:
+               1 => From top to bottom
+               2 => From bottom to top
+               3 => Middle 
+            */
             $("#selectScore").val(1).trigger('change');
 
             //-- re-user true
+            // Case Correct value between 0 => 100
             $("#txtCaseCorrectMin").val(0).trigger('change');
             $("#txtCaseCorrectMax").val(100).trigger('change');
             $("#txtTrueLimit").val(10).trigger('change');
+            // Re-User True value by W/% will between 0 => 100
             $("#txtTrueFrom").val(0).trigger('change');
             $("#txtTrueTo").val(100).trigger('change');
+            /* 
+            selectTrue:
+               1 => From top to bottom
+               2 => From bottom to top
+               3 => Middle 
+            */
             $("#selectTrue").val(1).trigger('change');
 
             //-- re-user false
+            // Case InCorrect value between 0 => 100
             $("#txtCaseInCorrectMin").val(0).trigger('change');
             $("#txtCaseInCorrectMax").val(100).trigger('change');
             $("#txtFalseLimit").val(10).trigger('change');
+            // Re-Use False value by W/% will between 0 => 100
             $("#txtFalseFrom").val(0).trigger('change');
             $("#txtFalseTo").val(100).trigger('change');
+            /* 
+            selectFalse:
+               1 => From top to bottom
+               2 => From bottom to top
+               3 => Middle 
+            */
             $("#selectFalse").val(1).trigger('change');
         })
     </script>
