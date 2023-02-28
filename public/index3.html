@@ -26,16 +26,20 @@
 
     <script type="text/javascript">
         $(document).ready(() => {
+            // -- M value
+            $("#txtMvalue").val(10).trigger('change');
+
             /* 
-            selectScore:
+            select M:
+                -1 => if wanna input textbox M value
                 1 => Average
                 2 => Median
                 3 => Min
                 4 => Max
                 5 => 25th
-                6 => 75th
+                6 => 75th txtMvalue
             */
-            $("#inlineCustomMValue").val(1).trigger('change');
+            $("#inlineCustomMValue").val(-1).trigger('change');
             
             //-- score limitation
             // Score value between 0 => 100
@@ -416,8 +420,8 @@
 <script type="text/javascript" src="assets/js/xlsx.full.min.js"></script>
 <script type="text/javascript" src="assets/js/jszip.js"></script>
 <script type="text/javascript" src="assets/js/xlsx-populate.min.js"></script>
-<script type="text/javascript" src="assets/js/main3.js">
-</script>
+<script type="text/javascript" src="assets/js/main3.js"></script>
+<script type="text/javascript" src="assets/js/percentile.js"></script>
 
 <link rel="stylesheet" href="assets/css/bootstrap-select.min.css">
 <script src="assets/js/bootstrap-select.js"></script>
