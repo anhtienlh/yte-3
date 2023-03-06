@@ -80,6 +80,8 @@ let result = [];
 let selectW;
 let selectTrue;
 let selectFalse;
+let selectTrueFromTo;
+let selectFalseFromTo;
 let selectScore;
 let dropdownArrayValue = [];
 let dropdownObject = {};
@@ -92,6 +94,8 @@ let setTo = 0;
 let scoreLimit = 0;
 let trueLimit = 0;
 let falseLimit = 0;
+let trueFromToLimit = 0;
+let falseFromToLimit = 0;
 let isW = 0;
 let valueM = 0;
 let caseCorrectMin = 0;
@@ -145,6 +149,14 @@ $("#selectFalse").change(function() {
     selectFalse = $(this).children("option:selected").val();
 });
 
+$("#selectTrueFromTo").change(function() {
+    selectTrueFromTo = $(this).children("option:selected").val();
+});
+
+$("#selectFalseFromTo").change(function() {
+    selectFalseFromTo = $(this).children("option:selected").val();
+});
+
 $("#selectScore").change(function() {
     selectScore = $(this).children("option:selected").val();
 });
@@ -170,8 +182,16 @@ $("#txtTrueLimit").change(function() {
     trueLimit = $(this).val();
 });
 
+$("#txtTrueFromToLimit").change(function() {
+    trueFromToLimit = $(this).val();
+});
+
 $("#txtFalseLimit").change(function() {
     falseLimit = $(this).val();
+});
+
+$("#txtFalseFromToLimit").change(function() {
+    falseFromToLimit = $(this).val();
 });
 
 $("#txtMvalue").change(function() {
@@ -1857,6 +1877,8 @@ function coreCalculate(RowsRawData, RowsDapAn) {
         limit: trueLimit,
         from: trueFrom,
         to: trueTo,
+        fromtochoose: selectTrueFromTo,
+        fromtolimit: trueFromToLimit,
     });
     listExportFilter.push({
         type: "RE-USE FALSE",
@@ -1866,7 +1888,10 @@ function coreCalculate(RowsRawData, RowsDapAn) {
         limit: falseLimit,
         from: falseFrom,
         to: falseTo,
+        fromtochoose: selectFalseFromTo,
+        fromtolimit: falseFromToLimit,
     });
+
     // CHU Y CO THEM SESSION_NO HAY KO ????
     // TINH TOAN MUC SO 1
     // $('body').removeClass("loading");
@@ -3052,13 +3077,13 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             .filter(
                 (obj) =>
                 obj["userId"] === element["userId"] &&
-                obj["type"] === typeOfElement &&
-                minTrueSet <= parseFloat(obj["percent"]) &&
-                maxTrueSet >= parseFloat(obj["percent"])
+                obj["type"] === typeOfElement
             )
             .map((obj) => obj);
+
+        let listOutputTrue = [];
+        let listReUseTrue;
         if (caseCorrectMin == 0 && listTruebyUser.length > 0) {
-            let listOutputTrue = [];
             listTruebyUser = listTruebyUser.sort(function(a, b) {
                 return a.percent - b.percent;
             });
@@ -3098,60 +3123,10 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                 }
             }
 
-            listOutputTrue = listOutputTrue.sort(function(a, b) {
-                return a.testId - b.testId;
-            });
-
             if (listOutputTrue.length > 0) {
-                let listReUseTrue =
-                    "(Tính theo % USER-TRUE thấp nhất)\n" +
-                    "Test " +
-                    listOutputTrue[0]["testId"] +
-                    " : ";
-                switch (typeOfElement) {
-                    // case "3":
-                    //     listReUseTrue += listOutputTrue[0]["caseId"] + " (" + listOutputTrue[0]["percent"] + "%)"
-                    //         + " - " + listOutputTrue[0]["lesionId"] + " - " + listOutputTrue[0]["truthOrder"] + " , ";
-                    //     break;
-                    // case "4":
-                    //     listReUseTrue += listOutputTrue[0]["caseId"] + " (" + listOutputTrue[0]["percent"] + "%)" + " - " + listOutputTrue[0]["lesionId"] + " , ";
-                    //     break;
-                    default: listReUseTrue +=
-                        listOutputTrue[0]["caseId"] +
-                        " (" +
-                        listOutputTrue[0]["percent"] +
-                        "%), ";
-                    break;
-                }
-                let checkTest = listOutputTrue[0]["testId"];
-                for (var i = 1; i < listOutputTrue.length; i++) {
-                    if (checkTest !== listOutputTrue[i]["testId"]) {
-                        checkTest = listOutputTrue[i]["testId"];
-                        listReUseTrue += "\nTest " + listOutputTrue[i]["testId"] + " : ";
-                    }
-                    // listReUseTrue += listOutputTrue[i]["caseId"] + " (" + listOutputTrue[i]["percent"] + "%), ";
-                    switch (typeOfElement) {
-                        // case "3":
-                        //     listReUseTrue += listOutputTrue[i]["caseId"] + " (" + listOutputTrue[i]["percent"] + "%)"
-                        //         + " - " + listOutputTrue[i]["lesionId"] + " - " + listOutputTrue[i]["truthOrder"] + " , ";
-                        //     break;
-                        // case "4":
-                        //     listReUseTrue += listOutputTrue[i]["caseId"] + " (" + listOutputTrue[i]["percent"] + "%)" + " - " + listOutputTrue[i]["lesionId"] + " , ";
-                        //     break;
-                        default: listReUseTrue +=
-                            listOutputTrue[i]["caseId"] +
-                            " (" +
-                            listOutputTrue[i]["percent"] +
-                            "%), ";
-                        break;
-                    }
-                }
-
-                element["listReUseTrue"] = listReUseTrue;
-                element["totalReuseTrue"] = listOutputTrue.length;
+                listReUseTrue = "(Tính theo % USER-TRUE thấp nhất)\n";
             }
         } else if (caseCorrectMax == 100 && listTruebyUser.length > 0) {
-            let listOutputTrue = [];
             listTruebyUser = listTruebyUser.sort(function(a, b) {
                 return b.percent - a.percent;
             });
@@ -3192,58 +3167,12 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                     listOutputTrue = listOutputTrueClone;
                 }
             }
-            listOutputTrue = listOutputTrue.sort(function(a, b) {
-                return a.testId - b.testId;
-            });
+
             if (listOutputTrue.length > 0) {
-                let listReUseTrue =
-                    "(Tính theo % USER-TRUE cao nhất)\n" +
-                    "Test " +
-                    listOutputTrue[0]["testId"] +
-                    " : ";
-                switch (typeOfElement) {
-                    // case "3":
-                    //     listReUseTrue += listOutputTrue[0]["caseId"] + " (" + listOutputTrue[0]["percent"] + "%)"
-                    //         + " - " + listOutputTrue[0]["lesionId"] + " - " + listOutputTrue[0]["truthOrder"] + " , ";
-                    //     break;
-                    // case "4":
-                    //     listReUseTrue += listOutputTrue[0]["caseId"] + " (" + listOutputTrue[0]["percent"] + "%)" + " - " + listOutputTrue[0]["lesionId"] + " , ";
-                    //     break;
-                    default: listReUseTrue +=
-                        listOutputTrue[0]["caseId"] +
-                        " (" +
-                        listOutputTrue[0]["percent"] +
-                        "%), ";
-                    break;
-                }
-                let checkTest = listOutputTrue[0]["testId"];
-                for (var i = 1; i < listOutputTrue.length; i++) {
-                    if (checkTest !== listOutputTrue[i]["testId"]) {
-                        checkTest = listOutputTrue[i]["testId"];
-                        listReUseTrue += "\nTest " + listOutputTrue[i]["testId"] + " : ";
-                    }
-                    switch (typeOfElement) {
-                        // case "3":
-                        //     listReUseTrue += listOutputTrue[i]["caseId"] + " (" + listOutputTrue[i]["percent"] + "%)"
-                        //         + " - " + listOutputTrue[i]["lesionId"] + " - " + listOutputTrue[i]["truthOrder"] + " , ";
-                        //     break;
-                        // case "4":
-                        //     listReUseTrue += listOutputTrue[i]["caseId"] + " (" + listOutputTrue[i]["percent"] + "%)" + " - " + listOutputTrue[i]["lesionId"] + " , ";
-                        //     break;
-                        default: listReUseTrue +=
-                            listOutputTrue[i]["caseId"] +
-                            " (" +
-                            listOutputTrue[i]["percent"] +
-                            "%), ";
-                        break;
-                    }
-                }
-                element["listReUseTrue"] = listReUseTrue;
-                element["totalReuseTrue"] = listOutputTrue.length;
+                listReUseTrue = "(Tính theo % USER-TRUE cao nhất)\n";
             }
         } else {
             if (listTruebyUser.length > 0) {
-                let listOutputTrue = [];
                 listTruebyUser = listTruebyUser.sort(function(a, b) {
                     return a.percent - b.percent;
                 });
@@ -3266,97 +3195,93 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                     }
                 }
 
-                if (listOutputTrue.length > 1) {
-                    if (selectTrue == "1") {
-                        listOutputTrue = listOutputTrue.reverse();
-                    }
+                if (selectTrue == "1") {
+                    listOutputTrue = litOutputTrue.reverse();
+                }
 
-                    if (trueLimit > 0 && trueLimit < listOutputTrue.length) {
-                        if (selectTrue == "3") {
-                            let haftScoreLimit = parseInt(trueLimit / 2);
-                            if (listOutputTrue.length % 2 == 1) {
-                                listOutputTrue.unshift(listOutputTrue[0]);
-                            } else if (parseInt(trueLimit) % 2 == 1) haftScoreLimit += 1;
-                            let countStartDelete = listOutputTrue.length / 2 - haftScoreLimit;
-                            let countEndDelete =
-                                parseInt(trueLimit) % 2 == 0 ?
-                                listOutputTrue.length / 2 - haftScoreLimit :
-                                listOutputTrue.length / 2 - (haftScoreLimit - 1);
-                            listOutputTrue.splice(0, countStartDelete);
-                            listOutputTrue.splice(trueLimit, countEndDelete);
-                        } else {
-                            let listOutputTrueClone = [];
-                            for (var i = 0; i < trueLimit; i++) {
-                                listOutputTrueClone.push(listOutputTrue[i]);
-                            }
-                            listOutputTrue = listOutputTrueClone;
+                if (trueLimit > 0 && trueLimit < listOutputTrue.length) {
+                    if (selectTrue == "3") {
+                        let haftScoreLimit = parseInt(trueLimit / 2);
+                        if (listOutputTrue.length % 2 == 1) {
+                            listOutputTrue.unshift(listOutputTrue[0]);
+                        } else if (parseInt(trueLimit) % 2 == 1) haftScoreLimit += 1;
+                        let countStartDelete = listOutputTrue.length / 2 - haftScoreLimit;
+                        let countEndDelete =
+                            parseInt(trueLimit) % 2 == 0 ?
+                            listOutputTrue.length / 2 - haftScoreLimit :
+                            listOutputTrue.length / 2 - (haftScoreLimit - 1);
+                        listOutputTrue.splice(0, countStartDelete);
+                        listOutputTrue.splice(trueLimit, countEndDelete);
+                    } else {
+                        let listOutputTrueClone = [];
+                        for (var i = 0; i < trueLimit; i++) {
+                            listOutputTrueClone.push(listOutputTrue[i]);
                         }
+                        listOutputTrue = listOutputTrueClone;
                     }
-                    listOutputTrue = listOutputTrue.sort(function(a, b) {
-                        return a.testId - b.testId;
-                    });
-                    let listReUseTrue =
-                        "(Tính theo % USER-TRUE ở giữa)\n" +
-                        "Test " +
-                        listOutputTrue[0]["testId"] +
-                        " : ";
-                    switch (typeOfElement) {
-                        // case "3":
-                        //     listReUseTrue += listOutputTrue[0]["caseId"] + " (" + listOutputTrue[0]["percent"] + "%)"
-                        //         + " - " + listOutputTrue[0]["lesionId"] + " - " + listOutputTrue[0]["truthOrder"] + " , ";
-                        //     break;
-                        // case "4":
-                        //     listReUseTrue += listOutputTrue[0]["caseId"] + " (" + listOutputTrue[0]["percent"] + "%)" + " - " + listOutputTrue[0]["lesionId"] + " , ";
-                        //     break;
-                        default: listReUseTrue +=
-                            listOutputTrue[0]["caseId"] +
-                            " (" +
-                            listOutputTrue[0]["percent"] +
-                            "%), ";
-                        break;
-                    }
-                    let checkTest = listOutputTrue[0]["testId"];
-                    for (var i = 1; i < listOutputTrue.length; i++) {
-                        if (checkTest !== listOutputTrue[i]["testId"]) {
-                            checkTest = listOutputTrue[i]["testId"];
-                            listReUseTrue += "\nTest " + listOutputTrue[i]["testId"] + " : ";
-                        }
-                        switch (typeOfElement) {
-                            // case "3":
-                            //     listReUseTrue += listOutputTrue[i]["caseId"] + " (" + listOutputTrue[i]["percent"] + "%)"
-                            //         + " - " + listOutputTrue[i]["lesionId"] + " - " + listOutputTrue[i]["truthOrder"] + " , ";
-                            //     break;
-                            // case "4":
-                            //     listReUseTrue += listOutputTrue[i]["caseId"] + " (" + listOutputTrue[i]["percent"] + "%)" + " - " + listOutputTrue[i]["lesionId"] + " , ";
-                            //     break;
-                            default: listReUseTrue +=
-                                listOutputTrue[i]["caseId"] +
-                                " (" +
-                                listOutputTrue[i]["percent"] +
-                                "%), ";
-                            break;
-                        }
-                    }
-                    element["listReUseTrue"] = listReUseTrue;
-                    element["totalReuseTrue"] = listOutputTrue.length;
-                } else if (listOutputTrue.length == 1) {
-                    element["listReUseTrue"] =
-                        "(Tính theo % USER-TRUE ở giữa)\n" +
-                        "Test " +
-                        listOutputTrue[0]["testId"] +
-                        " : " +
-                        listOutputTrue[0]["caseId"] +
-                        " (" +
-                        listOutputTrue[0]["percent"] +
-                        "%), ";
-                    element["totalReuseTrue"] = 1;
+                }
+
+                if (listOutputTrue.length > 0) {
+                    listReUseTrue = "(Tính theo % USER-TRUE ở giữa)\n";
                 }
             }
         }
 
-        if (element["listReUseTrue"] === undefined) {
+        if (listOutputTrue.length == 0) {
             element["listReUseTrue"] = "EMPTY!";
             element["totalReuseTrue"] = 0;
+        } else {
+            listOutputTrue = listOutputTrue
+                .filter(
+                    (obj) =>
+                    minTrueSet <= parseFloat(obj["percent"]) &&
+                    maxTrueSet >= parseFloat(obj["percent"])
+                )
+                .map((obj) => obj);
+
+            if (selectTrueFromTo == "1") {
+                listOutputTrue = listOutputTrue.sort(function(a, b) {
+                    return b.percent - a.percent;
+                });
+            } else {
+                listOutputTrue = listOutputTrue.sort(function(a, b) {
+                    return a.percent - b.percent;
+                });
+            }
+
+            if (trueFromToLimit > 0 && trueFromToLimit < listOutputTrue.length) {
+                if (selectTrueFromTo == "3") {
+                    let haftScoreLimit = parseInt(trueFromToLimit / 2);
+                    if (listOutputTrue.length % 2 == 1) {
+                        listOutputTrue.unshift(listOutputTrue[0]);
+                    } else if (parseInt(trueFromToLimit) % 2 == 1) haftScoreLimit += 1;
+                    let countStartDelete = listOutputTrue.length / 2 - haftScoreLimit;
+                    let countEndDelete =
+                        parseInt(trueFromToLimit) % 2 == 0 ?
+                        listOutputTrue.length / 2 - haftScoreLimit :
+                        listOutputTrue.length / 2 - (haftScoreLimit - 1);
+                    listOutputTrue.splice(0, countStartDelete);
+                    listOutputTrue.splice(trueFromToLimit, countEndDelete);
+                } else {
+                    let listOutputTrueClone = [];
+                    for (var i = 0; i < trueFromToLimit; i++) {
+                        listOutputTrueClone.push(listOutputTrue[i]);
+                    }
+                    listOutputTrue = listOutputTrueClone;
+                }
+            }
+
+            if (listOutputTrue.length > 0) {
+                listOutputTrue = listOutputTrue.sort(function(a, b) {
+                    return a.testId - b.testId;
+                });
+                listReUseTrue = genListReUse(listOutputTrue, listReUseTrue);
+                element["listReUseTrue"] = listReUseTrue;
+                element["totalReuseTrue"] = listOutputTrue.length;
+            } else {
+                element["listReUseTrue"] = "EMPTY!";
+                element["totalReuseTrue"] = 0;
+            }
         }
 
         // TÍNH CÁC CASE TÁI SỬ DỤNG SAI
@@ -3365,13 +3290,13 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             .filter(
                 (obj) =>
                 obj["userId"] === element["userId"] &&
-                obj["type"] === typeOfElement &&
-                minFalseSet <= parseFloat(obj["percent"]) &&
-                maxFalseSet >= parseFloat(obj["percent"])
+                obj["type"] === typeOfElement
             )
             .map((obj) => obj);
+
+        let listOutputFalse = [];
+        let listReUseFalse;
         if (caseInCorrectMin == 0 && listFalsebyUser.length > 0) {
-            let listOutputFalse = [];
             listFalsebyUser = listFalsebyUser.sort(function(a, b) {
                 return a.percent - b.percent;
             });
@@ -3409,60 +3334,10 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                     listOutputFalse = listOutputFalseClone;
                 }
             }
-            listOutputFalse = listOutputFalse.sort(function(a, b) {
-                return a.testId - b.testId;
-            });
             if (listOutputFalse.length > 0) {
-                let listReUseFalse =
-                    "(Tính theo % USER-FALSE thấp nhất)\n" +
-                    "Test " +
-                    listOutputFalse[0]["testId"] +
-                    " : ";
-                switch (typeOfElement) {
-                    // case "3":
-                    //     listReUseFalse += listOutputFalse[0]["caseId"] + " (" + listOutputFalse[0]["percent"] + "%)"
-                    //         + " - " + listOutputFalse[0]["lesionId"] + " - " + listOutputFalse[0]["truthOrder"] + " , ";
-                    //     break;
-                    // case "4":
-                    //     listReUseFalse += listOutputFalse[0]["caseId"] + " (" + listOutputFalse[0]["percent"] + "%)" + " - " + listOutputFalse[0]["lesionId"] + " , ";
-                    //     break;
-                    default: listReUseFalse +=
-                        listOutputFalse[0]["caseId"] +
-                        " (" +
-                        listOutputFalse[0]["percent"] +
-                        "%), ";
-                    break;
-                }
-                let checkTest = listOutputFalse[0]["testId"];
-                for (var i = 1; i < listOutputFalse.length; i++) {
-                    if (checkTest !== listOutputFalse[i]["testId"]) {
-                        checkTest = listOutputFalse[i]["testId"];
-                        listReUseFalse += "\nTest " + listOutputFalse[i]["testId"] + " : ";
-                    }
-                    switch (typeOfElement) {
-                        // case "3":
-                        //     listReUseFalse += listOutputFalse[i]["caseId"] + " (" + listOutputFalse[i]["percent"] + "%)"
-                        //         + " - " + listOutputFalse[i]["lesionId"] + " - " + listOutputFalse[i]["truthOrder"] + " , ";
-                        //     break;
-                        // case "4":
-                        //     listReUseFalse += listOutputFalse[i]["caseId"] + " (" + listOutputFalse[i]["percent"] + "%)" + " - " + listOutputFalse[i]["lesionId"] + " , ";
-                        //     break;
-                        default: listReUseFalse +=
-                            listOutputFalse[i]["caseId"] +
-                            " (" +
-                            listOutputFalse[i]["percent"] +
-                            "%), ";
-                        break;
-                    }
-                }
-                element["listReUseFalse"] = listReUseFalse;
-                element["totalReuseFalse"] = listOutputFalse.length;
+                listReUseFalse = "(Tính theo % USER-FALSE thấp nhất)\n";
             }
-            // if (element["listReUseFalse"] === undefined) {
-            //     element["listReUseFalse"] = "EMPTY!";
-            // }
         } else if (caseInCorrectMax == 100 && listFalsebyUser.length > 0) {
-            let listOutputFalse = [];
             listFalsebyUser = listFalsebyUser.sort(function(a, b) {
                 return b.percent - a.percent;
             });
@@ -3503,62 +3378,11 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                     listOutputFalse = listOutputFalseClone;
                 }
             }
-            listOutputFalse = listOutputFalse.sort(function(a, b) {
-                return a.testId - b.testId;
-            });
-
             if (listOutputFalse.length > 0) {
-                let listReUseFalse =
-                    "(Tính theo % USER-FALSE cao nhất)\n" +
-                    "Test " +
-                    listOutputFalse[0]["testId"] +
-                    " : ";
-                switch (typeOfElement) {
-                    // case "3":
-                    //     listReUseFalse += listOutputFalse[0]["caseId"] + " (" + listOutputFalse[0]["percent"] + "%)"
-                    //         + " - " + listOutputFalse[0]["lesionId"] + " - " + listOutputFalse[0]["truthOrder"] + " , ";
-                    //     break;
-                    // case "4":
-                    //     listReUseFalse += listOutputFalse[0]["caseId"] + " (" + listOutputFalse[0]["percent"] + "%)" + " - " + listOutputFalse[0]["lesionId"] + " , ";
-                    //     break;
-                    default: listReUseFalse +=
-                        listOutputFalse[0]["caseId"] +
-                        " (" +
-                        listOutputFalse[0]["percent"] +
-                        "%), ";
-                    break;
-                }
-                let checkTest = listOutputFalse[0]["testId"];
-                for (var i = 1; i < listOutputFalse.length; i++) {
-                    if (checkTest !== listOutputFalse[i]["testId"]) {
-                        checkTest = listOutputFalse[i]["testId"];
-                        listReUseFalse += "\nTest " + listOutputFalse[i]["testId"] + " : ";
-                    }
-                    switch (typeOfElement) {
-                        // case "3":
-                        //     listReUseFalse += listOutputFalse[i]["caseId"] + " (" + listOutputFalse[i]["percent"] + "%)"
-                        //         + " - " + listOutputFalse[i]["lesionId"] + " - " + listOutputFalse[i]["truthOrder"] + " , ";
-                        //     break;
-                        // case "4":
-                        //     listReUseFalse += listOutputFalse[i]["caseId"] + " (" + listOutputFalse[i]["percent"] + "%)" + " - " + listOutputFalse[i]["lesionId"] + " , ";
-                        //     break;
-                        default: listReUseFalse +=
-                            listOutputFalse[i]["caseId"] +
-                            " (" +
-                            listOutputFalse[i]["percent"] +
-                            "%), ";
-                        break;
-                    }
-                }
-                element["listReUseFalse"] = listReUseFalse;
-                element["totalReuseFalse"] = listOutputFalse.length;
+                listReUseFalse = "(Tính theo % USER-FALSE cao nhất)\n";
             }
-            // if (element["listReUseFalse"] === undefined) {
-            //     element["listReUseFalse"] = "EMPTY!";
-            // }
         } else {
             if (listFalsebyUser.length > 0) {
-                let listOutputFalse = [];
                 listFalsebyUser = listFalsebyUser.sort(function(a, b) {
                     return a.percent - b.percent;
                 });
@@ -3582,98 +3406,93 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                     }
                 }
 
-                if (listOutputFalse.length > 1) {
-                    if (selectFalse == "1") {
-                        listOutputFalse = listOutputFalse.reverse();
-                    }
+                if (selectFalse == "1") {
+                    listOutputFalse = listOutputFalse.reverse();
+                }
 
-                    if (falseLimit > 0 && falseLimit < listOutputFalse.length) {
-                        if (selectFalse == "3") {
-                            let haftScoreLimit = parseInt(falseLimit / 2);
-                            if (listOutputFalse.length % 2 == 1) {
-                                listOutputFalse.unshift(listOutputFalse[0]);
-                            } else if (parseInt(falseLimit) % 2 == 1) haftScoreLimit += 1;
-                            let countStartDelete =
-                                listOutputFalse.length / 2 - haftScoreLimit;
-                            let countEndDelete =
-                                parseInt(falseLimit) % 2 == 0 ?
-                                listOutputFalse.length / 2 - haftScoreLimit :
-                                listOutputFalse.length / 2 - (haftScoreLimit - 1);
-                            listOutputFalse.splice(0, countStartDelete);
-                            listOutputFalse.splice(falseLimit, countEndDelete);
-                        } else {
-                            let listOutputFalseClone = [];
-                            for (var i = 0; i < falseLimit; i++) {
-                                listOutputFalseClone.push(listOutputFalse[i]);
-                            }
-                            listOutputFalse = listOutputFalseClone;
+                if (falseLimit > 0 && falseLimit < listOutputFalse.length) {
+                    if (selectFalse == "3") {
+                        let haftScoreLimit = parseInt(falseLimit / 2);
+                        if (listOutputFalse.length % 2 == 1) {
+                            listOutputFalse.unshift(listOutputFalse[0]);
+                        } else if (parseInt(falseLimit) % 2 == 1) haftScoreLimit += 1;
+                        let countStartDelete =
+                            listOutputFalse.length / 2 - haftScoreLimit;
+                        let countEndDelete =
+                            parseInt(falseLimit) % 2 == 0 ?
+                            listOutputFalse.length / 2 - haftScoreLimit :
+                            listOutputFalse.length / 2 - (haftScoreLimit - 1);
+                        listOutputFalse.splice(0, countStartDelete);
+                        listOutputFalse.splice(falseLimit, countEndDelete);
+                    } else {
+                        let listOutputFalseClone = [];
+                        for (var i = 0; i < falseLimit; i++) {
+                            listOutputFalseClone.push(listOutputFalse[i]);
                         }
+                        listOutputFalse = listOutputFalseClone;
                     }
-                    listOutputFalse = listOutputFalse.sort(function(a, b) {
-                        return a.testId - b.testId;
-                    });
-                    let listReUseFalse =
-                        "(Tính theo % USER-FALSE ở giữa)\n" +
-                        "Test " +
-                        listOutputFalse[0]["testId"] +
-                        " : ";
-                    switch (typeOfElement) {
-                        // case "3":
-                        //     listReUseFalse += listOutputFalse[0]["caseId"] + " (" + listOutputFalse[0]["percent"] + "%)"
-                        //         + " - " + listOutputFalse[0]["lesionId"] + " - " + listOutputFalse[0]["truthOrder"] + " , ";
-                        //     break;
-                        // case "4":
-                        //     listReUseFalse += listOutputFalse[0]["caseId"] + " (" + listOutputFalse[0]["percent"] + "%)" + " - " + listOutputFalse[0]["lesionId"] + " , ";
-                        //     break;
-                        default: listReUseFalse +=
-                            listOutputFalse[0]["caseId"] +
-                            " (" +
-                            listOutputFalse[0]["percent"] +
-                            "%), ";
-                        break;
-                    }
-                    let checkTest = listOutputFalse[0]["testId"];
-                    for (var i = 1; i < listOutputFalse.length; i++) {
-                        if (checkTest !== listOutputFalse[i]["testId"]) {
-                            checkTest = listOutputFalse[i]["testId"];
-                            listReUseFalse +=
-                                "\nTest " + listOutputFalse[i]["testId"] + " : ";
-                        }
-                        switch (typeOfElement) {
-                            // case "3":
-                            //     listReUseFalse += listOutputFalse[i]["caseId"] + " (" + listOutputFalse[i]["percent"] + "%)"
-                            //         + " - " + listOutputFalse[i]["lesionId"] + " - " + listOutputFalse[i]["truthOrder"] + " , ";
-                            //     break;
-                            // case "4":
-                            //     listReUseFalse += listOutputFalse[i]["caseId"] + " (" + listOutputFalse[i]["percent"] + "%)" + " - " + listOutputFalse[i]["lesionId"] + " , ";
-                            //     break;
-                            default: listReUseFalse +=
-                                listOutputFalse[i]["caseId"] +
-                                " (" +
-                                listOutputFalse[i]["percent"] +
-                                "%), ";
-                            break;
-                        }
-                    }
-                    element["listReUseFalse"] = listReUseFalse;
-                    element["totalReuseFalse"] = listOutputFalse.length;
-                } else if (listOutputFalse.length == 1) {
-                    element["listReUseFalse"] =
-                        "(Tính theo % USER-FALSE ở giữa)\n" +
-                        "Test " +
-                        listOutputFalse[0]["testId"] +
-                        " : " +
-                        listOutputFalse[0]["caseId"] +
-                        " (" +
-                        listOutputFalse[0]["percent"] +
-                        "%), ";
-                    element["totalReuseFalse"] = 1;
+                }
+                if (listOutputFalse.length > 0) {
+                    listReUseFalse = "(Tính theo % USER-FALSE ở giữa)\n"
                 }
             }
         }
-        if (element["listReUseFalse"] === undefined) {
+
+        if (listOutputFalse.length == 0) {
             element["listReUseFalse"] = "EMPTY!";
             element["totalReuseFalse"] = 0;
+        } else {
+            listOutputFalse = listOutputFalse
+                .filter(
+                    (obj) =>
+                    minFalseSet <= parseFloat(obj["percent"]) &&
+                    maxFalseSet >= parseFloat(obj["percent"])
+                )
+                .map((obj) => obj);
+
+            if (selectFalseFromTo == "1") {
+                listOutputFalse = listOutputFalse.sort(function(a, b) {
+                    return b.percent - a.percent;
+                });
+            } else {
+                listOutputFalse = listOutputFalse.sort(function(a, b) {
+                    return a.percent - b.percent;
+                });
+            }
+
+            if (falseFromToLimit > 0 && falseFromToLimit < listOutputFalse.length) {
+                if (selectFalseFromTo == "3") {
+                    let haftScoreLimit = parseInt(falseFromToLimit / 2);
+                    if (listOutputFalse.length % 2 == 1) {
+                        listOutputFalse.unshift(listOutputFalse[0]);
+                    } else if (parseInt(falseFromToLimit) % 2 == 1) haftScoreLimit += 1;
+                    let countStartDelete = listOutputFalse.length / 2 - haftScoreLimit;
+                    let countEndDelete =
+                        parseInt(falseFromToLimit) % 2 == 0 ?
+                        listOutputFalse.length / 2 - haftScoreLimit :
+                        listOutputFalse.length / 2 - (haftScoreLimit - 1);
+                    listOutputFalse.splice(0, countStartDelete);
+                    listOutputFalse.splice(falseFromToLimit, countEndDelete);
+                } else {
+                    let listOutputFalseClone = [];
+                    for (var i = 0; i < falseFromToLimit; i++) {
+                        listOutputFalseClone.push(listOutputFalse[i]);
+                    }
+                    listOutputFalse = listOutputFalseClone;
+                }
+            }
+
+            if (listOutputFalse.length > 0) {
+                listOutputFalse = listOutputFalse.sort(function(a, b) {
+                    return a.testId - b.testId;
+                });
+                listReUseFalse = genListReUse(listOutputFalse, listReUseFalse);
+                element["listReUseFalse"] = listReUseFalse;
+                element["totalReuseFalse"] = listOutputFalse.length;
+            } else {
+                element["listReUseFalse"] = "EMPTY!";
+                element["totalReuseFalse"] = 0;
+            }
         }
 
         let userInfo = userFilter
@@ -3691,6 +3510,31 @@ function coreCalculate(RowsRawData, RowsDapAn) {
     console.log("LIST EXPORT DATA FINAL!");
     console.log(listExportDataFinal);
     console.log("LIST REPORT 2  ", listCaseIdbyTestId);
+}
+
+function genListReUse(listOutput, stringReUse) {
+    let listReUse = stringReUse +
+        "Test " +
+        listOutput[0]["testId"] +
+        " : Case " +
+        listOutput[0]["caseId"] +
+        " (" +
+        listOutput[0]["percent"] +
+        "%), ";
+    let checkTest = listOutput[0]["testId"];
+    for (var i = 1; i < listOutput.length; i++) {
+        if (checkTest !== listOutput[i]["testId"]) {
+            checkTest = listOutput[i]["testId"];
+            listReUse += "\nTest " + listOutput[i]["testId"] + " : ";
+        }
+        listReUse +=
+            "Case " +
+            listOutput[i]["caseId"] +
+            " (" +
+            listOutput[i]["percent"] +
+            "%), ";
+    }
+    return listReUse;
 }
 
 function round(value, step) {
@@ -4222,6 +4066,8 @@ function exportExcel() {
         limit: "LIMIT",
         from: "FROM (W/%)",
         to: "TO (W/%)",
+        fromtochoose: "FROM TO CHOOSE",
+        fromtolimit: "FROM TO LIMIT"
     };
 
     var tab_dynamic = {};
@@ -4338,13 +4184,26 @@ function exportExcel() {
     });
 
     listExportFilter.forEach((element) => {
-        console.log(element);
         switch (element["choose"]) {
             case "1":
                 element["choose"] = "From Top to Bottom";
                 break;
-            default:
+            case "2":
                 element["choose"] = "From Bottom to Top";
+                break;
+            case "3":
+                element["choose"] = "Middle";
+                break;
+        }
+        switch (element["fromtochoose"]) {
+            case "1":
+                element["fromtochoose"] = "From Top to Bottom";
+                break;
+            case "2":
+                element["fromtochoose"] = "From Bottom to Top";
+                break;
+            case "3":
+                element["fromtochoose"] = "Middle";
                 break;
         }
         tab_6.push(element);
