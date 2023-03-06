@@ -83,6 +83,8 @@ let selectFalse;
 let selectScore;
 let dropdownArrayValue = [];
 let dropdownObject = {};
+let caseDensityArrayValue = [];
+let lessionTypeArrayValue = [];
 let tagConfig;
 let rateConfig;
 let setFrom = 0;
@@ -113,6 +115,14 @@ $("#inlineFormCustomSelect").change(function() {
 
         dropdownObject[val] = txt;
     }
+});
+
+$("#caseDensityCustomSelect").change(function() {
+    caseDensityArrayValue = $(this).selectpicker("val");
+});
+
+$("#lessionTypeCustomSelect").change(function() {
+    lessionTypeArrayValue = $(this).selectpicker("val");
 });
 
 $("#tagSelect").change(function() {
@@ -1744,6 +1754,8 @@ function Upload() {
             var reader = new FileReader();
             $("#btnFilter").css("visibility", "visible");
             $("#dropdownOption").css("visibility", "visible");
+            $("#dropdownCaseDensity").css("visibility", "visible");
+            $("#dropdownlessionType").css("visibility", "visible");
             // $('body').addClass('loading');
             //For Browsers other than IE.
             if (reader.readAsBinaryString) {
@@ -2005,6 +2017,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                         (obj) =>
                         obj["Test set"] === element["test_id"] &&
                         obj["Case ID"] === element["case_id"] &&
+                        caseDensityArrayValue.indexOf(obj["Case density"]) != -1 &&
                         obj["Case density"] === element["Case density (user)"]
                     ).map((obj) => obj);
                     if (checkDensity.length > 0) {
@@ -2154,6 +2167,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                 (obj) =>
                                 obj["Test set"] === element["test_id"] &&
                                 obj["Case ID"] === element["case_id"] &&
+                                caseDensityArrayValue.indexOf(obj["Case density"]) != -1 &&
                                 obj["Case density"] === element["Case density (user)"]
                             ).map((obj) => obj);
                             if (checkDensity.length > 0) {
@@ -2222,6 +2236,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                 (obj) =>
                                 obj["Test set"] === element["test_id"] &&
                                 obj["Case ID"] === element["case_id"] &&
+                                caseDensityArrayValue.indexOf(obj["Case density"]) != -1 &&
                                 obj["Case density"] === element["Case density (user)"]
                             ).map((obj) => obj);
                             if (checkDensity.length > 0) {
@@ -6291,6 +6306,7 @@ function calcNormal(objRowData, objDapAn) {
                 if (objRowData[i]["rating"] <= 2) {
                     objDapAn.forEach(function(caseDapAn) {
                         if (
+                            caseDensityArrayValue.indexOf(caseDapAn["Case density"]) != -1 &&
                             objRowData[i]["Case density (user)"] === caseDapAn["Case density"]
                         ) {
                             count++;
@@ -6315,7 +6331,9 @@ function calcAbNormal(objRowData, objDapAn) {
         for (var i = 0; i < objRowData.length; i++) {
             checkDensity = objDapAn
                 .filter(
-                    (obj) => obj["Case density"] === objRowData[i]["Case density (user)"]
+                    (obj) =>
+                    caseDensityArrayValue.indexOf(obj["Case density"]) != -1 &&
+                    obj["Case density"] === objRowData[i]["Case density (user)"]
                 )
                 .map((obj) => obj);
             if (checkDensity.length != 0) {
@@ -6380,7 +6398,8 @@ function calcReCall(objRowData, objDapAn) {
         for (var i = 0; i < objRowData.length; i++) {
             checkDensity = objDapAn
                 .filter(
-                    (obj) => obj["Case density"] === objRowData[i]["Case density (user)"]
+                    (obj) => caseDensityArrayValue.indexOf(obj["Case density"]) != -1 &&
+                    obj["Case density"] === objRowData[i]["Case density (user)"]
                 )
                 .map((obj) => obj);
             if (checkDensity.length != 0) {
@@ -6439,10 +6458,10 @@ function checkLesionType(dapan, caserow) {
     var arr2 = [];
     var check = 0;
     if (dapan != undefined) {
-        arr1 = dapan.split(" / ");
+        arr1 = dapan.split(" / ").filter(s => lessionTypeArrayValue.indexOf(s) != -1);
     }
     if (caserow != undefined) {
-        arr2 = caserow.split(",");
+        arr2 = caserow.split(",").filter(s => lessionTypeArrayValue.indexOf(s) != -1);
     }
 
     arr1.forEach((element) => {

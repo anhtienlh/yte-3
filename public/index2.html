@@ -204,7 +204,7 @@
         </div>
 
         <div class="row" style="text-align: center;">
-            <div id="dropdownOption" style=" margin: 15px 0; visibility: hidden;" class="col-4">
+            <div id="dropdownOption" style=" margin: 15px 0; visibility: hidden;" class="col-2">
                 <div class="form-row align-items-center" style="float: right;">
                     <div class="col-auto my-1">
                         <select class="selectpicker" id="inlineFormCustomSelect" multiple title="Choose export filter">
@@ -217,10 +217,36 @@
                     </div>
                 </div>
             </div>
-            <div class="col-4" style=" margin: 20px 0; visibility: hidden;">
+            <div id="dropdownCaseDensity" style=" margin: 15px 0; visibility: hidden" class="col-2">
+                <div class="form-row align-items-center" style="float: right;">
+                    <div class="col-auto my-1">
+                        <select class="selectpicker" id="caseDensityCustomSelect" multiple title="Choose case density filter">
+                            <option value="1">A</option>
+                            <option value="2">B</option>
+                            <option value="3">C</option>
+                            <option value="4">D</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="dropdownlessionType" style=" margin: 15px 0; visibility: hidden" class="col-2">
+                <div class="form-row align-items-center" style="float: right;">
+                    <div class="col-auto my-1">
+                        <select class="selectpicker" id="lessionTypeCustomSelect" multiple title="Choose lession type filter">
+                            <option value="AD">AD</option>
+                            <option value="CAL">CAL</option>
+                            <option value="DM">DM</option>
+                            <option value="NSD">NSD</option>
+                            <option value="SL">SL</option>
+                            <option value="SM">SM</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3" style=" margin: 20px 0; visibility: hidden;">
                 <button id="btnApply" type="button" class="btn btn-outline-primary" onclick="getResult()">Apply</button>
             </div>
-            <div class="col-4" style=" margin: 20px 0; visibility: hidden;">
+            <div class="col-3" style=" margin: 20px 0; visibility: hidden;">
                 <button id="btnExport" type="button" class="btn btn-outline-primary" style="float: left;" onclick="exportExcel()">Export</button>
             </div>
         </div>
