@@ -101,7 +101,8 @@ $("#rateSelect").change(function() {
 });
 
 $("#caseDensityCustomSelect").change(function() {
-    caseDensityArrayValue = $(this).selectpicker("val");
+    let selected = $(this).children("option:selected").val();
+    caseDensityArrayValue = selected.split(',');
 });
 
 $("#lessionTypeCustomSelect").change(function() {
@@ -2612,9 +2613,7 @@ function exportExcel() {
         element.testId = element.testId ?
             parseInt(element.testId) :
             "";
-        element.caseId = element.caseId ?
-            parseInt(element.caseId) :
-            element.caseId;
+        element.caseId = isNaN(parseInt(element.caseId)) ? element.caseId : parseInt(element.caseId);
         element.lesionId = element.lesionId ?
             parseInt(element.lesionId) :
             "";
@@ -2631,9 +2630,7 @@ function exportExcel() {
         element["Test set"] = !isNaN(element["Test set"]) ?
             parseInt(element["Test set"]) :
             element["Test set"];
-        element["Case ID"] = !isNaN(element["Case ID"]) ?
-            parseInt(element["Case ID"]) :
-            element["Case ID"];
+        element["Case ID"] = isNaN(parseInt(element["Case ID"])) ? element["Case ID"] : parseInt(element["Case ID"]);
         element["Lesion ID"] = parseInt(element["Lesion ID"]);
         element["TruthX"] = parseInt(element["TruthX"]);
         element["TruthY"] = parseInt(element["TruthY"]);
@@ -2660,9 +2657,7 @@ function exportExcel() {
             parseInt(element["test_id"]) :
             element["test_id"];
         element["session_no"] = parseInt(element["session_no"]);
-        element["case_id"] = !isNaN(element["case_id"]) ?
-            parseInt(element["case_id"]) :
-            element["case_id"];
+        element["case_id"] = isNaN(parseInt(element["case_id"])) ? element["case_id"] : parseInt(element["case_id"]);
         element["rating"] = parseInt(element["rating"]);
         element["selectX"] = parseInt(element["selectX"]);
         element["selectY"] = parseInt(element["selectY"]);

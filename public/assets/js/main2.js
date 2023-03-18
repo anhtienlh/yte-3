@@ -122,7 +122,8 @@ $("#inlineFormCustomSelect").change(function() {
 });
 
 $("#caseDensityCustomSelect").change(function() {
-    caseDensityArrayValue = $(this).selectpicker("val");
+    let selected = $(this).children("option:selected").val();
+    caseDensityArrayValue = selected.split(',');
 });
 
 $("#lessionTypeCustomSelect").change(function() {
@@ -2950,8 +2951,7 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             maxSet =
                 parseFloat(average) + (parseFloat(average) * parseFloat(setTo)) / 100;
             minFalseSet =
-                parseFloat(average) -
-                (parseFloat(average) * parseFloat(falseFrom)) / 100;
+                parseFloat(average) - (parseFloat(average) * parseFloat(falseFrom)) / 100;
             maxFalseSet =
                 parseFloat(average) + (parseFloat(average) * parseFloat(falseTo)) / 100;
             minTrueSet =
@@ -3081,7 +3081,9 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             )
             .map((obj) => obj);
 
+        let listTruebyUserByScore = [...listTruebyUser];
         let listOutputTrue = [];
+        let listOutputTrueByScore = []
         let listReUseTrue;
         if (caseCorrectMin == 0 && listTruebyUser.length > 0) {
             listTruebyUser = listTruebyUser.sort(function(a, b) {
@@ -3231,58 +3233,87 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             element["listReUseTrue"] = "EMPTY!";
             element["totalReuseTrue"] = 0;
         } else {
-            listOutputTrue = listOutputTrue
-                .filter(
-                    (obj) =>
-                    minTrueSet <= parseFloat(obj["percent"]) &&
-                    maxTrueSet >= parseFloat(obj["percent"])
-                )
-                .map((obj) => obj);
+            listOutputTrue = listOutputTrue.sort(function(a, b) {
+                return a.testId - b.testId;
+            });
+            listReUseTrue = genListReUse(listOutputTrue, listReUseTrue);
+            element["listReUseTrue"] = listReUseTrue;
+            element["totalReuseTrue"] = listOutputTrue.length;
+        }
 
-            if (selectTrueFromTo == "1") {
-                listOutputTrue = listOutputTrue.sort(function(a, b) {
-                    return b.percent - a.percent;
-                });
+        listOutputTrueByScore = listTruebyUserByScore
+            .filter(
+                (obj) =>
+                minTrueSet <= parseFloat(obj["percent"]) &&
+                maxTrueSet >= parseFloat(obj["percent"])
+            )
+            .map((obj) => obj);
+
+        let totalTrueByScore = listOutputTrueByScore.length
+        if (selectTrueFromTo == "1") {
+            listOutputTrueByScore = listOutputTrueByScore.sort(function(a, b) {
+                return b.percent - a.percent;
+            });
+        } else {
+            listOutputTrueByScore = listOutputTrueByScore.sort(function(a, b) {
+                return a.percent - b.percent;
+            });
+        }
+
+        if (trueFromToLimit > 0 && trueFromToLimit < listOutputTrueByScore.length) {
+            if (selectTrueFromTo == "3") {
+                let haftScoreLimit = parseInt(trueFromToLimit / 2);
+                if (listOutputTrueByScore.length % 2 == 1) {
+                    listOutputTrueByScore.unshift(listOutputTrueByScore[0]);
+                } else if (parseInt(trueFromToLimit) % 2 == 1) haftScoreLimit += 1;
+                let countStartDelete = listOutputTrueByScore.length / 2 - haftScoreLimit;
+                let countEndDelete =
+                    parseInt(trueFromToLimit) % 2 == 0 ?
+                    listOutputTrueByScore.length / 2 - haftScoreLimit :
+                    listOutputTrueByScore.length / 2 - (haftScoreLimit - 1);
+                listOutputTrueByScore.splice(0, countStartDelete);
+                listOutputTrueByScore.splice(trueFromToLimit, countEndDelete);
             } else {
-                listOutputTrue = listOutputTrue.sort(function(a, b) {
-                    return a.percent - b.percent;
-                });
-            }
-
-            if (trueFromToLimit > 0 && trueFromToLimit < listOutputTrue.length) {
-                if (selectTrueFromTo == "3") {
-                    let haftScoreLimit = parseInt(trueFromToLimit / 2);
-                    if (listOutputTrue.length % 2 == 1) {
-                        listOutputTrue.unshift(listOutputTrue[0]);
-                    } else if (parseInt(trueFromToLimit) % 2 == 1) haftScoreLimit += 1;
-                    let countStartDelete = listOutputTrue.length / 2 - haftScoreLimit;
-                    let countEndDelete =
-                        parseInt(trueFromToLimit) % 2 == 0 ?
-                        listOutputTrue.length / 2 - haftScoreLimit :
-                        listOutputTrue.length / 2 - (haftScoreLimit - 1);
-                    listOutputTrue.splice(0, countStartDelete);
-                    listOutputTrue.splice(trueFromToLimit, countEndDelete);
-                } else {
-                    let listOutputTrueClone = [];
-                    for (var i = 0; i < trueFromToLimit; i++) {
-                        listOutputTrueClone.push(listOutputTrue[i]);
-                    }
-                    listOutputTrue = listOutputTrueClone;
+                let listOutputTrueCoreClone = [];
+                for (var i = 0; i < trueFromToLimit; i++) {
+                    listOutputTrueCoreClone.push(listOutputTrueByScore[i]);
                 }
-            }
-
-            if (listOutputTrue.length > 0) {
-                listOutputTrue = listOutputTrue.sort(function(a, b) {
-                    return a.testId - b.testId;
-                });
-                listReUseTrue = genListReUse(listOutputTrue, listReUseTrue);
-                element["listReUseTrue"] = listReUseTrue;
-                element["totalReuseTrue"] = listOutputTrue.length;
-            } else {
-                element["listReUseTrue"] = "EMPTY!";
-                element["totalReuseTrue"] = 0;
+                listOutputTrueByScore = listOutputTrueCoreClone;
             }
         }
+
+        listOutputTrueByScore = listOutputTrueByScore.sort(function(a, b) {
+            return a.testId - b.testId;
+        });
+
+        let listCaseTrueByScore = "";
+        if (listOutputTrueByScore.length > 0) {
+            listCaseTrueByScore = "Test " + listOutputTrueByScore[0]["testId"] + " : ";
+            listCaseTrueByScore +=
+                "Case " +
+                listOutputTrueByScore[0]["caseId"] +
+                " (" +
+                listOutputTrueByScore[0]["percent"] +
+                "W), ";
+
+            let checkTest = listOutputTrueByScore[0]["testId"];
+            for (var i = 1; i < listOutputTrueByScore.length; i++) {
+                if (checkTest !== listOutputTrueByScore[i]["testId"]) {
+                    checkTest = listOutputTrueByScore[i]["testId"];
+                    listCaseTrueByScore += "\nTest " + listOutputTrueByScore[i]["testId"] + " : ";
+                }
+                listCaseTrueByScore +=
+                    "Case " +
+                    listOutputTrueByScore[i]["caseId"] +
+                    " (" +
+                    listOutputTrueByScore[i]["percent"] +
+                    "W), ";
+            }
+        }
+
+        element["totalTrueByScore"] = totalTrueByScore;
+        element["listCaseTrueByScore"] = listCaseTrueByScore;
+        element["totalTrueByLimitScore"] = listOutputTrueByScore.length;
 
         // TÍNH CÁC CASE TÁI SỬ DỤNG SAI
 
@@ -3294,6 +3325,8 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             )
             .map((obj) => obj);
 
+        let listFalsebyUserByScore = [...listFalsebyUser];
+        let listOutputFalseByScore = []
         let listOutputFalse = [];
         let listReUseFalse;
         if (caseInCorrectMin == 0 && listFalsebyUser.length > 0) {
@@ -3442,58 +3475,87 @@ function coreCalculate(RowsRawData, RowsDapAn) {
             element["listReUseFalse"] = "EMPTY!";
             element["totalReuseFalse"] = 0;
         } else {
-            listOutputFalse = listOutputFalse
-                .filter(
-                    (obj) =>
-                    minFalseSet <= parseFloat(obj["percent"]) &&
-                    maxFalseSet >= parseFloat(obj["percent"])
-                )
-                .map((obj) => obj);
+            listOutputFalse = listOutputFalse.sort(function(a, b) {
+                return a.testId - b.testId;
+            });
+            listReUseFalse = genListReUse(listOutputFalse, listReUseFalse);
+            element["listReUseFalse"] = listReUseFalse;
+            element["totalReuseFalse"] = listOutputFalse.length;
+        }
 
-            if (selectFalseFromTo == "1") {
-                listOutputFalse = listOutputFalse.sort(function(a, b) {
-                    return b.percent - a.percent;
-                });
+        listOutputFalseByScore = listFalsebyUserByScore
+            .filter(
+                (obj) =>
+                minFalseSet <= parseFloat(obj["percent"]) &&
+                maxFalseSet >= parseFloat(obj["percent"])
+            )
+            .map((obj) => obj);
+
+        let totalFalseByScore = listOutputFalseByScore.length
+        if (selectFalseFromTo == "1") {
+            listOutputFalseByScore = listOutputFalseByScore.sort(function(a, b) {
+                return b.percent - a.percent;
+            });
+        } else {
+            listOutputFalseByScore = listOutputFalseByScore.sort(function(a, b) {
+                return a.percent - b.percent;
+            });
+        }
+
+        if (falseFromToLimit > 0 && falseFromToLimit < listOutputFalseByScore.length) {
+            if (selectFalseFromTo == "3") {
+                let haftScoreLimit = parseInt(falseFromToLimit / 2);
+                if (listOutputFalseByScore.length % 2 == 1) {
+                    listOutputFalseByScore.unshift(listOutputFalseByScore[0]);
+                } else if (parseInt(falseFromToLimit) % 2 == 1) haftScoreLimit += 1;
+                let countStartDelete = listOutputFalseByScore.length / 2 - haftScoreLimit;
+                let countEndDelete =
+                    parseInt(falseFromToLimit) % 2 == 0 ?
+                    listOutputFalseByScore.length / 2 - haftScoreLimit :
+                    listOutputFalseByScore.length / 2 - (haftScoreLimit - 1);
+                listOutputFalseByScore.splice(0, countStartDelete);
+                listOutputFalseByScore.splice(falseFromToLimit, countEndDelete);
             } else {
-                listOutputFalse = listOutputFalse.sort(function(a, b) {
-                    return a.percent - b.percent;
-                });
-            }
-
-            if (falseFromToLimit > 0 && falseFromToLimit < listOutputFalse.length) {
-                if (selectFalseFromTo == "3") {
-                    let haftScoreLimit = parseInt(falseFromToLimit / 2);
-                    if (listOutputFalse.length % 2 == 1) {
-                        listOutputFalse.unshift(listOutputFalse[0]);
-                    } else if (parseInt(falseFromToLimit) % 2 == 1) haftScoreLimit += 1;
-                    let countStartDelete = listOutputFalse.length / 2 - haftScoreLimit;
-                    let countEndDelete =
-                        parseInt(falseFromToLimit) % 2 == 0 ?
-                        listOutputFalse.length / 2 - haftScoreLimit :
-                        listOutputFalse.length / 2 - (haftScoreLimit - 1);
-                    listOutputFalse.splice(0, countStartDelete);
-                    listOutputFalse.splice(falseFromToLimit, countEndDelete);
-                } else {
-                    let listOutputFalseClone = [];
-                    for (var i = 0; i < falseFromToLimit; i++) {
-                        listOutputFalseClone.push(listOutputFalse[i]);
-                    }
-                    listOutputFalse = listOutputFalseClone;
+                let listOutputFalseCoreClone = [];
+                for (var i = 0; i < falseFromToLimit; i++) {
+                    listOutputFalseCoreClone.push(listOutputFalseByScore[i]);
                 }
-            }
-
-            if (listOutputFalse.length > 0) {
-                listOutputFalse = listOutputFalse.sort(function(a, b) {
-                    return a.testId - b.testId;
-                });
-                listReUseFalse = genListReUse(listOutputFalse, listReUseFalse);
-                element["listReUseFalse"] = listReUseFalse;
-                element["totalReuseFalse"] = listOutputFalse.length;
-            } else {
-                element["listReUseFalse"] = "EMPTY!";
-                element["totalReuseFalse"] = 0;
+                listOutputFalseByScore = listOutputFalseCoreClone;
             }
         }
+
+        listOutputFalseByScore = listOutputFalseByScore.sort(function(a, b) {
+            return a.testId - b.testId;
+        });
+
+        let listCaseFalseByScore = "";
+        if (listOutputFalseByScore.length > 0) {
+            listCaseFalseByScore = "Test " + listOutputFalseByScore[0]["testId"] + " : ";
+            listCaseFalseByScore +=
+                "Case " +
+                listOutputFalseByScore[0]["caseId"] +
+                " (" +
+                listOutputFalseByScore[0]["percent"] +
+                "W), ";
+
+            let checkTest = listOutputFalseByScore[0]["testId"];
+            for (var i = 1; i < listOutputFalseByScore.length; i++) {
+                if (checkTest !== listOutputFalseByScore[i]["testId"]) {
+                    checkTest = listOutputFalseByScore[i]["testId"];
+                    listCaseFalseByScore += "\nTest " + listOutputFalseByScore[i]["testId"] + " : ";
+                }
+                listCaseFalseByScore +=
+                    "Case " +
+                    listOutputFalseByScore[i]["caseId"] +
+                    " (" +
+                    listOutputFalseByScore[i]["percent"] +
+                    "W), ";
+            }
+        }
+
+        element["totalFalseByScore"] = totalFalseByScore;
+        element["listCaseFalseByScore"] = listCaseFalseByScore;
+        element["totalFalseByLimitScore"] = listOutputFalseByScore.length;
 
         let userInfo = userFilter
             .filter((obj) => obj["user_id"] === element["userId"])
@@ -3973,8 +4035,14 @@ function exportExcel() {
         totalSetScore: "Total by Limit Set Score",
         listReUseTrue: "Re-Use True",
         totalReuseTrue: "Total Re-Use True",
+        totalTrueByScore: "Total Re-use True by Set Score",
+        listCaseTrueByScore: "Re-Use True by Set Score",
+        totalTrueByLimitScore: "Total Re-Use True by Limit Set Score",
         listReUseFalse: "Re-Use False",
         totalReuseFalse: "Total Re-use False",
+        totalFalseByScore: "Total Re-use False by Set Score",
+        listCaseFalseByScore: "Re-Use False by Set Score",
+        totalFalseByLimitScore: "Total Re-Use False by Limit Set Score",
         address: "Địa chỉ",
         group: "Nhóm",
         timeTrue: "Số giờ",
@@ -4137,7 +4205,7 @@ function exportExcel() {
 
     listCaseIdbyTestId.forEach((element) => {
         element.testId = element.testId ? parseInt(element.testId) : "";
-        element.caseId = element.caseId ? parseInt(element.caseId) : element.caseId;
+        element.caseId = isNaN(parseInt(element.caseId)) ? element.caseId : parseInt(element.caseId);
         element.lesionId = element.lesionId ? parseInt(element.lesionId) : "";
         element.truthX = element.truthX ? parseInt(element.truthX) : "";
         element.truthY = element.truthY ? parseInt(element.truthY) : "";
@@ -4146,7 +4214,7 @@ function exportExcel() {
 
     answerFilter.forEach((element) => {
         element["Test set"] = parseInt(element["Test set"]);
-        element["Case ID"] = parseInt(element["Case ID"]);
+        element["Case ID"] = isNaN(parseInt(element["Case ID"])) ? element["Case ID"] : parseInt(element["Case ID"]);
         element["Lesion ID"] = parseInt(element["Lesion ID"]);
         element["TruthX"] = parseInt(element["TruthX"]);
         element["TruthY"] = parseInt(element["TruthY"]);
@@ -4169,7 +4237,7 @@ function exportExcel() {
     result.forEach((element) => {
         element["test_id"] = parseInt(element["test_id"]);
         element["session_no"] = parseInt(element["session_no"]);
-        element["case_id"] = parseInt(element["case_id"]);
+        element["case_id"] = isNaN(parseInt(element["case_id"])) ? element["case_id"] : parseInt(element["case_id"]);
         element["rating"] = parseInt(element["rating"]);
         element["selectX"] = parseInt(element["selectX"]);
         element["selectY"] = parseInt(element["selectY"]);
