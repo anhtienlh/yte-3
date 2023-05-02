@@ -2087,20 +2087,44 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                             "Normal"
                         );
                     }
+
+                    if (caseDensityArrayValue.length > 0) {
+                        if (calcNormal(objRowData, objDapAn, caseDensityArrayValue) == true) {
+                            checkDistinctTrueAnswer(
+                                arrUnique[0],
+                                arrUnique[1],
+                                listExportData,
+                                arrUnique[3],
+                                objDapAn,
+                                "Normal",
+                                "listCaseIdTrueFilter"
+                            );
+                        } else {
+                            checkDistinctTotalAnswer(
+                                arrUnique[0],
+                                arrUnique[1],
+                                listExportData,
+                                arrUnique[3],
+                                objDapAn,
+                                "Normal",
+                                "listCaseIdFalseFilter"
+                            );
+                        }
+                    }
                 }
             }
             // Case anormal
             else {
                 objRowData.forEach((element) => {
-                    let checkDensity = RowsDapAn.filter(
+                    let checkDensity = objDapAn.filter(
                         (obj) =>
                         obj["Test set"] === element["test_id"] &&
                         obj["Case ID"] === element["case_id"] &&
-                        caseDensityArrayValue.indexOf(obj["Case density"]) != -1 &&
                         obj["Case density"] === element["Case density (user)"]
                     ).map((obj) => obj);
                     if (checkDensity.length > 0) {
                         countDensity = 1;
+                        return;
                     }
                 });
                 switch (dropdownValue) {
@@ -2125,6 +2149,30 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                 "AbNormal"
                             );
                         }
+
+                        if (caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) {
+                            if (calcAbNormal(objRowData, objDapAn, caseDensityArrayValue, lessionTypeArrayValue) == true) {
+                                checkDistinctTrueAnswer(
+                                    arrUnique[0],
+                                    arrUnique[1],
+                                    listExportData,
+                                    arrUnique[3],
+                                    objDapAn,
+                                    "AbNormal",
+                                    "listCaseIdTrueFilter"
+                                );
+                            } else {
+                                checkDistinctTotalAnswer(
+                                    arrUnique[0],
+                                    arrUnique[1],
+                                    listExportData,
+                                    arrUnique[3],
+                                    objDapAn,
+                                    "AbNormal",
+                                    "listCaseIdFalseFilter"
+                                );
+                            }
+                        }
                         break;
 
                         // Case Recall
@@ -2148,10 +2196,34 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                 "Recall"
                             );
                         }
+
+                        if (caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) {
+                            if (calcReCall(objRowData, objDapAn, caseDensityArrayValue, lessionTypeArrayValue) == true) {
+                                checkDistinctTrueAnswer(
+                                    arrUnique[0],
+                                    arrUnique[1],
+                                    listExportData,
+                                    arrUnique[3],
+                                    objDapAn,
+                                    "Recall",
+                                    "listCaseIdTrueFilter"
+                                );
+                            } else {
+                                checkDistinctTotalAnswer(
+                                    arrUnique[0],
+                                    arrUnique[1],
+                                    listExportData,
+                                    arrUnique[3],
+                                    objDapAn,
+                                    "Recall",
+                                    "listCaseIdFalseFilter"
+                                );
+                            }
+                        }
                         break;
 
                     case "3":
-                        var symmetric = calcSymmetric(objRowData, objDapAn);
+                        var symmetric = calcSymmetric(objRowData, objDapAn, caseDensityArrayValue, lessionTypeArrayValue);
                         checkDistinctSymmetric(
                             arrUnique[0],
                             arrUnique[1],
@@ -2162,12 +2234,15 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                             objDapAn,
                             "Symmetric",
                             symmetric[2],
-                            symmetric[3]
+                            symmetric[3],
+                            symmetric[6],
+                            symmetric[7],
+                            symmetric[8]
                         );
                         break;
 
                     case "4":
-                        var non_symmetric = calcNonSymmetric(objRowData, objDapAn);
+                        var non_symmetric = calcNonSymmetric(objRowData, objDapAn, caseDensityArrayValue, lessionTypeArrayValue);
                         //checkDistinctNonSymmetric(arrUnique[0], arrUnique[1], listExportDataNonSymmetric, arrUnique[3], non_symmetric[0], non_symmetric[1], objDapAn, "NonSymmetric")
                         checkDistinctNonSymmetric1(
                             arrUnique[0],
@@ -2179,7 +2254,10 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                             objDapAn,
                             "NonSymmetric",
                             non_symmetric[2],
-                            non_symmetric[3]
+                            non_symmetric[3],
+                            non_symmetric[6],
+                            non_symmetric[7],
+                            non_symmetric[8]
                         );
                         break;
                 }
@@ -2246,7 +2324,6 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                 (obj) =>
                                 obj["Test set"] === element["test_id"] &&
                                 obj["Case ID"] === element["case_id"] &&
-                                caseDensityArrayValue.indexOf(obj["Case density"]) != -1 &&
                                 obj["Case density"] === element["Case density (user)"]
                             ).map((obj) => obj);
                             if (checkDensity.length > 0) {
@@ -2313,7 +2390,6 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                                 (obj) =>
                                 obj["Test set"] === element["test_id"] &&
                                 obj["Case ID"] === element["case_id"] &&
-                                caseDensityArrayValue.indexOf(obj["Case density"]) != -1 &&
                                 obj["Case density"] === element["Case density (user)"]
                             ).map((obj) => obj);
                             if (checkDensity.length > 0) {
@@ -3081,15 +3157,31 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                     obj.userId === items["userId"] && obj.type === items["percentType"]
                 );
                 if (objIndex == -1) {
-                    listExportDataFinal.push({
-                        userId: user["user_id"],
-                        type: items["percentType"],
-                        totalCaseofUser: items["totalCase"],
-                        listCaseIdTruebyUser: "Test " + items["testId"] + " : " + items["listCaseIdTrue"],
-                        totalCaseIdTrue: items["numberCaseTrue"],
-                        listCaseIdFalsebyUser: "Test " + items["testId"] + " : " + items["listCaseIdFalse"],
-                        totalCaseIdFalse: items["totalCase"] - items["numberCaseTrue"],
-                    });
+                    if (caseDensityArrayValue.length == 0 && lessionTypeArrayValue.length == 0) {
+                        listExportDataFinal.push({
+                            userId: user["user_id"],
+                            type: items["percentType"],
+                            totalCaseofUser: items["totalCase"],
+                            listCaseIdTruebyUser: "Test " + items["testId"] + " : " + items["listCaseIdTrue"],
+                            totalCaseIdTrue: items["numberCaseTrue"],
+                            listCaseIdFalsebyUser: "Test " + items["testId"] + " : " + items["listCaseIdFalse"],
+                            totalCaseIdFalse: items["totalCase"] - items["numberCaseTrue"],
+                        });
+                    } else {
+                        listExportDataFinal.push({
+                            userId: user["user_id"],
+                            type: items["percentType"],
+                            totalCaseofUser: items["totalCase"],
+                            listCaseIdTruebyUser: "Test " + items["testId"] + " : " + items["listCaseIdTrue"],
+                            totalCaseIdTrue: items["numberCaseTrue"],
+                            listCaseIdTruebyUserAndCaseLess: "Test " + items["testId"] + " : " + items["listCaseIdTrueFilter"],
+                            totalCaseIdTrueAndCaseLess: items["numberCaseTrueFilter"],
+                            listCaseIdFalsebyUser: "Test " + items["testId"] + " : " + items["listCaseIdFalse"],
+                            totalCaseIdFalse: items["totalCase"] - items["numberCaseTrue"],
+                            listCaseIdFalsebyUserAndCaseLess: "Test " + items["testId"] + " : " + items["listCaseIdFalseFilter"],
+                            totalCaseIdFalseAndCaseLess: items["totalCase"] - items["numberCaseTrueFilter"]
+                        });
+                    }
                 } else {
                     listExportDataFinal[objIndex]["totalCaseofUser"] +=
                         items["totalCase"];
@@ -3101,6 +3193,17 @@ function coreCalculate(RowsRawData, RowsDapAn) {
                         "\n" + "Test " + items["testId"] + " : " + items["listCaseIdFalse"];
                     listExportDataFinal[objIndex]["totalCaseIdFalse"] +=
                         items["totalCase"] - items["numberCaseTrue"];
+
+                    if (caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) {
+                        listExportDataFinal[objIndex]["listCaseIdTruebyUserAndCaseLess"] +=
+                            "\n" + "Test " + items["testId"] + " : " + items["listCaseIdTrueFilter"];
+                        listExportDataFinal[objIndex]["totalCaseIdTrueAndCaseLess"] +=
+                            items["numberCaseTrueFilter"];
+                        listExportDataFinal[objIndex]["listCaseIdFalsebyUserAndCaseLess"] +=
+                            "\n" + "Test " + items["testId"] + " : " + items["listCaseIdFalseFilter"];
+                        listExportDataFinal[objIndex]["totalCaseIdFalseAndCaseLess"] +=
+                            items["totalCase"] - items["numberCaseTrueFilter"];
+                    }
                 }
             });
         }
@@ -3836,6 +3939,43 @@ function caclAverageFG() {
         let averageFalse = totalFalse / strFinalFalse.length;
         element["averageF"] = averageTrue.toFixed(2) + "W";
         element["averageG"] = averageFalse.toFixed(2) + "W";
+
+        if (caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) {
+            let strTrue = element["listCaseIdTruebyUserAndCaseLess"].replace(/[^0-9.]/g, "W");
+            let strTempTrue = strTrue.split("W");
+            let strFinalTrue = [];
+            strTempTrue.forEach((element) => {
+                if (element.length > 3) {
+                    strFinalTrue.push(element);
+                }
+            });
+            let totalTrue = 0;
+            strFinalTrue.forEach((element) => {
+                totalTrue += parseFloat(element);
+            });
+            let averageTrue = totalTrue / strFinalTrue.length;
+            if (strFinalTrue.length == 0) {
+                averageTrue = 0;
+            }
+
+            // AVERAGE FALSE
+            let strFalse = element["listCaseIdFalsebyUserAndCaseLess"].replace(/[^0-9.]/g, "W");
+
+            let strTempFalse = strFalse.split("W");
+            let strFinalFalse = [];
+            strTempFalse.forEach((element) => {
+                if (element.length > 3) {
+                    strFinalFalse.push(element);
+                }
+            });
+            let totalFalse = 0;
+            strFinalFalse.forEach((element) => {
+                totalFalse += parseFloat(element);
+            });
+            let averageFalse = totalFalse / strFinalFalse.length;
+            element["averageTrueByCaseLess"] = averageTrue.toFixed(2) + "W";
+            element["averageFalseByCaseLess"] = averageFalse.toFixed(2) + "W";
+        }
     });
 }
 
@@ -3923,10 +4063,16 @@ function calcPercentOfCaseIdRawData(data) {
 function calcValueWWWOfCaseIdRawData(data) {
     let listTrueTiny = [];
     let listFalseTiny = [];
+    let listTrueTinyCaseLess = [];
+    let listFalseTinyCaseLess = [];
     let str = data["listCaseIdTrue"].split(",");
     let str2 = data["listCaseIdFalse"].split(",");
+    let strFilter = [];
+    let str2Filter = [];
     let listCaseIdTrue = "";
     let listCaseIdFalse = "";
+    let listCaseIdTrueFilter = "";
+    let listCaseIdFalseFilter = "";
     let listClone = listCaseIdbyTestId.slice(0);
     let valueCTrue = 0;
     let valueCFalse = 0;
@@ -4026,6 +4172,102 @@ function calcValueWWWOfCaseIdRawData(data) {
         }
     });
     console.log("STRRRRR", str);
+
+    if (caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) {
+        strFilter = data["listCaseIdTrueFilter"].split(",");
+        str2Filter = data["listCaseIdFalseFilter"].split(",");
+        let listFilterClone = listCaseIdbyTestId.slice(0);
+        strFilter.forEach((element) => {
+            let objIndex = listFilterClone.findIndex(
+                (obj) =>
+                obj.testId === data["testId"] &&
+                obj.caseId === element &&
+                obj.type === data["type"]
+            );
+            if (objIndex != -1) {
+                percent = listFilterClone[objIndex]["valueW"];
+                listTrueTinyCaseLess.push({
+                    userId: data["userId"],
+                    testId: data["testId"],
+                    caseId: "case " + element,
+                    percent: percent,
+                    type: data["type"],
+                });
+                listFilterClone.splice(objIndex, 1);
+            } else {
+                listTrueTinyCaseLess.push({
+                    userId: data["userId"],
+                    testId: data["testId"],
+                    caseId: "case " + element,
+                    percent: "0.00",
+                    type: data["type"],
+                });
+            }
+        });
+
+        let listFilterClone2 = listCaseIdbyTestId.slice(0);
+        str2Filter.forEach((element) => {
+            let objIndex1 = listFilterClone2.findIndex(
+                (obj) =>
+                obj.testId === data["testId"] &&
+                obj.caseId === element &&
+                obj.type === data["type"]
+            );
+            if (objIndex1 != -1) {
+                percent = listFilterClone2[objIndex1]["valueW"];
+                listFalseTinyCaseLess.push({
+                    userId: data["userId"],
+                    testId: data["testId"],
+                    caseId: "case " + element,
+                    percent: percent,
+                    type: data["type"],
+                });
+                listFilterClone2.splice(objIndex1, 1);
+            } else {
+                listFalseTinyCaseLess.push({
+                    userId: data["userId"],
+                    testId: data["testId"],
+                    caseId: "case " + element,
+                    percent: "0.00",
+                    type: data["type"],
+                });
+            }
+        });
+
+        let listTrueCaseLessClone = listTrueTinyCaseLess;
+        listTrueCaseLessClone = listTrueCaseLessClone.sort(function(a, b) {
+            return a.percent - b.percent;
+        });
+        let listFalseCaseLessClone = listFalseTinyCaseLess;
+        listFalseCaseLessClone = listFalseCaseLessClone.sort(function(a, b) {
+            return a.percent - b.percent;
+        });
+        listTrueCaseLessClone.forEach((element) => {
+            listCaseIdTrueFilter += element.caseId + " (" + element.percent + "W), ";
+        });
+        listFalseCaseLessClone.forEach((element) => {
+            listCaseIdFalseFilter += element.caseId + " (" + element.percent + "W), ";
+        });
+
+        switch (strFilter[0]) {
+            case "":
+                data["listCaseIdTrueFilter"] = "";
+                break;
+
+            default:
+                data["listCaseIdTrueFilter"] = listCaseIdTrueFilter;
+        }
+
+        switch (str2Filter[0]) {
+            case "":
+                data["listCaseIdFalseFilter"] = "";
+                break;
+
+            default:
+                data["listCaseIdFalseFilter"] = listCaseIdFalseFilter;
+        }
+    }
+
     let listTrueClone = listTrueTiny;
     listTrueClone = listTrueClone.sort(function(a, b) {
         return a.percent - b.percent;
@@ -4061,7 +4303,43 @@ function calcValueWWWOfCaseIdRawData(data) {
 }
 
 function exportExcel() {
-    const myHeader = {
+    const myHeader = (caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) ? {
+        userId: "List User",
+        type: "Type",
+        totalCaseofUser: "Total case of user",
+        listCaseIdTruebyUser: "List CaseID True by User",
+        totalCaseIdTrue: "Total True",
+        listCaseIdTruebyUserAndCaseLess: "List CaseID True by User And Case, Less",
+        totalCaseIdTrueAndCaseLess: "Total True Case, Less",
+        listCaseIdFalsebyUser: "List CaseID False by User",
+        totalCaseIdFalse: "Total False",
+        listCaseIdFalsebyUserAndCaseLess: "List CaseID False by User And Case, Less",
+        totalCaseIdFalseAndCaseLess: "Total False Case, Less",
+        averageF: "Average True By User",
+        averageG: "Average False By User",
+        averageTrueByCaseLess: "Average True By User and Case, Less",
+        averageFalseByCaseLess: "Average False By User and Case, Less",
+        listCaseIdbyAnswer: "List CaseID by Answer",
+        totalJ: "Total by Answer",
+        averageI: "Average Case Answer",
+        totalCaseJ: "Total Case by Set Score",
+        listCaseK: "List Case by Set Score",
+        totalSetScore: "Total by Limit Set Score",
+        listReUseTrue: "Re-Use True",
+        totalReuseTrue: "Total Re-Use True",
+        totalTrueByScore: "Total Re-use True by Set Score",
+        listCaseTrueByScore: "Re-Use True by Set Score",
+        totalTrueByLimitScore: "Total Re-Use True by Limit Set Score",
+        listReUseFalse: "Re-Use False",
+        totalReuseFalse: "Total Re-use False",
+        totalFalseByScore: "Total Re-use False by Set Score",
+        listCaseFalseByScore: "Re-Use False by Set Score",
+        totalFalseByLimitScore: "Total Re-Use False by Limit Set Score",
+        address: "Địa chỉ",
+        group: "Nhóm",
+        timeTrue: "Số giờ",
+        exp: "Số năm kinh nghiệm",
+    } : {
         userId: "List User",
         type: "Type",
         totalCaseofUser: "Total case of user",
@@ -4092,7 +4370,53 @@ function exportExcel() {
         timeTrue: "Số giờ",
         exp: "Số năm kinh nghiệm",
     };
-    var myHeader2 = {
+    var myHeader2 = (caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) ? {
+        testId: "Test ID",
+        caseId: "Case ID",
+        lesionId: "LesionID",
+        truthX: "Truth X",
+        truthY: "Truth Y",
+        truthOrder: "Truth Order",
+        totalUserTruth: "Total True",
+        totalUserTruthCaseLess: "Total True Case Less",
+        totalUser: "Total",
+        percent: "Percent",
+        percentCaseLess: "Percent Case Less",
+        listUserIdTrue: "List User Id True",
+        listUserIdTrueCaseLess: "List User Id True Case Less",
+        listUserAddressTrue: "Address True",
+        listUserAddressTrueCaseLess: "Address True Case Less",
+        listUserGroupTrue: "Group True",
+        listUserGroupTrueCaseLess: "Group True Case Less",
+        listUserTimeTrue: "Time True",
+        listUserTimeTrueCaseLess: "Time True Case Less",
+        listUserExpTrue: "Exp True",
+        listUserExpTrueCaseLess: "Exp True Case Less",
+        listUserIdFalse: "List User Id False",
+        listUserIdFalseCaseLess: "List User Id False Case Less",
+        listUserAddressFalse: "Address False",
+        listUserAddressFalseCaseLess: "Address False Case Less",
+        listUserGroupFalse: "Group False",
+        listUserGroupFalseCaseLess: "Group False Case Less",
+        listUserTimeFalse: "Time False",
+        listUserTimeFalseCaseLess: "Time False Case Less",
+        listUserExpFalse: "Exp False",
+        listUserExpFalseCaseLess: "Exp False Cass Less",
+        listAge: "Age",
+        listAgeCaseLess: "Age Case Less",
+        listCaseDensity: "Case Density",
+        listCaseDensityCaseLess: "Case Density Case Less",
+        listLesionType: "Lesion Type",
+        listLesionTypeCaseLess: "Lesion Type Case Less",
+        type: "Type",
+        lesionSide: "Lesion side",
+        lesionSideCaseLess: "Lesion side Case Less",
+        lesionSite: "Lesion site",
+        lesionSiteCaseLess: "Lesion site Case Less",
+        lesionSize: "Lesion size (mm)",
+        lesionSizeCaseLess: "Lesion size Case Less (mm)",
+        valueW: "W Value",
+    } : {
         testId: "Test ID",
         caseId: "Case ID",
         lesionId: "LesionID",
@@ -4580,7 +4904,8 @@ function checkDistinctTrueAnswer(
     listExportData,
     session_no,
     objDapAn,
-    type
+    type,
+    columnListCase = "listCaseIdTrue"
 ) {
     var objIndex;
     let user = userFilter
@@ -4608,10 +4933,13 @@ function checkDistinctTrueAnswer(
             sessionNo: session_no,
             listCaseIdTrue: "",
             listCaseIdFalse: "",
+            listCaseIdTrueFilter: "",
+            listCaseIdFalseFilter: "",
             percentType: type,
             type: type,
             percent: "",
             numberCaseTrue: 1,
+            numberCaseTrueFilter: 0,
             totalCase: 1,
             listAgeTrue: "",
             listAgeFalse: "",
@@ -4639,71 +4967,28 @@ function checkDistinctTrueAnswer(
             obj.type == type
         );
 
-        if (listExportData[objIndex].listAgeTrue == "") {
-            listExportData[objIndex].listAgeTrue += objDapAn[0]["Tuổi"];
+        if (listExportData[objIndex][columnListCase] == "") {
+            listExportData[objIndex][columnListCase] += objDapAn[0]["Case ID"];
         } else {
-            listExportData[objIndex].listAgeTrue += "," + objDapAn[0]["Tuổi"];
+            listExportData[objIndex][columnListCase] += "," + objDapAn[0]["Case ID"];
         }
 
-        if (listExportData[objIndex].listCaseIdTrue == "") {
-            listExportData[objIndex].listCaseIdTrue += objDapAn[0]["Case ID"];
-        } else {
-            listExportData[objIndex].listCaseIdTrue += "," + objDapAn[0]["Case ID"];
-        }
-
-        if (listExportData[objIndex].listCaseDensityTrue == "") {
-            listExportData[objIndex].listCaseDensityTrue +=
-                objDapAn[0]["Case density"];
-        } else {
-            listExportData[objIndex].listCaseDensityTrue +=
-                "," + objDapAn[0]["Case density"];
-        }
-
-        if (listExportData[objIndex].listLesionSideTrue == "") {
-            listExportData[objIndex].listLesionSideTrue += objDapAn[0]["Lesion side"];
-        } else {
-            listExportData[objIndex].listLesionSideTrue +=
-                "," + objDapAn[0]["Lesion side"];
-        }
-
-        if (listExportData[objIndex].listLesionSiteTrue == "") {
-            listExportData[objIndex].listLesionSiteTrue += objDapAn[0]["Lesion site"];
-        } else {
-            listExportData[objIndex].listLesionSiteTrue +=
-                "," + objDapAn[0]["Lesion site"];
-        }
-
-        if (listExportData[objIndex].listLesionSizeTrue == "") {
-            listExportData[objIndex].listLesionSizeTrue +=
-                objDapAn[0]["Lesion size (mm)"];
-        } else {
-            listExportData[objIndex].listLesionSizeTrue +=
-                "," + objDapAn[0]["Lesion size (mm)"];
-        }
-
-        if (type != "Normal") {
-            if (listExportData[objIndex].listLesionTypeTrue == "") {
-                listExportData[objIndex].listLesionTypeTrue +=
-                    objDapAn[0]["Lesion type"];
-            } else {
-                listExportData[objIndex].listLesionTypeTrue +=
-                    "," + objDapAn[0]["Lesion type"];
+        if (columnListCase == "listCaseIdTrue") {
+            if (isCaseDensity == true && isLessionType == false) {
+                listExportData[objIndex].percentType += " (Compare with Case Density)";
+            } else if (isCaseDensity == false && isLessionType == true) {
+                listExportData[objIndex].percentType += " (Compare with Lesion Type)";
+            } else if (isCaseDensity == true && isLessionType == true) {
+                listExportData[objIndex].percentType +=
+                    " (Compare with Case Density and Lesion Type)";
             }
-        }
 
-        if (isCaseDensity == true && isLessionType == false) {
-            listExportData[objIndex].percentType += " (Compare with Case Density)";
-        } else if (isCaseDensity == false && isLessionType == true) {
-            listExportData[objIndex].percentType += " (Compare with Lesion Type)";
-        } else if (isCaseDensity == true && isLessionType == true) {
-            listExportData[objIndex].percentType +=
-                " (Compare with Case Density and Lesion Type)";
+            listExportData[objIndex].percent =
+                (listExportData[objIndex].numberCaseTrue /
+                    listExportData[objIndex].totalCase) *
+                100 +
+                "W";
         }
-        listExportData[objIndex].percent =
-            (listExportData[objIndex].numberCaseTrue /
-                listExportData[objIndex].totalCase) *
-            100 +
-            "W";
     } else {
         objIndex = listExportData.findIndex(
             (obj) =>
@@ -4712,64 +4997,22 @@ function checkDistinctTrueAnswer(
             obj.sessionNo === session_no &&
             obj.type == type
         );
-        listExportData[objIndex].numberCaseTrue++;
-        listExportData[objIndex].totalCase++;
-        listExportData[objIndex].percent =
-            (listExportData[objIndex].numberCaseTrue /
-                listExportData[objIndex].totalCase) *
-            100 +
-            "W";
-
-        if (listExportData[objIndex].listAgeTrue == "") {
-            listExportData[objIndex].listAgeTrue += objDapAn[0]["Tuổi"];
+        if (columnListCase == "listCaseIdTrue") {
+            listExportData[objIndex].numberCaseTrue++;
+            listExportData[objIndex].totalCase++;
+            listExportData[objIndex].percent =
+                (listExportData[objIndex].numberCaseTrue /
+                    listExportData[objIndex].totalCase) *
+                100 +
+                "W";
         } else {
-            listExportData[objIndex].listAgeTrue += "," + objDapAn[0]["Tuổi"];
+            listExportData[objIndex].numberCaseTrueFilter++;
         }
 
-        if (listExportData[objIndex].listCaseIdTrue == "") {
-            listExportData[objIndex].listCaseIdTrue += objDapAn[0]["Case ID"];
+        if (listExportData[objIndex][columnListCase] == "") {
+            listExportData[objIndex][columnListCase] += objDapAn[0]["Case ID"];
         } else {
-            listExportData[objIndex].listCaseIdTrue += "," + objDapAn[0]["Case ID"];
-        }
-
-        if (listExportData[objIndex].listCaseDensityTrue == "") {
-            listExportData[objIndex].listCaseDensityTrue +=
-                objDapAn[0]["Case density"];
-        } else {
-            listExportData[objIndex].listCaseDensityTrue +=
-                "," + objDapAn[0]["Case density"];
-        }
-
-        if (listExportData[objIndex].listLesionSideTrue == "") {
-            listExportData[objIndex].listLesionSideTrue += objDapAn[0]["Lesion side"];
-        } else {
-            listExportData[objIndex].listLesionSideTrue +=
-                "," + objDapAn[0]["Lesion side"];
-        }
-
-        if (listExportData[objIndex].listLesionSiteTrue == "") {
-            listExportData[objIndex].listLesionSiteTrue += objDapAn[0]["Lesion site"];
-        } else {
-            listExportData[objIndex].listLesionSiteTrue +=
-                "," + objDapAn[0]["Lesion site"];
-        }
-
-        if (listExportData[objIndex].listLesionSizeTrue == "") {
-            listExportData[objIndex].listLesionSizeTrue +=
-                objDapAn[0]["Lesion size (mm)"];
-        } else {
-            listExportData[objIndex].listLesionSizeTrue +=
-                "," + objDapAn[0]["Lesion size (mm)"];
-        }
-
-        if (type != "Normal") {
-            if (listExportData[objIndex].listLesionTypeTrue == "") {
-                listExportData[objIndex].listLesionTypeTrue +=
-                    objDapAn[0]["Lesion type"];
-            } else {
-                listExportData[objIndex].listLesionTypeTrue +=
-                    "," + objDapAn[0]["Lesion type"];
-            }
+            listExportData[objIndex][columnListCase] += "," + objDapAn[0]["Case ID"];
         }
     }
 }
@@ -4781,7 +5024,8 @@ function checkDistinctTotalAnswer(
     listExportData,
     session_no,
     objDapAn,
-    type
+    type,
+    columnListCase = "listCaseIdFalse"
 ) {
     var objIndex;
     let user = userFilter
@@ -4809,10 +5053,13 @@ function checkDistinctTotalAnswer(
             sessionNo: session_no,
             listCaseIdTrue: "",
             listCaseIdFalse: "",
+            listCaseIdTrueFilter: "",
+            listCaseIdFalseFilter: "",
             percentType: type,
             type: type,
             percent: "",
             numberCaseTrue: 0,
+            numberCaseTrueFilter: 0,
             totalCase: 1,
             listAgeTrue: "",
             listAgeFalse: "",
@@ -4840,73 +5087,27 @@ function checkDistinctTotalAnswer(
             obj.type === type
         );
 
-        if (listExportData[objIndex].listAgeFalse == "") {
-            listExportData[objIndex].listAgeFalse += objDapAn[0]["Tuổi"];
+        if (listExportData[objIndex][columnListCase] == "") {
+            listExportData[objIndex][columnListCase] += objDapAn[0]["Case ID"];
         } else {
-            listExportData[objIndex].listAgeFalse += "," + objDapAn[0]["Tuổi"];
+            listExportData[objIndex][columnListCase] += "," + objDapAn[0]["Case ID"];
         }
 
-        if (listExportData[objIndex].listCaseIdFalse == "") {
-            listExportData[objIndex].listCaseIdFalse += objDapAn[0]["Case ID"];
-        } else {
-            listExportData[objIndex].listCaseIdFalse += "," + objDapAn[0]["Case ID"];
-        }
-
-        if (listExportData[objIndex].listCaseDensityFalse == "") {
-            listExportData[objIndex].listCaseDensityFalse +=
-                objDapAn[0]["Case density"];
-        } else {
-            listExportData[objIndex].listCaseDensityFalse +=
-                "," + objDapAn[0]["Case density"];
-        }
-
-        if (listExportData[objIndex].listLesionSideFalse == "") {
-            listExportData[objIndex].listLesionSideFalse +=
-                objDapAn[0]["Lesion side"];
-        } else {
-            listExportData[objIndex].listLesionSideFalse +=
-                "," + objDapAn[0]["Lesion side"];
-        }
-
-        if (listExportData[objIndex].listLesionSiteFalse == "") {
-            listExportData[objIndex].listLesionSiteFalse +=
-                objDapAn[0]["Lesion site"];
-        } else {
-            listExportData[objIndex].listLesionSiteFalse +=
-                "," + objDapAn[0]["Lesion site"];
-        }
-
-        if (listExportData[objIndex].listLesionSizeFalse == "") {
-            listExportData[objIndex].listLesionSizeFalse +=
-                objDapAn[0]["Lesion size (mm)"];
-        } else {
-            listExportData[objIndex].listLesionSizeFalse +=
-                "," + objDapAn[0]["Lesion size (mm)"];
-        }
-
-        if (type != "Normal") {
-            if (listExportData[objIndex].listLesionTypeFalse == "") {
-                listExportData[objIndex].listLesionTypeFalse +=
-                    objDapAn[0]["Lesion type"];
-            } else {
-                listExportData[objIndex].listLesionTypeFalse +=
-                    "," + objDapAn[0]["Lesion type"];
+        if (columnListCase == "listCaseIdFalse") {
+            if (isCaseDensity == true && isLessionType == false) {
+                listExportData[objIndex].percentType += " (Compare with Case Density)";
+            } else if (isCaseDensity == false && isLessionType == true) {
+                listExportData[objIndex].percentType += " (Compare with Lesion Type)";
+            } else if (isCaseDensity == true && isLessionType == true) {
+                listExportData[objIndex].percentType +=
+                    " (Compare with Case Density and Lesion Type)";
             }
+            listExportData[objIndex].percent =
+                (listExportData[objIndex].numberCaseTrue /
+                    listExportData[objIndex].totalCase) *
+                100 +
+                "W";
         }
-
-        if (isCaseDensity == true && isLessionType == false) {
-            listExportData[objIndex].percentType += " (Compare with Case Density)";
-        } else if (isCaseDensity == false && isLessionType == true) {
-            listExportData[objIndex].percentType += " (Compare with Lesion Type)";
-        } else if (isCaseDensity == true && isLessionType == true) {
-            listExportData[objIndex].percentType +=
-                " (Compare with Case Density and Lesion Type)";
-        }
-        listExportData[objIndex].percent =
-            (listExportData[objIndex].numberCaseTrue /
-                listExportData[objIndex].totalCase) *
-            100 +
-            "W";
     } else {
         objIndex = listExportData.findIndex(
             (obj) =>
@@ -4915,63 +5116,20 @@ function checkDistinctTotalAnswer(
             obj.sessionNo === session_no &&
             obj.type === type
         );
-        listExportData[objIndex].totalCase++;
-        listExportData[objIndex].percent =
-            (listExportData[objIndex].numberCaseTrue /
-                listExportData[objIndex].totalCase) *
-            100 +
-            "W";
-        if (listExportData[objIndex].listAgeFalse == "") {
-            listExportData[objIndex].listAgeFalse += objDapAn[0]["Tuổi"];
-        } else {
-            listExportData[objIndex].listAgeFalse += "," + objDapAn[0]["Tuổi"];
+
+        if (columnListCase == "listCaseIdFalse") {
+            listExportData[objIndex].totalCase++;
+            listExportData[objIndex].percent =
+                (listExportData[objIndex].numberCaseTrue /
+                    listExportData[objIndex].totalCase) *
+                100 +
+                "W";
         }
 
-        if (listExportData[objIndex].listCaseIdFalse == "") {
-            listExportData[objIndex].listCaseIdFalse += objDapAn[0]["Case ID"];
+        if (listExportData[objIndex][columnListCase] == "") {
+            listExportData[objIndex][columnListCase] += objDapAn[0]["Case ID"];
         } else {
-            listExportData[objIndex].listCaseIdFalse += "," + objDapAn[0]["Case ID"];
-        }
-
-        if (listExportData[objIndex].listCaseDensityFalse == "") {
-            listExportData[objIndex].listCaseDensityFalse +=
-                objDapAn[0]["Case density"];
-        } else {
-            listExportData[objIndex].listCaseDensityFalse +=
-                "," + objDapAn[0]["Case density"];
-        }
-
-        if (listExportData[objIndex].listLesionSideFalse == "") {
-            listExportData[objIndex].listLesionSideFalse +=
-                objDapAn[0]["Lesion side"];
-        } else {
-            listExportData[objIndex].listLesionSideFalse +=
-                "," + objDapAn[0]["Lesion side"];
-        }
-
-        if (listExportData[objIndex].listLesionSiteFalse == "") {
-            listExportData[objIndex].listLesionSiteFalse +=
-                objDapAn[0]["Lesion site"];
-        } else {
-            listExportData[objIndex].listLesionSiteFalse +=
-                "," + objDapAn[0]["Lesion site"];
-        }
-
-        if (listExportData[objIndex].listLesionSizeFalse == "") {
-            listExportData[objIndex].listLesionSizeFalse +=
-                objDapAn[0]["Lesion size (mm)"];
-        } else {
-            listExportData[objIndex].listLesionSizeFalse +=
-                "," + objDapAn[0]["Lesion size (mm)"];
-        }
-        if (type != "Normal") {
-            if (listExportData[objIndex].listLesionTypeFalse == "") {
-                listExportData[objIndex].listLesionTypeFalse +=
-                    objDapAn[0]["Lesion type"];
-            } else {
-                listExportData[objIndex].listLesionTypeFalse +=
-                    "," + objDapAn[0]["Lesion type"];
-            }
+            listExportData[objIndex][columnListCase] += "," + objDapAn[0]["Case ID"];
         }
     }
 }
@@ -4986,7 +5144,10 @@ function checkDistinctSymmetric(
     objDapAn,
     type,
     listSysTrue,
-    listSysFalse
+    listSysFalse,
+    case_true_filter,
+    listSysTrueFilter,
+    listSysFalseFilter
 ) {
     let user = userFilter
         .filter(
@@ -5013,10 +5174,13 @@ function checkDistinctSymmetric(
             sessionNo: session_no,
             listCaseIdTrue: "",
             listCaseIdFalse: "",
+            listCaseIdTrueFilter: "",
+            listCaseIdFalseFilter: "",
             percentType: type,
             type: type,
             percent: "",
             numberCaseTrue: case_true,
+            numberCaseTrueFilter: case_true_filter,
             totalCase: total_case,
             listAgeTrue: "",
             listAgeFalse: "",
@@ -5045,22 +5209,6 @@ function checkDistinctSymmetric(
 
         if (listSysTrue.length !== 0) {
             for (var i = 0; i < listSysTrue.length; i++) {
-                if (listSysTrue[i].arrayTrue.length !== 0) {
-                    for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
-                        if (listExportData[objIndex].listAgeTrue == "") {
-                            listExportData[objIndex].listAgeTrue +=
-                                listSysTrue[i].arrayTrue[k]["Tuổi"];
-                        } else {
-                            listExportData[objIndex].listAgeTrue +=
-                                "," + listSysTrue[i].arrayTrue[k]["Tuổi"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysTrue.length !== 0) {
-            for (var i = 0; i < listSysTrue.length; i++) {
                 if (listExportData[objIndex].listCaseIdTrue == "") {
                     listExportData[objIndex].listCaseIdTrue +=
                         listSysTrue[i].arrayTrue[0]["Case ID"] +
@@ -5080,98 +5228,23 @@ function checkDistinctSymmetric(
             }
         }
 
-        if (listSysTrue.length !== 0) {
-            for (var i = 0; i < listSysTrue.length; i++) {
-                if (listSysTrue[i].arrayTrue.length !== 0) {
-                    for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
-                        if (listExportData[objIndex].listCaseDensityTrue == "") {
-                            listExportData[objIndex].listCaseDensityTrue +=
-                                listSysTrue[i].arrayTrue[k]["Case density"];
-                        } else {
-                            listExportData[objIndex].listCaseDensityTrue +=
-                                "," + listSysTrue[i].arrayTrue[k]["Case density"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysTrue.length !== 0) {
-            for (var i = 0; i < listSysTrue.length; i++) {
-                if (listSysTrue[i].arrayTrue.length !== 0) {
-                    for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
-                        if (listExportData[objIndex].listLesionSideTrue == "") {
-                            listExportData[objIndex].listLesionSideTrue +=
-                                listSysTrue[i].arrayTrue[k]["Lesion side"];
-                        } else {
-                            listExportData[objIndex].listLesionSideTrue +=
-                                "," + listSysTrue[i].arrayTrue[k]["Lesion side"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysTrue.length !== 0) {
-            for (var i = 0; i < listSysTrue.length; i++) {
-                if (listSysTrue[i].arrayTrue.length !== 0) {
-                    for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
-                        if (listExportData[objIndex].listLesionSiteTrue == "") {
-                            listExportData[objIndex].listLesionSiteTrue +=
-                                listSysTrue[i].arrayTrue[k]["Lesion site"];
-                        } else {
-                            listExportData[objIndex].listLesionSiteTrue +=
-                                "," + listSysTrue[i].arrayTrue[k]["Lesion site"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysTrue.length !== 0) {
-            for (var i = 0; i < listSysTrue.length; i++) {
-                if (listSysTrue[i].arrayTrue.length !== 0) {
-                    for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
-                        if (listExportData[objIndex].listLesionSizeTrue == "") {
-                            listExportData[objIndex].listLesionSizeTrue +=
-                                listSysTrue[i].arrayTrue[k]["Lesion size (mm)"];
-                        } else {
-                            listExportData[objIndex].listLesionSizeTrue +=
-                                "," + listSysTrue[i].arrayTrue[k]["Lesion size (mm)"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysTrue.length !== 0) {
-            for (var i = 0; i < listSysTrue.length; i++) {
-                if (listSysTrue[i].arrayTrue.length !== 0) {
-                    for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
-                        if (listExportData[objIndex].listLesionTypeTrue == "") {
-                            listExportData[objIndex].listLesionTypeTrue +=
-                                listSysTrue[i].arrayTrue[k]["Lesion type"];
-                        } else {
-                            listExportData[objIndex].listLesionTypeTrue +=
-                                "," + listSysTrue[i].arrayTrue[k]["Lesion type"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysFalse.length !== 0) {
-            for (var i = 0; i < listSysFalse.length; i++) {
-                if (listSysFalse[i].arrayFalse.length !== 0) {
-                    for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
-                        if (listExportData[objIndex].listAgeFalse == "") {
-                            listExportData[objIndex].listAgeFalse +=
-                                listSysFalse[i].arrayFalse[k]["Tuổi"];
-                        } else {
-                            listExportData[objIndex].listAgeFalse +=
-                                "," + listSysFalse[i].arrayFalse[k]["Tuổi"];
-                        }
-                    }
+        if (listSysTrueFilter.length !== 0) {
+            for (var i = 0; i < listSysTrueFilter.length; i++) {
+                if (listExportData[objIndex].listCaseIdTrueFilter == "") {
+                    listExportData[objIndex].listCaseIdTrueFilter +=
+                        listSysTrueFilter[i].arrayTrue[0]["Case ID"] +
+                        " - " +
+                        listSysTrueFilter[i].arrayTrue[0]["Lesion ID"] +
+                        " - " +
+                        listSysTrueFilter[i].arrayTrue[0]["Truth Order"];
+                } else {
+                    listExportData[objIndex].listCaseIdTrueFilter +=
+                        "," +
+                        listSysTrueFilter[i].arrayTrue[0]["Case ID"] +
+                        " - " +
+                        listSysTrueFilter[i].arrayTrue[0]["Lesion ID"] +
+                        " - " +
+                        listSysTrueFilter[i].arrayTrue[0]["Truth Order"];
                 }
             }
         }
@@ -5201,80 +5274,25 @@ function checkDistinctSymmetric(
             }
         }
 
-        if (listSysFalse.length !== 0) {
-            for (var i = 0; i < listSysFalse.length; i++) {
-                if (listSysFalse[i].arrayFalse.length !== 0) {
-                    for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
-                        if (listExportData[objIndex].listCaseDensityFalse == "") {
-                            listExportData[objIndex].listCaseDensityFalse +=
-                                listSysFalse[i].arrayFalse[k]["Case density"];
+        if (listSysFalseFilter.length !== 0) {
+            for (var i = 0; i < listSysFalseFilter.length; i++) {
+                if (listSysFalseFilter[i].arrayFalse.length !== 0) {
+                    for (var k = 0; k < listSysFalseFilter[i].arrayFalse.length; k++) {
+                        if (listExportData[objIndex].listCaseIdFalseFilter == "") {
+                            listExportData[objIndex].listCaseIdFalseFilter +=
+                                listSysFalseFilter[i].arrayFalse[k]["Case ID"] +
+                                " - " +
+                                listSysFalseFilter[i].arrayFalse[k]["Lesion ID"] +
+                                " - " +
+                                listSysFalseFilter[i].arrayFalse[k]["Truth Order"];
                         } else {
-                            listExportData[objIndex].listCaseDensityFalse +=
-                                "," + listSysFalse[i].arrayFalse[k]["Case density"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysFalse.length !== 0) {
-            for (var i = 0; i < listSysFalse.length; i++) {
-                if (listSysFalse[i].arrayFalse.length !== 0) {
-                    for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
-                        if (listExportData[objIndex].listLesionSideFalse == "") {
-                            listExportData[objIndex].listLesionSideFalse +=
-                                listSysFalse[i].arrayFalse[k]["Lesion side"];
-                        } else {
-                            listExportData[objIndex].listLesionSideFalse +=
-                                "," + listSysFalse[i].arrayFalse[k]["Lesion side"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysFalse.length !== 0) {
-            for (var i = 0; i < listSysFalse.length; i++) {
-                if (listSysFalse[i].arrayFalse.length !== 0) {
-                    for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
-                        if (listExportData[objIndex].listLesionSiteFalse == "") {
-                            listExportData[objIndex].listLesionSiteFalse +=
-                                listSysFalse[i].arrayFalse[k]["Lesion site"];
-                        } else {
-                            listExportData[objIndex].listLesionSiteFalse +=
-                                "," + listSysFalse[i].arrayFalse[k]["Lesion site"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysFalse.length !== 0) {
-            for (var i = 0; i < listSysFalse.length; i++) {
-                if (listSysFalse[i].arrayFalse.length !== 0) {
-                    for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
-                        if (listExportData[objIndex].listLesionSizeFalse == "") {
-                            listExportData[objIndex].listLesionSizeFalse +=
-                                listSysFalse[i].arrayFalse[k]["Lesion size (mm)"];
-                        } else {
-                            listExportData[objIndex].listLesionSizeFalse +=
-                                "," + listSysFalse[i].arrayFalse[k]["Lesion size (mm)"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysFalse.length !== 0) {
-            for (var i = 0; i < listSysFalse.length; i++) {
-                if (listSysFalse[i].arrayFalse.length !== 0) {
-                    for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
-                        if (listExportData[objIndex].listLesionTypeFalse == "") {
-                            listExportData[objIndex].listLesionTypeFalse +=
-                                listSysFalse[i].arrayFalse[k]["Lesion type"];
-                        } else {
-                            listExportData[objIndex].listLesionTypeFalse +=
-                                "," + listSysFalse[i].arrayFalse[k]["Lesion type"];
+                            listExportData[objIndex].listCaseIdFalseFilter +=
+                                "," +
+                                listSysFalseFilter[i].arrayFalse[k]["Case ID"] +
+                                " - " +
+                                listSysFalseFilter[i].arrayFalse[k]["Lesion ID"] +
+                                " - " +
+                                listSysFalseFilter[i].arrayFalse[k]["Truth Order"];
                         }
                     }
                 }
@@ -5303,6 +5321,7 @@ function checkDistinctSymmetric(
             obj.type === type
         );
         listExportData[objIndex].numberCaseTrue += case_true;
+        listExportData[objIndex].numberCaseTrueFilter += case_true_filter;
         listExportData[objIndex].totalCase += total_case;
 
         if (listSysTrue.length !== 0) {
@@ -5325,6 +5344,28 @@ function checkDistinctSymmetric(
                 }
             }
         }
+
+        if (listSysTrueFilter.length !== 0) {
+            for (var i = 0; i < listSysTrueFilter.length; i++) {
+                if (listExportData[objIndex].listCaseIdTrueFilter == "") {
+                    listExportData[objIndex].listCaseIdTrueFilter +=
+                        listSysTrueFilter[i].arrayTrue[0]["Case ID"] +
+                        " - " +
+                        listSysTrueFilter[i].arrayTrue[0]["Lesion ID"] +
+                        " - " +
+                        listSysTrueFilter[i].arrayTrue[0]["Truth Order"];
+                } else {
+                    listExportData[objIndex].listCaseIdTrueFilter +=
+                        "," +
+                        listSysTrueFilter[i].arrayTrue[0]["Case ID"] +
+                        " - " +
+                        listSysTrueFilter[i].arrayTrue[0]["Lesion ID"] +
+                        " - " +
+                        listSysTrueFilter[i].arrayTrue[0]["Truth Order"];
+                }
+            }
+        }
+
         if (listSysFalse.length !== 0) {
             for (var i = 0; i < listSysFalse.length; i++) {
                 if (listSysFalse[i].arrayFalse.length !== 0) {
@@ -5349,192 +5390,27 @@ function checkDistinctSymmetric(
                 }
             }
         }
-        if (listSysTrue.length !== 0) {
-            for (var i = 0; i < listSysTrue.length; i++) {
-                if (listSysTrue[i].arrayTrue.length !== 0) {
-                    for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
-                        if (listExportData[objIndex].listAgeTrue == "") {
-                            listExportData[objIndex].listAgeTrue +=
-                                listSysTrue[i].arrayTrue[k]["Tuổi"];
-                        } else {
-                            listExportData[objIndex].listAgeTrue +=
-                                "," + listSysTrue[i].arrayTrue[k]["Tuổi"];
-                        }
-                    }
-                }
-            }
-        }
 
-        if (listSysTrue.length !== 0) {
-            for (var i = 0; i < listSysTrue.length; i++) {
-                if (listSysTrue[i].arrayTrue.length !== 0) {
-                    for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
-                        if (listExportData[objIndex].listCaseDensityTrue == "") {
-                            listExportData[objIndex].listCaseDensityTrue +=
-                                listSysTrue[i].arrayTrue[k]["Case density"];
-                        } else {
-                            listExportData[objIndex].listCaseDensityTrue +=
-                                "," + listSysTrue[i].arrayTrue[k]["Case density"];
-                        }
-                    }
-                }
-            }
-        }
 
-        if (listSysTrue.length !== 0) {
-            for (var i = 0; i < listSysTrue.length; i++) {
-                if (listSysTrue[i].arrayTrue.length !== 0) {
-                    for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
-                        if (listExportData[objIndex].listLesionSideTrue == "") {
-                            listExportData[objIndex].listLesionSideTrue +=
-                                listSysTrue[i].arrayTrue[k]["Lesion side"];
+        if (listSysFalseFilter.length !== 0) {
+            for (var i = 0; i < listSysFalseFilter.length; i++) {
+                if (listSysFalseFilter[i].arrayFalse.length !== 0) {
+                    for (var k = 0; k < listSysFalseFilter[i].arrayFalse.length; k++) {
+                        if (listExportData[objIndex].listCaseIdFalseFilter == "") {
+                            listExportData[objIndex].listCaseIdFalseFilter +=
+                                listSysFalseFilter[i].arrayFalse[k]["Case ID"] +
+                                " - " +
+                                listSysFalseFilter[i].arrayFalse[k]["Lesion ID"] +
+                                " - " +
+                                listSysFalseFilter[i].arrayFalse[k]["Truth Order"];
                         } else {
-                            listExportData[objIndex].listLesionSideTrue +=
-                                "," + listSysTrue[i].arrayTrue[k]["Lesion side"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysTrue.length !== 0) {
-            for (var i = 0; i < listSysTrue.length; i++) {
-                if (listSysTrue[i].arrayTrue.length !== 0) {
-                    for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
-                        if (listExportData[objIndex].listLesionSiteTrue == "") {
-                            listExportData[objIndex].listLesionSiteTrue +=
-                                listSysTrue[i].arrayTrue[k]["Lesion site"];
-                        } else {
-                            listExportData[objIndex].listLesionSiteTrue +=
-                                "," + listSysTrue[i].arrayTrue[k]["Lesion site"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysTrue.length !== 0) {
-            for (var i = 0; i < listSysTrue.length; i++) {
-                if (listSysTrue[i].arrayTrue.length !== 0) {
-                    for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
-                        if (listExportData[objIndex].listLesionSizeTrue == "") {
-                            listExportData[objIndex].listLesionSizeTrue +=
-                                listSysTrue[i].arrayTrue[k]["Lesion size (mm)"];
-                        } else {
-                            listExportData[objIndex].listLesionSizeTrue +=
-                                "," + listSysTrue[i].arrayTrue[k]["Lesion size (mm)"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysTrue.length !== 0) {
-            for (var i = 0; i < listSysTrue.length; i++) {
-                if (listSysTrue[i].arrayTrue.length !== 0) {
-                    for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
-                        if (listExportData[objIndex].listLesionTypeTrue == "") {
-                            listExportData[objIndex].listLesionTypeTrue +=
-                                listSysTrue[i].arrayTrue[k]["Lesion type"];
-                        } else {
-                            listExportData[objIndex].listLesionTypeTrue +=
-                                "," + listSysTrue[i].arrayTrue[k]["Lesion type"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysFalse.length !== 0) {
-            for (var i = 0; i < listSysFalse.length; i++) {
-                if (listSysFalse[i].arrayFalse.length !== 0) {
-                    for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
-                        if (listExportData[objIndex].listAgeFalse == "") {
-                            listExportData[objIndex].listAgeFalse +=
-                                listSysFalse[i].arrayFalse[k]["Tuổi"];
-                        } else {
-                            listExportData[objIndex].listAgeFalse +=
-                                "," + listSysFalse[i].arrayFalse[k]["Tuổi"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysFalse.length !== 0) {
-            for (var i = 0; i < listSysFalse.length; i++) {
-                if (listSysFalse[i].arrayFalse.length !== 0) {
-                    for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
-                        if (listExportData[objIndex].listCaseDensityFalse == "") {
-                            listExportData[objIndex].listCaseDensityFalse +=
-                                listSysFalse[i].arrayFalse[k]["Case density"];
-                        } else {
-                            listExportData[objIndex].listCaseDensityFalse +=
-                                "," + listSysFalse[i].arrayFalse[k]["Case density"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysFalse.length !== 0) {
-            for (var i = 0; i < listSysFalse.length; i++) {
-                if (listSysFalse[i].arrayFalse.length !== 0) {
-                    for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
-                        if (listExportData[objIndex].listLesionSideFalse == "") {
-                            listExportData[objIndex].listLesionSideFalse +=
-                                listSysFalse[i].arrayFalse[k]["Lesion side"];
-                        } else {
-                            listExportData[objIndex].listLesionSideFalse +=
-                                "," + listSysFalse[i].arrayFalse[k]["Lesion side"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysFalse.length !== 0) {
-            for (var i = 0; i < listSysFalse.length; i++) {
-                if (listSysFalse[i].arrayFalse.length !== 0) {
-                    for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
-                        if (listExportData[objIndex].listLesionSiteFalse == "") {
-                            listExportData[objIndex].listLesionSiteFalse +=
-                                listSysFalse[i].arrayFalse[k]["Lesion site"];
-                        } else {
-                            listExportData[objIndex].listLesionSiteFalse +=
-                                "," + listSysFalse[i].arrayFalse[k]["Lesion site"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysFalse.length !== 0) {
-            for (var i = 0; i < listSysFalse.length; i++) {
-                if (listSysFalse[i].arrayFalse.length !== 0) {
-                    for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
-                        if (listExportData[objIndex].listLesionSizeFalse == "") {
-                            listExportData[objIndex].listLesionSizeFalse +=
-                                listSysFalse[i].arrayFalse[k]["Lesion size (mm)"];
-                        } else {
-                            listExportData[objIndex].listLesionSizeFalse +=
-                                "," + listSysFalse[i].arrayFalse[k]["Lesion size (mm)"];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysFalse.length !== 0) {
-            for (var i = 0; i < listSysFalse.length; i++) {
-                if (listSysFalse[i].arrayFalse.length !== 0) {
-                    for (var k = 0; k < listSysFalse[i].arrayFalse.length; k++) {
-                        if (listExportData[objIndex].listLesionTypeFalse == "") {
-                            listExportData[objIndex].listLesionTypeFalse +=
-                                listSysFalse[i].arrayFalse[k]["Lesion type"];
-                        } else {
-                            listExportData[objIndex].listLesionTypeFalse +=
-                                "," + listSysFalse[i].arrayFalse[k]["Lesion type"];
+                            listExportData[objIndex].listCaseIdFalseFilter +=
+                                "," +
+                                listSysFalseFilter[i].arrayFalse[k]["Case ID"] +
+                                " - " +
+                                listSysFalseFilter[i].arrayFalse[k]["Lesion ID"] +
+                                " - " +
+                                listSysFalseFilter[i].arrayFalse[k]["Truth Order"];
                         }
                     }
                 }
@@ -5865,7 +5741,10 @@ function checkDistinctNonSymmetric1(
     objDapAn,
     type,
     listSysTrue,
-    listSysFalse
+    listSysFalse,
+    case_true_filter,
+    listSysTrueFilter,
+    listSysFalseFilter
 ) {
     // console.log("LISSS FALSEEE", listSysFalse)
     let user = userFilter
@@ -5882,11 +5761,12 @@ function checkDistinctNonSymmetric1(
             obj["testId"] === testId &&
             obj["userId"] === userId &&
             obj["sessionNo"] === session_no &&
-            obj["tyoe"] === type
+            obj["type"] === type
         )
         .map((obj) => obj);
     var checkLesion = [];
     var checkLesionFalse = [];
+    var checkLesionFalseFilter = [];
     if (check.length == 0) {
         listExportData.push({
             testId: testId,
@@ -5894,10 +5774,13 @@ function checkDistinctNonSymmetric1(
             sessionNo: session_no,
             listCaseIdTrue: "",
             listCaseIdFalse: "",
+            listCaseIdTrueFilter: "",
+            listCaseIdFalseFilter: "",
             percentType: type,
             type: type,
             percent: "",
             numberCaseTrue: case_true,
+            numberCaseTrueFilter: case_true_filter,
             totalCase: total_case,
             listAgeTrue: "",
             listAgeFalse: "",
@@ -5926,69 +5809,6 @@ function checkDistinctNonSymmetric1(
 
         if (listSysTrue.length !== 0) {
             for (var i = 0; i < listSysTrue.length; i++) {
-                if (listSysTrue[i].arrayTrue.length !== 0) {
-                    for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
-                        objIndexLesion = checkLesion.findIndex(
-                            (obj) => obj === listSysTrue[i].arrayTrue[k]["Lesion ID"]
-                        );
-                        if (objIndexLesion == -1) {
-                            checkLesion.push(listSysTrue[i].arrayTrue[k]["Lesion ID"] + "");
-                            // console.log("CHECKLESION", checkLesion)
-                            if (listExportData[objIndex].listAgeTrue == "") {
-                                listExportData[objIndex].listAgeTrue +=
-                                    listSysTrue[i].arrayTrue[k]["Tuổi"];
-                            } else {
-                                listExportData[objIndex].listAgeTrue +=
-                                    "," + listSysTrue[i].arrayTrue[k]["Tuổi"];
-                            }
-
-                            if (listExportData[objIndex].listCaseDensityTrue == "") {
-                                listExportData[objIndex].listCaseDensityTrue +=
-                                    listSysTrue[i].arrayTrue[k]["Case density"];
-                            } else {
-                                listExportData[objIndex].listCaseDensityTrue +=
-                                    "," + listSysTrue[i].arrayTrue[k]["Case density"];
-                            }
-
-                            if (listExportData[objIndex].listLesionSideTrue == "") {
-                                listExportData[objIndex].listLesionSideTrue +=
-                                    listSysTrue[i].arrayTrue[k]["Lesion side"];
-                            } else {
-                                listExportData[objIndex].listLesionSideTrue +=
-                                    "," + listSysTrue[i].arrayTrue[k]["Lesion side"];
-                            }
-
-                            if (listExportData[objIndex].listLesionSiteTrue == "") {
-                                listExportData[objIndex].listLesionSiteTrue +=
-                                    listSysTrue[i].arrayTrue[k]["Lesion site"];
-                            } else {
-                                listExportData[objIndex].listLesionSiteTrue +=
-                                    "," + listSysTrue[i].arrayTrue[k]["Lesion site"];
-                            }
-
-                            if (listExportData[objIndex].listLesionSizeTrue == "") {
-                                listExportData[objIndex].listLesionSizeTrue +=
-                                    listSysTrue[i].arrayTrue[k]["Lesion size (mm)"];
-                            } else {
-                                listExportData[objIndex].listLesionSizeTrue +=
-                                    "," + listSysTrue[i].arrayTrue[k]["Lesion size (mm)"];
-                            }
-
-                            if (listExportData[objIndex].listLesionTypeTrue == "") {
-                                listExportData[objIndex].listLesionTypeTrue +=
-                                    listSysTrue[i].arrayTrue[k]["Lesion type"];
-                            } else {
-                                listExportData[objIndex].listLesionTypeTrue +=
-                                    "," + listSysTrue[i].arrayTrue[k]["Lesion type"];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (listSysTrue.length !== 0) {
-            for (var i = 0; i < listSysTrue.length; i++) {
                 if (listExportData[objIndex].listCaseIdTrue == "") {
                     listExportData[objIndex].listCaseIdTrue +=
                         listSysTrue[i].arrayTrue[0]["Case ID"] +
@@ -6000,6 +5820,23 @@ function checkDistinctNonSymmetric1(
                         listSysTrue[i].arrayTrue[0]["Case ID"] +
                         " - " +
                         listSysTrue[i].arrayTrue[0]["Lesion ID"];
+                }
+            }
+        }
+
+        if (listSysTrueFilter.length !== 0) {
+            for (var i = 0; i < listSysTrueFilter.length; i++) {
+                if (listExportData[objIndex].listCaseIdTrueFilter == "") {
+                    listExportData[objIndex].listCaseIdTrueFilter +=
+                        listSysTrueFilter[i].arrayTrue[0]["Case ID"] +
+                        " - " +
+                        listSysTrueFilter[i].arrayTrue[0]["Lesion ID"];
+                } else {
+                    listExportData[objIndex].listCaseIdTrueFilter +=
+                        "," +
+                        listSysTrueFilter[i].arrayTrue[0]["Case ID"] +
+                        " - " +
+                        listSysTrueFilter[i].arrayTrue[0]["Lesion ID"];
                 }
             }
         }
@@ -6027,53 +5864,34 @@ function checkDistinctNonSymmetric1(
                                     " - " +
                                     listSysFalse[i].arrayFalse[0]["Lesion ID"];
                             }
+                        }
+                    }
+                }
+            }
+        }
 
-                            if (listExportData[objIndex].listAgeFalse == "") {
-                                listExportData[objIndex].listAgeFalse +=
-                                    listSysFalse[i].arrayFalse[k]["Tuổi"];
+        if (listSysFalseFilter.length !== 0) {
+            for (var i = 0; i < listSysFalseFilter.length; i++) {
+                if (listSysFalseFilter[i].arrayFalse.length !== 0) {
+                    for (var k = 0; k < listSysFalseFilter[i].arrayFalse.length; k++) {
+                        objIndexLesionFalse = checkLesionFalseFilter.findIndex(
+                            (obj) => obj === listSysFalseFilter[i].arrayFalse[k]["Lesion ID"]
+                        );
+                        if (objIndexLesionFalse == -1) {
+                            checkLesionFalseFilter.push(
+                                listSysFalseFilter[i].arrayFalse[k]["Lesion ID"] + ""
+                            );
+                            if (listExportData[objIndex].listCaseIdFalseFilter == "") {
+                                listExportData[objIndex].listCaseIdFalseFilter +=
+                                    listSysFalseFilter[i].arrayFalse[k]["Case ID"] +
+                                    " - " +
+                                    listSysFalseFilter[i].arrayFalse[0]["Lesion ID"];
                             } else {
-                                listExportData[objIndex].listAgeFalse +=
-                                    "," + listSysFalse[i].arrayFalse[k]["Tuổi"];
-                            }
-
-                            if (listExportData[objIndex].listCaseDensityFalse == "") {
-                                listExportData[objIndex].listCaseDensityFalse +=
-                                    listSysFalse[i].arrayFalse[k]["Case density"];
-                            } else {
-                                listExportData[objIndex].listCaseDensityFalse +=
-                                    "," + listSysFalse[i].arrayFalse[k]["Case density"];
-                            }
-
-                            if (listExportData[objIndex].listLesionSideFalse == "") {
-                                listExportData[objIndex].listLesionSideFalse +=
-                                    listSysFalse[i].arrayFalse[k]["Lesion side"];
-                            } else {
-                                listExportData[objIndex].listLesionSideFalse +=
-                                    "," + listSysFalse[i].arrayFalse[k]["Lesion side"];
-                            }
-
-                            if (listExportData[objIndex].listLesionSiteFalse == "") {
-                                listExportData[objIndex].listLesionSiteFalse +=
-                                    listSysFalse[i].arrayFalse[k]["Lesion site"];
-                            } else {
-                                listExportData[objIndex].listLesionSiteFalse +=
-                                    "," + listSysFalse[i].arrayFalse[k]["Lesion site"];
-                            }
-
-                            if (listExportData[objIndex].listLesionSizeFalse == "") {
-                                listExportData[objIndex].listLesionSizeFalse +=
-                                    listSysFalse[i].arrayFalse[k]["Lesion size (mm)"];
-                            } else {
-                                listExportData[objIndex].listLesionSizeFalse +=
-                                    "," + listSysFalse[i].arrayFalse[k]["Lesion size (mm)"];
-                            }
-
-                            if (listExportData[objIndex].listLesionTypeFalse == "") {
-                                listExportData[objIndex].listLesionTypeFalse +=
-                                    listSysFalse[i].arrayFalse[k]["Lesion type"];
-                            } else {
-                                listExportData[objIndex].listLesionTypeFalse +=
-                                    "," + listSysFalse[i].arrayFalse[k]["Lesion type"];
+                                listExportData[objIndex].listCaseIdFalseFilter +=
+                                    "," +
+                                    listSysFalseFilter[i].arrayFalse[k]["Case ID"] +
+                                    " - " +
+                                    listSysFalseFilter[i].arrayFalse[0]["Lesion ID"];
                             }
                         }
                     }
@@ -6104,6 +5922,7 @@ function checkDistinctNonSymmetric1(
             obj.type === type
         );
         listExportData[objIndex].numberCaseTrue += case_true;
+        listExportData[objIndex].numberCaseTrueFilter += case_true_filter;
         listExportData[objIndex].totalCase += total_case;
 
         if (listSysTrue.length !== 0) {
@@ -6123,65 +5942,19 @@ function checkDistinctNonSymmetric1(
             }
         }
 
-        if (listSysTrue.length !== 0) {
-            for (var i = 0; i < listSysTrue.length; i++) {
-                if (listSysTrue[i].arrayTrue.length !== 0) {
-                    for (var k = 0; k < listSysTrue[i].arrayTrue.length; k++) {
-                        objIndexLesion = checkLesion.findIndex(
-                            (obj) => obj === listSysTrue[i].arrayTrue[k]["Lesion ID"]
-                        );
-                        if (objIndexLesion == -1) {
-                            checkLesion.push(listSysTrue[i].arrayTrue[k]["Lesion ID"] + "");
-                            // console.log("CHECKLESION", checkLesion)
-                            if (listExportData[objIndex].listAgeTrue == "") {
-                                listExportData[objIndex].listAgeTrue +=
-                                    listSysTrue[i].arrayTrue[k]["Tuổi"];
-                            } else {
-                                listExportData[objIndex].listAgeTrue +=
-                                    "," + listSysTrue[i].arrayTrue[k]["Tuổi"];
-                            }
-
-                            if (listExportData[objIndex].listCaseDensityTrue == "") {
-                                listExportData[objIndex].listCaseDensityTrue +=
-                                    listSysTrue[i].arrayTrue[k]["Case density"];
-                            } else {
-                                listExportData[objIndex].listCaseDensityTrue +=
-                                    "," + listSysTrue[i].arrayTrue[k]["Case density"];
-                            }
-
-                            if (listExportData[objIndex].listLesionSideTrue == "") {
-                                listExportData[objIndex].listLesionSideTrue +=
-                                    listSysTrue[i].arrayTrue[k]["Lesion side"];
-                            } else {
-                                listExportData[objIndex].listLesionSideTrue +=
-                                    "," + listSysTrue[i].arrayTrue[k]["Lesion side"];
-                            }
-
-                            if (listExportData[objIndex].listLesionSiteTrue == "") {
-                                listExportData[objIndex].listLesionSiteTrue +=
-                                    listSysTrue[i].arrayTrue[k]["Lesion site"];
-                            } else {
-                                listExportData[objIndex].listLesionSiteTrue +=
-                                    "," + listSysTrue[i].arrayTrue[k]["Lesion site"];
-                            }
-
-                            if (listExportData[objIndex].listLesionSizeTrue == "") {
-                                listExportData[objIndex].listLesionSizeTrue +=
-                                    listSysTrue[i].arrayTrue[k]["Lesion size (mm)"];
-                            } else {
-                                listExportData[objIndex].listLesionSizeTrue +=
-                                    "," + listSysTrue[i].arrayTrue[k]["Lesion size (mm)"];
-                            }
-
-                            if (listExportData[objIndex].listLesionTypeTrue == "") {
-                                listExportData[objIndex].listLesionTypeTrue +=
-                                    listSysTrue[i].arrayTrue[k]["Lesion type"];
-                            } else {
-                                listExportData[objIndex].listLesionTypeTrue +=
-                                    "," + listSysTrue[i].arrayTrue[k]["Lesion type"];
-                            }
-                        }
-                    }
+        if (listSysTrueFilter.length !== 0) {
+            for (var i = 0; i < listSysTrueFilter.length; i++) {
+                if (listExportData[objIndex].listCaseIdTrueFilter == "") {
+                    listExportData[objIndex].listCaseIdTrueFilter +=
+                        listSysTrueFilter[i].arrayTrue[0]["Case ID"] +
+                        " - " +
+                        listSysTrueFilter[i].arrayTrue[0]["Lesion ID"];
+                } else {
+                    listExportData[objIndex].listCaseIdTrueFilter +=
+                        "," +
+                        listSysTrueFilter[i].arrayTrue[0]["Case ID"] +
+                        " - " +
+                        listSysTrueFilter[i].arrayTrue[0]["Lesion ID"];
                 }
             }
         }
@@ -6209,53 +5982,34 @@ function checkDistinctNonSymmetric1(
                                     " - " +
                                     listSysFalse[i].arrayFalse[0]["Lesion ID"];
                             }
+                        }
+                    }
+                }
+            }
+        }
 
-                            if (listExportData[objIndex].listAgeFalse == "") {
-                                listExportData[objIndex].listAgeFalse +=
-                                    listSysFalse[i].arrayFalse[k]["Tuổi"];
+        if (listSysFalseFilter.length !== 0) {
+            for (var i = 0; i < listSysFalseFilter.length; i++) {
+                if (listSysFalseFilter[i].arrayFalse.length !== 0) {
+                    for (var k = 0; k < listSysFalseFilter[i].arrayFalse.length; k++) {
+                        objIndexLesionFalse = checkLesionFalseFilter.findIndex(
+                            (obj) => obj === listSysFalseFilter[i].arrayFalse[k]["Lesion ID"]
+                        );
+                        if (objIndexLesionFalse == -1) {
+                            checkLesionFalseFilter.push(
+                                listSysFalseFilter[i].arrayFalse[k]["Lesion ID"] + ""
+                            );
+                            if (listExportData[objIndex].listCaseIdFalseFilter == "") {
+                                listExportData[objIndex].listCaseIdFalseFilter +=
+                                    listSysFalseFilter[i].arrayFalse[k]["Case ID"] +
+                                    " - " +
+                                    listSysFalseFilter[i].arrayFalse[0]["Lesion ID"];
                             } else {
-                                listExportData[objIndex].listAgeFalse +=
-                                    "," + listSysFalse[i].arrayFalse[k]["Tuổi"];
-                            }
-
-                            if (listExportData[objIndex].listCaseDensityFalse == "") {
-                                listExportData[objIndex].listCaseDensityFalse +=
-                                    listSysFalse[i].arrayFalse[k]["Case density"];
-                            } else {
-                                listExportData[objIndex].listCaseDensityFalse +=
-                                    "," + listSysFalse[i].arrayFalse[k]["Case density"];
-                            }
-
-                            if (listExportData[objIndex].listLesionSideFalse == "") {
-                                listExportData[objIndex].listLesionSideFalse +=
-                                    listSysFalse[i].arrayFalse[k]["Lesion side"];
-                            } else {
-                                listExportData[objIndex].listLesionSideFalse +=
-                                    "," + listSysFalse[i].arrayFalse[k]["Lesion side"];
-                            }
-
-                            if (listExportData[objIndex].listLesionSiteFalse == "") {
-                                listExportData[objIndex].listLesionSiteFalse +=
-                                    listSysFalse[i].arrayFalse[k]["Lesion site"];
-                            } else {
-                                listExportData[objIndex].listLesionSiteFalse +=
-                                    "," + listSysFalse[i].arrayFalse[k]["Lesion site"];
-                            }
-
-                            if (listExportData[objIndex].listLesionSizeFalse == "") {
-                                listExportData[objIndex].listLesionSizeFalse +=
-                                    listSysFalse[i].arrayFalse[k]["Lesion size (mm)"];
-                            } else {
-                                listExportData[objIndex].listLesionSizeFalse +=
-                                    "," + listSysFalse[i].arrayFalse[k]["Lesion size (mm)"];
-                            }
-
-                            if (listExportData[objIndex].listLesionTypeFalse == "") {
-                                listExportData[objIndex].listLesionTypeFalse +=
-                                    listSysFalse[i].arrayFalse[k]["Lesion type"];
-                            } else {
-                                listExportData[objIndex].listLesionTypeFalse +=
-                                    "," + listSysFalse[i].arrayFalse[k]["Lesion type"];
+                                listExportData[objIndex].listCaseIdFalseFilter +=
+                                    "," +
+                                    listSysFalseFilter[i].arrayFalse[k]["Case ID"] +
+                                    " - " +
+                                    listSysFalseFilter[i].arrayFalse[0]["Lesion ID"];
                             }
                         }
                     }
@@ -6276,21 +6030,21 @@ function splitUniqueTest(unique) {
     return unique.split(":");
 }
 
-function calcNormal(objRowData, objDapAn) {
+function calcNormal(objRowData, objDapAn, caseDensityArray = []) {
     var count = 0;
-    if (isCaseDensity == true) {
+    if (isCaseDensity == true || caseDensityArray.length > 0) {
         const maxRatingValue = Math.max(...objRowData.map((o) => o["rating"]), 0);
         if (maxRatingValue <= 2) {
             for (var i = 0; i < objRowData.length; i++) {
                 if (objRowData[i]["rating"] <= 2) {
-                    objDapAn.forEach(function(caseDapAn) {
-                        if (
-                            caseDensityArrayValue.indexOf(caseDapAn["Case density"]) != -1 &&
-                            objRowData[i]["Case density (user)"] === caseDapAn["Case density"]
-                        ) {
-                            count++;
-                        }
-                    });
+                    if (caseDensityArray.length == 0 || caseDensityArray.indexOf(objRowData[i]["Case density (user)"]) != -1) {
+                        objDapAn.forEach(function(caseDapAn) {
+                            if (objRowData[i]["Case density (user)"] === caseDapAn["Case density"]) {
+                                count++;
+                                return;
+                            }
+                        });
+                    }
                 }
             }
         }
@@ -6303,19 +6057,21 @@ function calcNormal(objRowData, objDapAn) {
     return false;
 }
 
-function calcAbNormal(objRowData, objDapAn) {
+function calcAbNormal(objRowData, objDapAn, caseDensityArray = [], lessionTypeArray = []) {
     var count = 0;
     var countDensityAb = 0;
-    if (isCaseDensity == true || isLessionType == true) {
+    if (isCaseDensity == true || isLessionType == true || caseDensityArray.length > 0 || lessionTypeArray.length > 0) {
         for (var i = 0; i < objRowData.length; i++) {
-            checkDensity = objDapAn
-                .filter(
-                    (obj) => caseDensityArrayValue.indexOf(obj["Case density"]) != -1 &&
-                    obj["Case density"] === objRowData[i]["Case density (user)"]
-                )
-                .map((obj) => obj);
-            if (checkDensity.length != 0) {
-                countDensityAb++;
+            if (caseDensityArray.length == 0 || caseDensityArray.indexOf(objRowData[i]) != -1) {
+                let checkDensity = objDapAn
+                    .filter(
+                        (obj) => obj["Case density"] === objRowData[i]["Case density (user)"]
+                    )
+                    .map((obj) => obj);
+                if (checkDensity.length != 0) {
+                    countDensityAb++;
+                    break;
+                }
             }
         }
 
@@ -6325,22 +6081,41 @@ function calcAbNormal(objRowData, objDapAn) {
                 objRowData[i]["selectY"] > 0 &&
                 objRowData[i]["rating"] >= 3
             ) {
+                let checkDen = false;
+                let checkLess = false;
+                if (objRowData[i]["Lesion type(User)"] != null && (caseDensityArray.length > 0 || lessionTypeArray.length > 0)) {
+                    checkDen = countDensityAb > 0;
+                    lessionTypeArray.forEach((element) => {
+                        objRowData[i]["Lesion type(User)"].split(",").forEach((element1) => {
+                            if (element1 === element) {
+                                checkLess = true;
+                                return;
+                            }
+                        });
+                    });
+                    if (!checkDen && !checkLess)
+                        continue;
+                }
                 objDapAn.forEach(function(caseDapAn) {
-                    if (isCaseDensity == true && isLessionType == true) {
-                        if (
+                    if ((isCaseDensity == true && isLessionType == true && caseDensityArray.length == 0 && lessionTypeArray.length == 0) ||
+                        (checkDen && checkLess)) {
+                        if (countDensityAb > 0 &&
                             checkLesionType(
                                 caseDapAn["Lesion type"],
                                 objRowData[i]["Lesion type(User)"]
-                            ) == true &&
-                            countDensityAb > 0
+                            ) == true
                         ) {
                             count++;
+                            return;
                         }
-                    } else if (isCaseDensity == true && isLessionType == false) {
+                    } else if ((isCaseDensity == true && isLessionType == false &&
+                            caseDensityArray.length == 0 && lessionTypeArray.length == 0) || checkDen) {
                         if (countDensityAb > 0) {
                             count++;
+                            return;
                         }
-                    } else if (isCaseDensity == false && isLessionType == true) {
+                    } else if ((isCaseDensity == false && isLessionType == true &&
+                            caseDensityArray.length == 0 && lessionTypeArray.length == 0) || checkLess) {
                         if (
                             checkLesionType(
                                 caseDapAn["Lesion type"],
@@ -6348,6 +6123,7 @@ function calcAbNormal(objRowData, objDapAn) {
                             ) == true
                         ) {
                             count++;
+                            return;
                         }
                     }
                 });
@@ -6367,41 +6143,77 @@ function calcAbNormal(objRowData, objDapAn) {
     return false;
 }
 
-function calcReCall(objRowData, objDapAn) {
+function calcReCall(objRowData, objDapAn, caseDensityArray = [], lessionTypeArray = []) {
     var count = 0;
     var countDensityRecall = 0;
     var checkDensity = [];
     let check = [];
-    if (isCaseDensity == true || isLessionType == true) {
+    if (isCaseDensity == true || isLessionType == true || caseDensityArray.length > 0 || lessionTypeArray.length > 0) {
         for (var i = 0; i < objRowData.length; i++) {
-            checkDensity = objDapAn
-                .filter(
-                    (obj) => caseDensityArrayValue.indexOf(obj["Case density"]) != -1 &&
-                    obj["Case density"] === objRowData[i]["Case density (user)"]
-                )
-                .map((obj) => obj);
-            if (checkDensity.length != 0) {
-                countDensityRecall++;
+            if (caseDensityArray.length == 0 || caseDensityArray.indexOf(objRowData[i]) != -1) {
+                checkDensity = objDapAn
+                    .filter(
+                        (obj) => obj["Case density"] === objRowData[i]["Case density (user)"]
+                    )
+                    .map((obj) => obj);
+                if (checkDensity.length != 0) {
+                    countDensityRecall++;
+                    break;
+                }
             }
         }
         for (var i = 0; i < objRowData.length; i++) {
-            check = objDapAn
-                .filter(
-                    (obj) =>
-                    obj["Lesion ID"] === objRowData[i]["lesionID"] &&
-                    objRowData[i]["distance"] > 0 &&
-                    objRowData[i]["rating"] >= 3 &&
-                    objRowData[i]["selectX"] > 0 &&
-                    objRowData[i]["selectY"] > 0 &&
-                    (isCaseDensity ? countDensityRecall > 0 : true) &&
-                    (isLessionType ?
-                        checkLesionType(
-                            obj["Lesion type"],
-                            objRowData[i]["Lesion type(User)"]
-                        ) === true :
-                        true)
-                )
-                .map((obj) => obj);
+            let checkDen = false;
+            let checkLess = false;
+            if (objRowData[i]["Lesion type(User)"] != null && (caseDensityArray.length > 0 || lessionTypeArray.length > 0)) {
+                checkDen = countDensityRecall > 0;
+                lessionTypeArray.forEach((element) => {
+                    objRowData[i]["Lesion type(User)"].split(",").forEach((element1) => {
+                        if (element1 === element) {
+                            checkLess = true;
+                            return;
+                        }
+                    });
+                });
+                if (!checkDen && !checkLess)
+                    continue;
+
+                check = objDapAn
+                    .filter(
+                        (obj) =>
+                        obj["Lesion ID"] === objRowData[i]["lesionID"] &&
+                        objRowData[i]["distance"] > 0 &&
+                        objRowData[i]["rating"] >= 3 &&
+                        objRowData[i]["selectX"] > 0 &&
+                        objRowData[i]["selectY"] > 0 &&
+                        (caseDensityArray.length > 0 ? checkDen : true) &&
+                        (lessionTypeArray.length > 0 ? (checkLess ?
+                                checkLesionType(
+                                    obj["Lesion type"],
+                                    objRowData[i]["Lesion type(User)"]
+                                ) === true : false) :
+                            true)
+                    )
+                    .map((obj) => obj);
+            } else {
+                check = objDapAn
+                    .filter(
+                        (obj) =>
+                        obj["Lesion ID"] === objRowData[i]["lesionID"] &&
+                        objRowData[i]["distance"] > 0 &&
+                        objRowData[i]["rating"] >= 3 &&
+                        objRowData[i]["selectX"] > 0 &&
+                        objRowData[i]["selectY"] > 0 &&
+                        (isCaseDensity ? countDensityRecall > 0 : true) &&
+                        (isLessionType ?
+                            checkLesionType(
+                                obj["Lesion type"],
+                                objRowData[i]["Lesion type(User)"]
+                            ) === true :
+                            true)
+                    )
+                    .map((obj) => obj);
+            }
             if (check.length != 0) {
                 count++;
             }
@@ -6436,16 +6248,17 @@ function checkLesionType(dapan, caserow) {
     var arr2 = [];
     var check = 0;
     if (dapan != undefined) {
-        arr1 = dapan.split(" / ").filter(s => lessionTypeArrayValue.indexOf(s) != -1);
+        arr1 = dapan.split(" / ");
     }
     if (caserow != undefined) {
-        arr2 = caserow.split(",").filter(s => lessionTypeArrayValue.indexOf(s) != -1);
+        arr2 = caserow.split(",");
     }
 
     arr1.forEach((element) => {
         arr2.forEach((element1) => {
             if (element1 === element) {
                 check++;
+                return;
             }
         });
     });
@@ -6453,7 +6266,7 @@ function checkLesionType(dapan, caserow) {
     return true;
 }
 
-function calcSymmetric(objRowData, objDapAn) {
+function calcSymmetric(objRowData, objDapAn, caseDensityArray = [], lessionTypeArray = []) {
     var listSysTrue = [];
     var listSysFalse = [];
     var answerTrue = null;
@@ -6461,12 +6274,36 @@ function calcSymmetric(objRowData, objDapAn) {
     var countAnswer = 0;
     var countTotal = 0;
     var checkXY = [];
-    var checkFalse = [];
-    var checkTruthXY = [];
-    var checkFrame = [];
     var newData = [];
     var listCheck1 = [];
     var listCheck2 = [];
+
+    var listSysTrueByFilter = [];
+    var listSysFalseByFilter = [];
+    var answerTrueFilter = null;
+    var answerFalseFilter = null;
+    var countAnswerFilter = 0;
+    var checkXYFilter = [];
+    var listCheckFilter1 = [];
+    var listCheckFilter2 = [];
+    var checkDensityFilter = false;
+
+    if (caseDensityArray.length > 0) {
+        objRowData.forEach((element) => {
+            if (caseDensityArray.indexOf(element["Case density (user)"]) != -1) {
+                let checkDensity = objDapAn.filter(
+                    (obj) =>
+                    obj["Test set"] === element["test_id"] &&
+                    obj["Case ID"] === element["case_id"] &&
+                    obj["Case density"] === element["Case density (user)"]
+                ).map((obj) => obj);
+                if (checkDensity.length > 0) {
+                    checkDensityFilter = true;
+                    return;
+                }
+            }
+        });
+    }
 
     objRowData.forEach((item) => {
         if (
@@ -6541,6 +6378,71 @@ function calcSymmetric(objRowData, objDapAn) {
                 // listSysFalse = const check = objDapAn
                 // .filter(obj => obj["Test set"] === objRowData[i]["test_id"]
             }
+
+            if (caseDensityArray.length > 0 || lessionTypeArray.length > 0) {
+                if (
+                    checkXYFilter.indexOf(
+                        objRowData[i]["truthX"] +
+                        "" +
+                        objRowData[i]["truthY"] +
+                        "" +
+                        objRowData[i]["lesionID"]
+                    ) == -1
+                ) {
+                    let checkLessFilter = false;
+                    if (objRowData[i]["Lesion type(User)"] != null && lessionTypeArray.length > 0) {
+                        lessionTypeArray.forEach((element) => {
+                            objRowData[i]["Lesion type(User)"].split(",").forEach((element1) => {
+                                if (element1 === element) {
+                                    checkLessFilter = true;
+                                    return;
+                                }
+                            });
+                        });
+                    }
+                    const checkFilter = objDapAn
+                        .filter(
+                            (obj) =>
+                            obj["Test set"] === objRowData[i]["test_id"] &&
+                            obj["Case ID"] === objRowData[i]["case_id"] &&
+                            obj["Lesion ID"] === objRowData[i]["lesionID"] &&
+                            obj["Lesion ID"] === objRowData[i]["lesionID"] &&
+                            obj["TruthX"] === objRowData[i]["truthX"] &&
+                            obj["TruthY"] === objRowData[i]["truthY"] &&
+                            objRowData[i]["distance"] > 0 &&
+                            objRowData[i]["rating"] > 2 &&
+                            objRowData[i]["selectX"] > 0 &&
+                            objRowData[i]["selectY"] > 0 &&
+                            (caseDensityArray.length > 0 ? checkDensityFilter : true) &&
+                            (lessionTypeArray.length > 0 ? (checkLessFilter ?
+                                    checkLesionType(
+                                        obj["Lesion type"],
+                                        objRowData[i]["Lesion type(User)"]
+                                    ) === true : false) :
+                                true)
+                        )
+                        .map((obj) => obj);
+
+                    if (checkFilter.length != 0) {
+                        listCheckFilter1.push(checkFilter);
+                        listSysTrueByFilter.push({
+                            user: objRowData[i]["user_id"],
+                            arrayTrue: checkFilter,
+                        });
+                        answerTrueFilter = objDapAn[0];
+                        checkXYFilter.push(
+                            objRowData[i]["truthX"] +
+                            "" +
+                            objRowData[i]["truthY"] +
+                            "" +
+                            objRowData[i]["lesionID"]
+                        );
+                        countAnswerFilter++;
+                    } else {
+                        answerFalseFilter = objDapAn[0];
+                    }
+                }
+            }
         }
 
         // var arrFalse = objDapAn.filter(obj => listCheck1.indexOf(obj) === -1);
@@ -6554,6 +6456,19 @@ function calcSymmetric(objRowData, objDapAn) {
             user: objRowData[0]["user_id"],
             arrayFalse: arrFalse,
         });
+
+        if (caseDensityArray.length > 0 || lessionTypeArray.length > 0) {
+            var arrFalseFilter = objDapAn.filter(
+                (elm) =>
+                !listCheckFilter1
+                .map((elm) => JSON.stringify(elm[0]))
+                .includes(JSON.stringify(elm))
+            );
+            listSysFalseByFilter.push({
+                user: objRowData[0]["user_id"],
+                arrayFalse: arrFalseFilter,
+            });
+        }
     }
     //  TRUONG HOP >=2 FRAME
     else {
@@ -6616,6 +6531,75 @@ function calcSymmetric(objRowData, objDapAn) {
                 }
                 //}
             }
+
+            if (caseDensityArray.length > 0 || lessionTypeArray.length > 0) {
+                if (
+                    checkXYFilter.indexOf(
+                        objRowData[i]["truthX"] +
+                        "" +
+                        objRowData[i]["truthY"] +
+                        +"" +
+                        objRowData[i]["case_id"] +
+                        "" +
+                        objRowData[i]["lesionID"] +
+                        "" +
+                        objRowData[i]["frame"]
+                    ) == -1
+                ) {
+                    let checkLessFilter = false;
+                    if (objRowData[i]["Lesion type(User)"] != null && lessionTypeArray.length > 0) {
+                        lessionTypeArray.forEach((element) => {
+                            objRowData[i]["Lesion type(User)"].split(",").forEach((element1) => {
+                                if (element1 === element) {
+                                    checkLessFilter = true;
+                                    return;
+                                }
+                            });
+                        });
+                    }
+
+                    const checkFilter = objDapAn
+                        .filter(
+                            (obj) =>
+                            obj["Test set"] === objRowData[i]["test_id"] &&
+                            obj["Case ID"] === objRowData[i]["case_id"] &&
+                            obj["Lesion ID"] === objRowData[i]["lesionID"] &&
+                            objRowData[i]["distance"] > 0 &&
+                            objRowData[i]["rating"] > 2 &&
+                            (caseDensityArray.length > 0 ? checkDensityFilter : true) &&
+                            (lessionTypeArray.length > 0 ? (checkLessFilter ?
+                                    checkLesionType(
+                                        obj["Lesion type"],
+                                        objRowData[i]["Lesion type(User)"]
+                                    ) === true : false) :
+                                true)
+                        )
+                        .map((obj) => obj);
+
+                    if (checkFilter.length != 0) {
+                        listCheckFilter2.push(checkFilter);
+                        listSysTrueByFilter.push({
+                            user: objRowData[i]["user_id"],
+                            arrayTrue: checkFilter,
+                        });
+                        answerTrueFilter = objDapAn[0];
+                        checkXYFilter.push(
+                            objRowData[i]["truthX"] +
+                            "" +
+                            objRowData[i]["truthY"] +
+                            +"" +
+                            objRowData[i]["case_id"] +
+                            "" +
+                            objRowData[i]["lesionID"] +
+                            "" +
+                            objRowData[i]["frame"]
+                        );
+                        countAnswerFilter++;
+                    } else {
+                        answerFalseFilter = objDapAn[0];
+                    }
+                }
+            }
         }
         // var arrFalse = objDapAn.filter(obj => listCheck2.indexOf(obj) === -1);
         var arrFalse = objDapAn.filter(
@@ -6628,7 +6612,21 @@ function calcSymmetric(objRowData, objDapAn) {
             user: objRowData[0]["user_id"],
             arrayFalse: arrFalse,
         });
+
+        if (caseDensityArray.length > 0 || lessionTypeArray.length > 0) {
+            var arrFalseFilter = objDapAn.filter(
+                (elm) =>
+                !listCheckFilter2
+                .map((elm) => JSON.stringify(elm[0]))
+                .includes(JSON.stringify(elm))
+            );
+            listSysFalseByFilter.push({
+                user: objRowData[0]["user_id"],
+                arrayFalse: arrFalseFilter,
+            });
+        }
     }
+
 
     return [
         countAnswer,
@@ -6637,10 +6635,15 @@ function calcSymmetric(objRowData, objDapAn) {
         listSysFalse,
         answerTrue,
         answerFalse,
+        countAnswerFilter,
+        listSysTrueByFilter,
+        listSysFalseByFilter,
+        answerTrueFilter,
+        answerFalseFilter
     ];
 }
 
-function calcNonSymmetric(objRowData, objDapAn) {
+function calcNonSymmetric(objRowData, objDapAn, caseDensityArray = [], lessionTypeArray = []) {
     var listSysTrue = [];
     var answerTrue = null;
     var answerFalse = null;
@@ -6649,11 +6652,38 @@ function calcNonSymmetric(objRowData, objDapAn) {
     var countTotal = 0;
     var checkLesion = [];
     var listCheck1 = [];
+
+    var listSysTrueFilter = [];
+    var answerTrueFilter = null;
+    var answerFalseFilter = null;
+    var listSysFalseFilter = [];
+    var countAnswerFilter = 0;
+    var checkLesionFilter = [];
+    var listCheck1Filter = [];
     const uniqueLesionId = [
         ...new Set(objDapAn.map((item) => item["Lesion ID"])),
     ];
 
     countTotal = uniqueLesionId.length;
+
+    var checkDensityFilter = false;
+    if (caseDensityArray.length > 0) {
+        objRowData.forEach((element) => {
+            if (caseDensityArray.indexOf(element["Case density (user)"]) != -1) {
+                let checkDensity = objDapAn.filter(
+                    (obj) =>
+                    obj["Test set"] === element["test_id"] &&
+                    obj["Case ID"] === element["case_id"] &&
+                    obj["Case density"] === element["Case density (user)"]
+                ).map((obj) => obj);
+                if (checkDensity.length > 0) {
+                    checkDensityFilter = true;
+                    return;
+                }
+            }
+        });
+    }
+
     for (var i = 0; i < objRowData.length; i++) {
         if (
             checkLesion.indexOf(
@@ -6710,6 +6740,74 @@ function calcNonSymmetric(objRowData, objDapAn) {
                 answerFalse = objDapAn[0];
             }
         }
+
+        if (caseDensityArray.length > 0 || lessionTypeArray.length > 0) {
+            if (
+                checkLesionFilter.indexOf(
+                    objRowData[i]["test_id"] +
+                    "-" +
+                    objRowData[i]["user_id"] +
+                    "-" +
+                    objRowData[i]["case_id"] +
+                    "-" +
+                    objRowData[i]["lesionID"]
+                ) == -1
+            ) {
+                let checkLessFilter = false;
+                if (objRowData[i]["Lesion type(User)"] != null && lessionTypeArray.length > 0) {
+                    lessionTypeArray.forEach((element) => {
+                        objRowData[i]["Lesion type(User)"].split(",").forEach((element1) => {
+                            if (element1 === element) {
+                                checkLessFilter = true;
+                                return;
+                            }
+                        });
+                    });
+                }
+                const checkFilter = objDapAn
+                    .filter(
+                        (obj) =>
+                        obj["Test set"] === objRowData[i]["test_id"] &&
+                        obj["Case ID"] === objRowData[i]["case_id"] &&
+                        obj["Lesion ID"] === objRowData[i]["lesionID"] &&
+                        parseInt(objRowData[i]["distance"]) > 0 &&
+                        objRowData[i]["rating"] >= 3 &&
+                        (caseDensityArray.length > 0 ? checkDensityFilter : true) &&
+                        (lessionTypeArray.length > 0 ? (checkLessFilter ? checkLesionType(
+                                obj["Lesion type"],
+                                objRowData[i]["Lesion type(User)"]
+                            ) === true : false) :
+                            true)
+                    )
+                    .map((obj) => obj);
+
+                if (checkFilter.length != 0) {
+                    checkFilter.forEach((element) => {
+                        let temp = [];
+                        temp.push(element);
+                        listCheck1Filter.push(temp);
+                    });
+
+                    listSysTrueFilter.push({
+                        user: objRowData[i]["user_id"],
+                        arrayTrue: checkFilter,
+                    });
+                    answerTrueFilter = objDapAn[0];
+                    checkLesionFilter.push(
+                        objRowData[i]["test_id"] +
+                        "-" +
+                        objRowData[i]["user_id"] +
+                        "-" +
+                        objRowData[i]["case_id"] +
+                        "-" +
+                        objRowData[i]["lesionID"]
+                    );
+                    countAnswerFilter++;
+                } else {
+                    answerFalseFilter = objDapAn[0];
+                }
+            }
+        }
     }
     // console.log("CHECK DATA",objRowData)
     var arrFalse = objDapAn.filter(
@@ -6725,6 +6823,19 @@ function calcNonSymmetric(objRowData, objDapAn) {
         arrayFalse: arrFalse,
     });
 
+    if (caseDensityArray.length > 0 || lessionTypeArray.length > 0) {
+        var arrFalseFilter = objDapAn.filter(
+            (elm) =>
+            !listCheck1Filter
+            .map((elm) => JSON.stringify(elm[0]))
+            .includes(JSON.stringify(elm))
+        );
+        listSysFalseFilter.push({
+            user: objRowData[0]["user_id"],
+            arrayFalse: arrFalseFilter,
+        });
+    }
+
     return [
         countAnswer,
         countTotal,
@@ -6732,6 +6843,11 @@ function calcNonSymmetric(objRowData, objDapAn) {
         listSysFalse,
         answerTrue,
         answerFalse,
+        countAnswerFilter,
+        listSysTrueFilter,
+        listSysFalseFilter,
+        answerTrueFilter,
+        answerFalseFilter
     ];
 }
 
@@ -6750,34 +6866,83 @@ function calcTruePercentofAnyCase(objRowData, objDapAn, dropdownValue) {
         obj.type === dropdownObject[dropdownValue]
     );
     if (objIndex == -1) {
-        listCaseIdbyTestId.push({
-            testId: objRowData[0]["test_id"],
-            caseId: objRowData[0]["case_id"],
-            lesionId: null,
-            truthX: null,
-            truthY: null,
-            truthOrder: null,
-            totalUserTruth: 0,
-            totalUser: 0,
-            percent: "",
-            listUserIdTrue: "",
-            listUserAddressTrue: "",
-            listUserGroupTrue: "",
-            listUserTimeTrue: "",
-            listUserExpTrue: "",
-            listUserIdFalse: "",
-            listUserAddressFalse: "",
-            listUserGroupFalse: "",
-            listUserTimeFalse: "",
-            listUserExpFalse: "",
-            listAge: "",
-            listCaseDensity: "",
-            listLesionType: "",
-            type: dropdownObject[dropdownValue],
-            lesionSide: "",
-            lesionSite: "",
-            lesionSize: "",
-        });
+        if (caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) {
+            listCaseIdbyTestId.push({
+                testId: objRowData[0]["test_id"],
+                caseId: objRowData[0]["case_id"],
+                lesionId: null,
+                truthX: null,
+                truthY: null,
+                truthOrder: null,
+                totalUserTruth: 0,
+                totalUserTruthCaseLess: 0,
+                totalUser: 0,
+                percent: "",
+                percentCaseLess: "",
+                listUserIdTrue: "",
+                listUserIdTrueCaseLess: "",
+                listUserAddressTrue: "",
+                listUserAddressTrueCaseLess: "",
+                listUserGroupTrue: "",
+                listUserGroupTrueCaseLess: "",
+                listUserTimeTrue: "",
+                listUserTimeTrueCaseLess: "",
+                listUserExpTrue: "",
+                listUserExpTrueCaseLess: "",
+                listUserIdFalse: "",
+                listUserIdFalseCaseLess: "",
+                listUserAddressFalse: "",
+                listUserAddressFalseCaseLess: "",
+                listUserGroupFalse: "",
+                listUserGroupFalseCaseLess: "",
+                listUserTimeFalse: "",
+                listUserTimeFalseCaseLess: "",
+                listUserExpFalse: "",
+                listUserExpFalseCaseLess: "",
+                listAge: "",
+                listAgeCaseLess: "",
+                listCaseDensity: "",
+                listCaseDensityCaseLess: "",
+                listLesionType: "",
+                listLesionTypeCaseLess: "",
+                type: dropdownObject[dropdownValue],
+                lesionSide: "",
+                lesionSideCaseLess: "",
+                lesionSite: "",
+                lesionSiteCaseLess: "",
+                lesionSize: "",
+                lesionSizeCaseLess: ""
+            });
+        } else {
+            listCaseIdbyTestId.push({
+                testId: objRowData[0]["test_id"],
+                caseId: objRowData[0]["case_id"],
+                lesionId: null,
+                truthX: null,
+                truthY: null,
+                truthOrder: null,
+                totalUserTruth: 0,
+                totalUser: 0,
+                percent: "",
+                listUserIdTrue: "",
+                listUserAddressTrue: "",
+                listUserGroupTrue: "",
+                listUserTimeTrue: "",
+                listUserExpTrue: "",
+                listUserIdFalse: "",
+                listUserAddressFalse: "",
+                listUserGroupFalse: "",
+                listUserTimeFalse: "",
+                listUserExpFalse: "",
+                listAge: "",
+                listCaseDensity: "",
+                listLesionType: "",
+                type: dropdownObject[dropdownValue],
+                lesionSide: "",
+                lesionSite: "",
+                lesionSize: ""
+            });
+        }
     }
     const checkUser = userFilter.filter(
         (obj) => objRowData[0]["user_id"] === obj["user_id"]
@@ -6835,6 +7000,52 @@ function calcTruePercentofAnyCase(objRowData, objDapAn, dropdownValue) {
                     checkUser[0]["Số giờ"] + ",";
                 listCaseIdbyTestId[currentIndex]["listUserExpFalse"] +=
                     checkUser[0]["Số năm kinh nghiệm"] + ",";
+            }
+
+            if (caseDensityArrayValue.length > 0) {
+                if (calcNormal(objRowData, objDapAn, caseDensityArrayValue) == true) {
+                    listCaseIdbyTestId[currentIndex]["totalUserTruthCaseLess"]++;
+                    listCaseIdbyTestId[currentIndex]["percentCaseLess"] =
+                        (
+                            (listCaseIdbyTestId[currentIndex]["totalUserTruthCaseLess"] /
+                                listCaseIdbyTestId[currentIndex]["totalUser"]) *
+                            100
+                        ).toFixed(2) + "W";
+                    if (listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] += objDapAn[0]["Tuổi"];
+                    }
+                    listCaseIdbyTestId[currentIndex]["listUserIdTrueCaseLess"] +=
+                        objRowData[0]["user_id"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserAddressTrueCaseLess"] +=
+                        checkUser[0]["Địa chỉ"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserGroupTrueCaseLess"] +=
+                        checkUser[0]["Nhóm"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserTimeTrueCaseLess"] +=
+                        checkUser[0]["Số giờ"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserExpTrueCaseLess"] +=
+                        checkUser[0]["Số năm kinh nghiệm"] + ",";
+                } else {
+                    listCaseIdbyTestId[currentIndex]["percentCaseLess"] =
+                        (
+                            (listCaseIdbyTestId[currentIndex]["totalUserTruthCaseLess"] /
+                                listCaseIdbyTestId[currentIndex]["totalUser"]) *
+                            100
+                        ).toFixed(2) + "W";
+                    if (listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] +=
+                            objDapAn[0]["Tuổi"] + ",";
+                    }
+                    listCaseIdbyTestId[currentIndex]["listUserIdFalseCaseLess"] +=
+                        objRowData[0]["user_id"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserAddressFalseCaseLess"] +=
+                        checkUser[0]["Địa chỉ"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserGroupFalseCaseLess"] +=
+                        checkUser[0]["Nhóm"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserTimeFalseCaseLess"] +=
+                        checkUser[0]["Số giờ"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserExpFalseCaseLess"] +=
+                        checkUser[0]["Số năm kinh nghiệm"] + ",";
+                }
             }
             break;
         case "2":
@@ -6930,6 +7141,99 @@ function calcTruePercentofAnyCase(objRowData, objDapAn, dropdownValue) {
                 listCaseIdbyTestId[currentIndex]["listUserExpFalse"] +=
                     checkUser[0]["Số năm kinh nghiệm"] + ",";
             }
+
+            if (caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) {
+                if (calcAbNormal(objRowData, objDapAn, caseDensityArrayValue, lessionTypeArrayValue) == true) {
+                    listCaseIdbyTestId[currentIndex]["totalUserTruthCaseLess"]++;
+                    listCaseIdbyTestId[currentIndex]["percentCaseLess"] =
+                        (
+                            (listCaseIdbyTestId[currentIndex]["totalUserTruthCaseLess"] /
+                                listCaseIdbyTestId[currentIndex]["totalUser"]) *
+                            100
+                        ).toFixed(2) + "W";
+                    if (listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] +=
+                            objDapAn[0]["Tuổi"] + ",";
+                    }
+                    if (listCaseIdbyTestId[currentIndex]["listCaseDensityCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["listCaseDensityCaseLess"] +=
+                            objDapAn[0]["Case density"] + ",";
+                    }
+                    if (listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] +=
+                            objDapAn[0]["Lesion type"] + ",";
+                    }
+
+                    if (listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] +=
+                            objDapAn[0]["Lesion side"] + ",";
+                    }
+
+                    if (listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] +=
+                            objDapAn[0]["Lesion site"] + ",";
+                    }
+
+                    if (listCaseIdbyTestId[currentIndex]["lesionSizCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["lesionSizeCaseLess"] +=
+                            objDapAn[0]["Lesion size (mm)"] + ",";
+                    }
+
+                    listCaseIdbyTestId[currentIndex]["listUserIdTrueCaseLess"] +=
+                        objRowData[0]["user_id"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserAddressTrueCaseLess"] +=
+                        checkUser[0]["Địa chỉ"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserGroupTrueCaseLess"] +=
+                        checkUser[0]["Nhóm"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserTimeTrueCaseLess"] +=
+                        checkUser[0]["Số giờ"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserExpTrueCaseLess"] +=
+                        checkUser[0]["Số năm kinh nghiệm"] + ",";
+                } else {
+                    listCaseIdbyTestId[currentIndex]["percentCaseLess"] =
+                        (
+                            (listCaseIdbyTestId[currentIndex]["totalUserTruthCaseLess"] /
+                                listCaseIdbyTestId[currentIndex]["totalUser"]) *
+                            100
+                        ).toFixed(2) + "W";
+                    if (listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] +=
+                            objDapAn[0]["Tuổi"] + ",";
+                    }
+                    if (listCaseIdbyTestId[currentIndex]["listCaseDensity"] === "") {
+                        listCaseIdbyTestId[currentIndex]["listCaseDensity"] +=
+                            objDapAn[0]["Case density"] + ",";
+                    }
+                    if (listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] +=
+                            objDapAn[0]["Lesion type"] + ",";
+                    }
+                    if (listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] +=
+                            objDapAn[0]["Lesion side"] + ",";
+                    }
+
+                    if (listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] +=
+                            objDapAn[0]["Lesion site"] + ",";
+                    }
+
+                    if (listCaseIdbyTestId[currentIndex]["lesionSizeCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["lesionSizeCaseLess"] +=
+                            objDapAn[0]["Lesion size (mm)"] + ",";
+                    }
+                    listCaseIdbyTestId[currentIndex]["listUserIdFalseCaseLess"] +=
+                        objRowData[0]["user_id"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserAddressFalseCaseLess"] +=
+                        checkUser[0]["Địa chỉ"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserGroupFalseCaseLess"] +=
+                        checkUser[0]["Nhóm"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserTimeFalseCaseLess"] +=
+                        checkUser[0]["Số giờ"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserExpFalseCaseLess"] +=
+                        checkUser[0]["Số năm kinh nghiệm"] + ",";
+                }
+            }
             break;
         case "5":
             if (calcReCall(objRowData, objDapAn) == true) {
@@ -7024,6 +7328,99 @@ function calcTruePercentofAnyCase(objRowData, objDapAn, dropdownValue) {
                 listCaseIdbyTestId[currentIndex]["listUserExpFalse"] +=
                     checkUser[0]["Số năm kinh nghiệm"] + ",";
             }
+
+            if (caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) {
+                if (calcReCall(objRowData, objDapAn, caseDensityArrayValue, lessionTypeArrayValue) == true) {
+                    listCaseIdbyTestId[currentIndex]["totalUserTruthCaseLess"]++;
+                    listCaseIdbyTestId[currentIndex]["percentCaseLess"] =
+                        (
+                            (listCaseIdbyTestId[currentIndex]["totalUserTruthCaseLess"] /
+                                listCaseIdbyTestId[currentIndex]["totalUser"]) *
+                            100
+                        ).toFixed(2) + "W";
+                    if (listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] +=
+                            objDapAn[0]["Tuổi"] + ",";
+                    }
+                    if (listCaseIdbyTestId[currentIndex]["listCaseDensityCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["listCaseDensityCaseLess"] +=
+                            objDapAn[0]["Case density"] + ",";
+                    }
+                    if (listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] +=
+                            objDapAn[0]["Lesion type"] + ",";
+                    }
+
+                    if (listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] +=
+                            objDapAn[0]["Lesion side"] + ",";
+                    }
+
+                    if (listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] +=
+                            objDapAn[0]["Lesion site"] + ",";
+                    }
+
+                    if (listCaseIdbyTestId[currentIndex]["lesionSizeCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["lesionSizeCaseLess"] +=
+                            objDapAn[0]["Lesion size (mm)"] + ",";
+                    }
+
+                    listCaseIdbyTestId[currentIndex]["listUserIdTrueCaseLess"] +=
+                        objRowData[0]["user_id"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserAddressTrueCaseLess"] +=
+                        checkUser[0]["Địa chỉ"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserGroupTrueCaseLess"] +=
+                        checkUser[0]["Nhóm"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserTimeTrueCaseLess"] +=
+                        checkUser[0]["Số giờ"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserExpTrueCaseLess"] +=
+                        checkUser[0]["Số năm kinh nghiệm"] + ",";
+                } else {
+                    listCaseIdbyTestId[currentIndex]["percentCaseLess"] =
+                        (
+                            (listCaseIdbyTestId[currentIndex]["totalUserTruthCaseLess"] /
+                                listCaseIdbyTestId[currentIndex]["totalUser"]) *
+                            100
+                        ).toFixed(2) + "W";
+                    if (listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] +=
+                            objDapAn[0]["Tuổi"] + ",";
+                    }
+                    if (listCaseIdbyTestId[currentIndex]["listCaseDensityCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["listCaseDensityCaseLess"] +=
+                            objDapAn[0]["Case density"] + ",";
+                    }
+                    if (listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] +=
+                            objDapAn[0]["Lesion type"] + ",";
+                    }
+                    if (listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] +=
+                            objDapAn[0]["Lesion side"] + ",";
+                    }
+
+                    if (listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] +=
+                            objDapAn[0]["Lesion site"] + ",";
+                    }
+
+                    if (listCaseIdbyTestId[currentIndex]["lesionSizeCaseLess"] === "") {
+                        listCaseIdbyTestId[currentIndex]["lesionSizeCaseLess"] +=
+                            objDapAn[0]["Lesion size (mm)"] + ",";
+                    }
+                    listCaseIdbyTestId[currentIndex]["listUserIdFalseCaseLess"] +=
+                        objRowData[0]["user_id"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserAddressFalseCaseLess"] +=
+                        checkUser[0]["Địa chỉ"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserGroupFalseCaseLess"] +=
+                        checkUser[0]["Nhóm"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserTimeFalseCaseLess"] +=
+                        checkUser[0]["Số giờ"] + ",";
+                    listCaseIdbyTestId[currentIndex]["listUserExpFalseCaseLess"] +=
+                        checkUser[0]["Số năm kinh nghiệm"] + ",";
+                }
+            }
             break;
     }
 }
@@ -7045,38 +7442,91 @@ function calcTruePercentofAnyLesionDX(objRowData, objDapAn) {
         obj.type === "Symmetric"
     );
     if (objIndex == -1) {
-        listCaseIdbyTestId.push({
-            testId: objRowData[0]["test_id"],
-            caseId: objRowData[0]["case_id"] +
-                " - " +
-                objRowData[0]["lesionID"] +
-                " - " +
-                objDapAn[0]["Truth Order"],
-            lesionId: objRowData[0]["lesionID"],
-            truthX: objDapAn[0]["TruthX"],
-            truthY: objDapAn[0]["TruthY"],
-            truthOrder: objDapAn[0]["Truth Order"],
-            totalUserTruth: 0,
-            totalUser: 0,
-            percent: "",
-            listUserIdTrue: "",
-            listUserAddressTrue: "",
-            listUserGroupTrue: "",
-            listUserTimeTrue: "",
-            listUserExpTrue: "",
-            listUserIdFalse: "",
-            listUserAddressFalse: "",
-            listUserGroupFalse: "",
-            listUserTimeFalse: "",
-            listUserExpFalse: "",
-            listAge: "",
-            listCaseDensity: "",
-            listLesionType: "",
-            type: "Symmetric",
-            lesionSide: "",
-            lesionSite: "",
-            lesionSize: "",
-        });
+        if (caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) {
+            listCaseIdbyTestId.push({
+                testId: objRowData[0]["test_id"],
+                caseId: objRowData[0]["case_id"] +
+                    " - " +
+                    objRowData[0]["lesionID"] +
+                    " - " +
+                    objDapAn[0]["Truth Order"],
+                lesionId: objRowData[0]["lesionID"],
+                truthX: objDapAn[0]["TruthX"],
+                truthY: objDapAn[0]["TruthY"],
+                truthOrder: objDapAn[0]["Truth Order"],
+                totalUserTruth: 0,
+                totalUserTruthCaseLess: 0,
+                totalUser: 0,
+                percent: "",
+                percentCaseLess: "",
+                listUserIdTrue: "",
+                listUserIdTrueCaseLess: "",
+                listUserAddressTrue: "",
+                listUserAddressTrueCaseLess: "",
+                listUserGroupTrue: "",
+                listUserGroupTrueCaseLess: "",
+                listUserTimeTrue: "",
+                listUserTimeTrueCaseLess: "",
+                listUserExpTrue: "",
+                listUserExpTrueCaseLess: "",
+                listUserIdFalse: "",
+                listUserIdFalseCaseLess: "",
+                listUserAddressFalse: "",
+                listUserAddressFalseCaseLess: "",
+                listUserGroupFalse: "",
+                listUserGroupFalseCaseLess: "",
+                listUserTimeFalse: "",
+                listUserTimeFalseCaseLess: "",
+                listUserExpFalse: "",
+                listUserExpFalseCaseLess: "",
+                listAge: "",
+                listAgeCaseLess: "",
+                listCaseDensity: "",
+                listCaseDensityCaseLess: "",
+                listLesionType: "",
+                listLesionTypeCaseLess: "",
+                type: "Symmetric",
+                lesionSide: "",
+                lesionSideCaseLess: "",
+                lesionSite: "",
+                lesionSiteCaseLess: "",
+                lesionSize: "",
+                lesionSizeCaseLess: ""
+            });
+        } else {
+            listCaseIdbyTestId.push({
+                testId: objRowData[0]["test_id"],
+                caseId: objRowData[0]["case_id"] +
+                    " - " +
+                    objRowData[0]["lesionID"] +
+                    " - " +
+                    objDapAn[0]["Truth Order"],
+                lesionId: objRowData[0]["lesionID"],
+                truthX: objDapAn[0]["TruthX"],
+                truthY: objDapAn[0]["TruthY"],
+                truthOrder: objDapAn[0]["Truth Order"],
+                totalUserTruth: 0,
+                totalUser: 0,
+                percent: "",
+                listUserIdTrue: "",
+                listUserAddressTrue: "",
+                listUserGroupTrue: "",
+                listUserTimeTrue: "",
+                listUserExpTrue: "",
+                listUserIdFalse: "",
+                listUserAddressFalse: "",
+                listUserGroupFalse: "",
+                listUserTimeFalse: "",
+                listUserExpFalse: "",
+                listAge: "",
+                listCaseDensity: "",
+                listLesionType: "",
+                type: "Symmetric",
+                lesionSide: "",
+                lesionSite: "",
+                lesionSize: "",
+            });
+        }
     }
     // const checkUser = userFilter
     //     .filter(obj => objRowData[0]["user_id"] === obj["user_id"])
@@ -7090,10 +7540,7 @@ function calcTruePercentofAnyLesionDX(objRowData, objDapAn) {
         obj.type === "Symmetric"
     );
 
-    let symmetric = calcSymmetric(objRowData, objDapAn);
-    if (symmetric[3].length != 0) {}
-    let listSysTrue = symmetric[2];
-    let listSysFalse = symmetric[3];
+    let symmetric = calcSymmetric(objRowData, objDapAn, caseDensityArrayValue, lessionTypeArrayValue);
 
     if (symmetric[0] > 0) {
         listCaseIdbyTestId[currentIndex]["totalUserTruth"] += 1;
@@ -7171,14 +7618,74 @@ function calcTruePercentofAnyLesionDX(objRowData, objDapAn) {
         }
     }
 
+    if ((caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) && symmetric[9] === null) {
+        if (listCaseIdbyTestId[currentIndex]["listCaseDensityCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["listCaseDensityCaseLess"] +=
+                symmetric[10] === null ? "" : symmetric[10]["Case density"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] +=
+                symmetric[10] === null ? "" : symmetric[10]["Lesion type"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] +=
+                symmetric[10] === null ? "" : symmetric[10]["Tuổi"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] +=
+                symmetric[10] === null ? "" : symmetric[10]["Lesion side"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] +=
+                symmetric[10] === null ? "" : symmetric[10]["Lesion site"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["lesionSizeCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["lesionSizeCaseLess"] +=
+                symmetric[10] === null ? "" : symmetric[10]["Lesion size (mm)"] + ",";
+        }
+    } else if ((caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) && symmetric[10] === null) {
+        if (listCaseIdbyTestId[currentIndex]["listCaseDensityCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["listCaseDensityCaseLess"] +=
+                symmetric[9] === null ? "" : symmetric[9]["Case density"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] +=
+                symmetric[9] === null ? "" : symmetric[9]["Lesion type"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] +=
+                symmetric[9] === null ? "" : symmetric[9]["Tuổi"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] +=
+                symmetric[9] === null ? "" : symmetric[9]["Lesion side"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] +=
+                symmetric[9] === null ? "" : symmetric[9]["Lesion site"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["lesionSizeCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["lesionSizeCaseLess"] +=
+                symmetric[9] === null ? "" : symmetric[9]["Lesion size (mm)"] + ",";
+        }
+    }
+
     listCaseIdbyTestId[currentIndex]["listUserIdTrue"] +=
         symmetric[2].length === 0 ? "" : symmetric[2][0]["user"] + ",";
-
     if (symmetric[3][0].arrayFalse.length !== 0) {
         listCaseIdbyTestId[currentIndex]["listUserIdFalse"] +=
             symmetric[3].length === 0 ? "" : symmetric[3][0]["user"] + ",";
     }
-
     listCaseIdbyTestId[currentIndex]["listUserAddressTrue"] +=
         symmetric[2].length === 0 ?
         "" :
@@ -7203,7 +7710,6 @@ function calcTruePercentofAnyLesionDX(objRowData, objDapAn) {
         userFilter.filter(
             (obj) => symmetric[2][0]["user"] === obj["user_id"]
         )[0]["Số năm kinh nghiệm"] + ",";
-
     if (symmetric[3][0].arrayFalse.length !== 0) {
         listCaseIdbyTestId[currentIndex]["listUserAddressFalse"] +=
             symmetric[3].length === 0 ?
@@ -7235,6 +7741,82 @@ function calcTruePercentofAnyLesionDX(objRowData, objDapAn) {
             userFilter.filter(
                 (obj) => symmetric[3][0]["user"] === obj["user_id"]
             )[0]["Số năm kinh nghiệm"] + ",";
+    }
+
+    if (caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) {
+        listCaseIdbyTestId[currentIndex]["percentCaseLess"] =
+            (
+                (listCaseIdbyTestId[currentIndex]["totalUserTruthCaseLess"] /
+                    listCaseIdbyTestId[currentIndex]["totalUser"]) *
+                100
+            ).toFixed(2) + "W";
+
+        if (symmetric[6] > 0) {
+            listCaseIdbyTestId[currentIndex]["totalUserTruthCaseLess"] += 1;
+        }
+
+        listCaseIdbyTestId[currentIndex]["listUserIdTrueCaseLess"] +=
+            symmetric[7].length === 0 ? "" : symmetric[7][0]["user"] + ",";
+
+        if (symmetric[8].length > 0 && symmetric[8][0].arrayFalse.length !== 0) {
+            listCaseIdbyTestId[currentIndex]["listUserIdFalseCaseLess"] += symmetric[8][0]["user"] + ",";
+        }
+
+        listCaseIdbyTestId[currentIndex]["listUserAddressTrueCaseLess"] +=
+            symmetric[7].length === 0 ?
+            "" :
+            userFilter.filter(
+                (obj) => symmetric[7][0]["user"] === obj["user_id"]
+            )[0]["Địa chỉ"] + ",";
+
+        listCaseIdbyTestId[currentIndex]["listUserGroupTrueCaseLess"] +=
+            symmetric[7].length === 0 ?
+            "" :
+            userFilter.filter(
+                (obj) => symmetric[7][0]["user"] === obj["user_id"]
+            )[0]["Nhóm"] + ",";
+
+        listCaseIdbyTestId[currentIndex]["listUserTimeTrueCaseLess"] +=
+            symmetric[7].length === 0 ?
+            "" :
+            userFilter.filter(
+                (obj) => symmetric[7][0]["user"] === obj["user_id"]
+            )[0]["Số giờ"] + ",";
+
+        listCaseIdbyTestId[currentIndex]["listUserExpTrueCaseLess"] +=
+            symmetric[7].length === 0 ?
+            "" :
+            userFilter.filter(
+                (obj) => symmetric[7][0]["user"] === obj["user_id"]
+            )[0]["Số năm kinh nghiệm"] + ",";
+
+        if (symmetric[8].length > 0 && symmetric[8][0].arrayFalse.length !== 0) {
+            listCaseIdbyTestId[currentIndex]["listUserAddressFalseCaseLess"] +=
+                userFilter.filter(
+                    (obj) => symmetric[8][0]["user"] === obj["user_id"]
+                )[0]["Địa chỉ"] + ",";
+        }
+
+        if (symmetric[8].length > 0 && symmetric[8][0].arrayFalse.length !== 0) {
+            listCaseIdbyTestId[currentIndex]["listUserGroupFalseCaseLess"] +=
+                userFilter.filter(
+                    (obj) => symmetric[8][0]["user"] === obj["user_id"]
+                )[0]["Nhóm"] + ",";
+        }
+
+        if (symmetric[8].length > 0 && symmetric[8][0].arrayFalse.length !== 0) {
+            listCaseIdbyTestId[currentIndex]["listUserTimeFalseCaseLess"] +=
+                userFilter.filter(
+                    (obj) => symmetric[8][0]["user"] === obj["user_id"]
+                )[0]["Số giờ"] + ",";
+        }
+
+        if (symmetric[8].length > 0 && symmetric[8][0].arrayFalse.length !== 0) {
+            listCaseIdbyTestId[currentIndex]["listUserExpFalseCaseLess"] +=
+                userFilter.filter(
+                    (obj) => symmetric[8][0]["user"] === obj["user_id"]
+                )[0]["Số năm kinh nghiệm"] + ",";
+        }
     }
 }
 
@@ -7253,34 +7835,83 @@ function calcTruePercentofAnyLesionKDX(objRowData, objDapAn) {
         obj.type === "NonSymmetric"
     );
     if (objIndex == -1) {
-        listCaseIdbyTestId.push({
-            testId: objRowData[0]["test_id"],
-            caseId: objRowData[0]["case_id"] + " - " + objRowData[0]["lesionID"],
-            lesionId: objRowData[0]["lesionID"],
-            truthX: null,
-            truthY: null,
-            truthOrder: null,
-            totalUserTruth: 0,
-            totalUser: 0,
-            percent: "",
-            listUserIdTrue: "",
-            listUserAddressTrue: "",
-            listUserGroupTrue: "",
-            listUserTimeTrue: "",
-            listUserExpTrue: "",
-            listUserIdFalse: "",
-            listUserAddressFalse: "",
-            listUserGroupFalse: "",
-            listUserTimeFalse: "",
-            listUserExpFalse: "",
-            listAge: "",
-            listCaseDensity: "",
-            listLesionType: "",
-            type: "NonSymmetric",
-            lesionSide: "",
-            lesionSite: "",
-            lesionSize: "",
-        });
+        if (caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) {
+            listCaseIdbyTestId.push({
+                testId: objRowData[0]["test_id"],
+                caseId: objRowData[0]["case_id"] + " - " + objRowData[0]["lesionID"],
+                lesionId: objRowData[0]["lesionID"],
+                truthX: null,
+                truthY: null,
+                truthOrder: null,
+                totalUserTruth: 0,
+                totalUserTruthCaseLess: 0,
+                totalUser: 0,
+                percent: "",
+                percentCaseLess: "",
+                listUserIdTrue: "",
+                listUserIdTrueCaseLess: "",
+                listUserAddressTrue: "",
+                listUserAddressTrueCaseLess: "",
+                listUserGroupTrue: "",
+                listUserGroupTrueCaseLess: "",
+                listUserTimeTrue: "",
+                listUserTimeTrueCaseLess: "",
+                listUserExpTrue: "",
+                listUserExpTrueCaseLess: "",
+                listUserIdFalse: "",
+                listUserIdFalseCaseLess: "",
+                listUserAddressFalse: "",
+                listUserAddressFalseCaseLess: "",
+                listUserGroupFalse: "",
+                listUserGroupFalseCaseLess: "",
+                listUserTimeFalse: "",
+                listUserTimeFalseCaseLess: "",
+                listUserExpFalse: "",
+                listUserExpFalseCaseLess: "",
+                listAge: "",
+                listAgeCaseLess: "",
+                listCaseDensity: "",
+                listCaseDensityCaseLess: "",
+                listLesionType: "",
+                listLesionTypeCaseLess: "",
+                type: "NonSymmetric",
+                lesionSide: "",
+                lesionSideCaseLess: "",
+                lesionSite: "",
+                lesionSiteCaseLess: "",
+                lesionSize: "",
+                lesionSizeCaseLess: ""
+            });
+        } else {
+            listCaseIdbyTestId.push({
+                testId: objRowData[0]["test_id"],
+                caseId: objRowData[0]["case_id"] + " - " + objRowData[0]["lesionID"],
+                lesionId: objRowData[0]["lesionID"],
+                truthX: null,
+                truthY: null,
+                truthOrder: null,
+                totalUserTruth: 0,
+                totalUser: 0,
+                percent: "",
+                listUserIdTrue: "",
+                listUserAddressTrue: "",
+                listUserGroupTrue: "",
+                listUserTimeTrue: "",
+                listUserExpTrue: "",
+                listUserIdFalse: "",
+                listUserAddressFalse: "",
+                listUserGroupFalse: "",
+                listUserTimeFalse: "",
+                listUserExpFalse: "",
+                listAge: "",
+                listCaseDensity: "",
+                listLesionType: "",
+                type: "NonSymmetric",
+                lesionSide: "",
+                lesionSite: "",
+                lesionSize: "",
+            });
+        }
     }
     // const checkUser = userFilter
     //     .filter(obj => objRowData[0]["user_id"] === obj["user_id"])
@@ -7293,8 +7924,6 @@ function calcTruePercentofAnyLesionKDX(objRowData, objDapAn) {
     );
 
     let symmetric = calcNonSymmetric(objRowData, objDapAn);
-    let listSysTrue = symmetric[2];
-    let listSysFalse = symmetric[3];
 
     if (symmetric[0] > 0) {
         listCaseIdbyTestId[currentIndex]["totalUserTruth"] += 1;
@@ -7371,18 +8000,74 @@ function calcTruePercentofAnyLesionKDX(objRowData, objDapAn) {
         }
     }
 
+    if ((caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) && symmetric[9] === null) {
+        if (listCaseIdbyTestId[currentIndex]["listCaseDensityCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["listCaseDensityCaseLess"] +=
+                symmetric[10] === null ? "" : symmetric[10]["Case density"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] +=
+                symmetric[10] === null ? "" : symmetric[10]["Lesion type"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] +=
+                symmetric[10] === null ? "" : symmetric[10]["Tuổi"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] +=
+                symmetric[10] === null ? "" : symmetric[10]["Lesion side"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] +=
+                symmetric[10] === null ? "" : symmetric[10]["Lesion site"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["lesionSizeCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["lesionSizeCaseLess"] +=
+                symmetric[10] === null ? "" : symmetric[10]["Lesion size (mm)"] + ",";
+        }
+    } else if ((caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) && symmetric[10] === null) {
+        if (listCaseIdbyTestId[currentIndex]["listCaseDensityCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["listCaseDensityCaseLess"] +=
+                symmetric[9] === null ? "" : symmetric[9]["Case density"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["listLesionTypeCaseLess"] +=
+                symmetric[9] === null ? "" : symmetric[9]["Lesion type"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["listAgeCaseLess"] +=
+                symmetric[9] === null ? "" : symmetric[9]["Tuổi"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["lesionSideCaseLess"] +=
+                symmetric[9] === null ? "" : symmetric[9]["Lesion side"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["lesionSiteCaseLess"] +=
+                symmetric[9] === null ? "" : symmetric[9]["Lesion site"] + ",";
+        }
+
+        if (listCaseIdbyTestId[currentIndex]["lesionSizeCaseLess"] === "") {
+            listCaseIdbyTestId[currentIndex]["lesionSizeCaseLess"] +=
+                symmetric[9] === null ? "" : symmetric[9]["Lesion size (mm)"] + ",";
+        }
+    }
+
     listCaseIdbyTestId[currentIndex]["listUserIdTrue"] +=
         symmetric[2].length == 0 ? "" : symmetric[2][0]["user"] + ",";
     if (symmetric[3][0].arrayFalse.length !== 0) {
         listCaseIdbyTestId[currentIndex]["listUserIdFalse"] +=
             symmetric[3].length == 0 ? "" : symmetric[3][0]["user"] + ",";
     }
-    // listCaseIdbyTestId[currentIndex]["listUserIdTrue"] += (symmetric[2].length === 0) ? '' : symmetric[2][0]["user_id"] + ",";
-
-    // if (symmetric[3][0].arrayFalse.length !== 0) {
-    //     listCaseIdbyTestId[currentIndex]["listUserIdFalse"] += (symmetric[3].length === 0) ? '' : symmetric[3][0]["user_id"] + ",";
-    // }
-
     listCaseIdbyTestId[currentIndex]["listUserAddressTrue"] +=
         symmetric[2].length == 0 ?
         "" :
@@ -7439,6 +8124,82 @@ function calcTruePercentofAnyLesionKDX(objRowData, objDapAn) {
             userFilter.filter(
                 (obj) => symmetric[3][0]["user"] === obj["user_id"]
             )[0]["Số năm kinh nghiệm"] + ",";
+    }
+
+    if (caseDensityArrayValue.length > 0 || lessionTypeArrayValue.length > 0) {
+        listCaseIdbyTestId[currentIndex]["percentCaseLess"] =
+            (
+                (listCaseIdbyTestId[currentIndex]["totalUserTruthCaseLess"] /
+                    listCaseIdbyTestId[currentIndex]["totalUser"]) *
+                100
+            ).toFixed(2) + "W";
+
+        if (symmetric[6] > 0) {
+            listCaseIdbyTestId[currentIndex]["totalUserTruthCaseLess"] += 1;
+        }
+
+        listCaseIdbyTestId[currentIndex]["listUserIdTrueCaseLess"] +=
+            symmetric[7].length === 0 ? "" : symmetric[7][0]["user"] + ",";
+
+        if (symmetric[8].length > 0 && symmetric[8][0].arrayFalse.length !== 0) {
+            listCaseIdbyTestId[currentIndex]["listUserIdFalseCaseLess"] += symmetric[8][0]["user"] + ",";
+        }
+
+        listCaseIdbyTestId[currentIndex]["listUserAddressTrueCaseLess"] +=
+            symmetric[7].length === 0 ?
+            "" :
+            userFilter.filter(
+                (obj) => symmetric[7][0]["user"] === obj["user_id"]
+            )[0]["Địa chỉ"] + ",";
+
+        listCaseIdbyTestId[currentIndex]["listUserGroupTrueCaseLess"] +=
+            symmetric[7].length === 0 ?
+            "" :
+            userFilter.filter(
+                (obj) => symmetric[7][0]["user"] === obj["user_id"]
+            )[0]["Nhóm"] + ",";
+
+        listCaseIdbyTestId[currentIndex]["listUserTimeTrueCaseLess"] +=
+            symmetric[7].length === 0 ?
+            "" :
+            userFilter.filter(
+                (obj) => symmetric[7][0]["user"] === obj["user_id"]
+            )[0]["Số giờ"] + ",";
+
+        listCaseIdbyTestId[currentIndex]["listUserExpTrueCaseLess"] +=
+            symmetric[7].length === 0 ?
+            "" :
+            userFilter.filter(
+                (obj) => symmetric[7][0]["user"] === obj["user_id"]
+            )[0]["Số năm kinh nghiệm"] + ",";
+
+        if (symmetric[8].length > 0 && symmetric[8][0].arrayFalse.length !== 0) {
+            listCaseIdbyTestId[currentIndex]["listUserAddressFalseCaseLess"] +=
+                userFilter.filter(
+                    (obj) => symmetric[8][0]["user"] === obj["user_id"]
+                )[0]["Địa chỉ"] + ",";
+        }
+
+        if (symmetric[8].length > 0 && symmetric[8][0].arrayFalse.length !== 0) {
+            listCaseIdbyTestId[currentIndex]["listUserGroupFalseCaseLess"] +=
+                userFilter.filter(
+                    (obj) => symmetric[8][0]["user"] === obj["user_id"]
+                )[0]["Nhóm"] + ",";
+        }
+
+        if (symmetric[8].length > 0 && symmetric[8][0].arrayFalse.length !== 0) {
+            listCaseIdbyTestId[currentIndex]["listUserTimeFalseCaseLess"] +=
+                userFilter.filter(
+                    (obj) => symmetric[8][0]["user"] === obj["user_id"]
+                )[0]["Số giờ"] + ",";
+        }
+
+        if (symmetric[8].length > 0 && symmetric[8][0].arrayFalse.length !== 0) {
+            listCaseIdbyTestId[currentIndex]["listUserExpFalseCaseLess"] +=
+                userFilter.filter(
+                    (obj) => symmetric[8][0]["user"] === obj["user_id"]
+                )[0]["Số năm kinh nghiệm"] + ",";
+        }
     }
 }
 
